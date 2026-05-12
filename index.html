@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLACKSITE EGRESS</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <canvas id="game" width="1280" height="720" aria-label="BLACKSITE EGRESS tactical top-down shooter"></canvas>
+
+    <section class="hud hud-left" aria-label="mission status">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <div>
+          <strong>BLACKSITE EGRESS</strong>
+          <small>Signal lost / sector B-17</small>
+        </div>
+      </div>
+      <div class="meters">
+        <label><span>Health</span><b id="healthText">100</b></label>
+        <div class="bar"><i id="healthBar"></i></div>
+        <label><span>Battery</span><b id="batteryText">100</b></label>
+        <div class="bar battery"><i id="batteryBar"></i></div>
+        <label><span>Noise</span><b id="noiseText">low</b></label>
+        <div class="bar sound"><i id="noiseBar"></i></div>
+      </div>
+      <div class="objective" id="objectiveText">Find the access card, restore power, reach extraction.</div>
+    </section>
+
+    <section class="hud hud-right" aria-label="equipment">
+      <div class="ammo"><span id="ammoText">12 / 36</span><small>9mm suppressed</small></div>
+      <div class="tools">
+        <div><kbd>F</kbd><span id="interactHint">Interact</span></div>
+        <div><kbd>E</kbd><span>Medkit</span></div>
+        <div><kbd>Q</kbd><span>Motion sensor</span></div>
+        <div><kbd>Tab</kbd><span>Inventory</span></div>
+      </div>
+      <div class="log" id="radioLog"></div>
+    </section>
+
+    <section class="overlay start" id="startOverlay">
+      <div class="briefing">
+        <p class="eyebrow">Playable tactical prototype</p>
+        <h1>BLACKSITE EGRESS</h1>
+        <p>
+          Sweep a derelict underground facility with limited visibility, scarce supplies,
+          reactive enemies, locked sectors, and multiple extraction routes.
+        </p>
+        <button id="startButton">Begin Operation</button>
+        <div class="keygrid" aria-label="default controls">
+          <span>WASD move</span><span>Mouse aim</span><span>LMB fire</span><span>RMB focus</span>
+          <span>R reload</span><span>F interact</span><span>E medkit</span><span>Q sensor</span>
+          <span>Shift sprint</span><span>Ctrl crouch</span><span>Space vault</span><span>Tab inventory</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="overlay panel hidden" id="inventoryPanel">
+      <div class="sheet">
+        <header>
+          <h2>Loadout / Keybinds</h2>
+          <button id="closeInventory" aria-label="Close inventory">x</button>
+        </header>
+        <div class="columns">
+          <div>
+            <h3>Equipment</h3>
+            <ul id="equipmentList"></ul>
+          </div>
+          <div>
+            <h3>Rebind Controls</h3>
+            <div class="binds" id="bindList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

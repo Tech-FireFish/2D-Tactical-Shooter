@@ -1,0 +1,10 @@
+{
+  "name": "blacksite-egress",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dark tactical 2D top-down shooter prototype built with HTML, CSS, and JavaScript.",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check game.js"
+  }
+}
