@@ -6,6 +6,9 @@ const ui = {
   startButton: document.getElementById("startButton"),
   inventory: document.getElementById("inventoryPanel"),
   closeInventory: document.getElementById("closeInventory"),
+  openSettings: document.getElementById("openSettings"),
+  settings: document.getElementById("settingsPanel"),
+  closeSettings: document.getElementById("closeSettings"),
   healthText: document.getElementById("healthText"),
   healthBar: document.getElementById("healthBar"),
   batteryText: document.getElementById("batteryText"),
@@ -17,7 +20,10 @@ const ui = {
   interactHint: document.getElementById("interactHint"),
   radioLog: document.getElementById("radioLog"),
   equipmentList: document.getElementById("equipmentList"),
-  bindList: document.getElementById("bindList")
+  bindList: document.getElementById("bindList"),
+  settingsList: document.getElementById("settingsList"),
+  assistList: document.getElementById("assistList"),
+  presetList: document.getElementById("presetList")
 };
 
 const TAU = Math.PI * 2;
@@ -38,7 +44,8 @@ const defaultBinds = {
   sprint: "ShiftLeft",
   crouch: "ControlLeft",
   inventory: "Tab",
-  dodge: "Space"
+  dodge: "Space",
+  settings: "KeyO"
 };
 
 const bindLabels = {
@@ -53,10 +60,64 @@ const bindLabels = {
   sprint: "Sprint",
   crouch: "Crouch",
   inventory: "Inventory",
-  dodge: "Dodge / vault"
+  dodge: "Dodge / vault",
+  settings: "Lighting settings"
 };
 
-const binds = JSON.parse(localStorage.getItem("blacksite-binds") || "null") || { ...defaultBinds };
+function readStoredJson(key, fallback) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "null") || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+const binds = { ...defaultBinds, ...readStoredJson("blacksite-binds", {}) };
+const defaultSettings = {
+  brightness: 100,
+  gamma: 105,
+  shadowQuality: "high",
+  fogDensity: 70,
+  contrast: 112,
+  bloomIntensity: 55,
+  flashlightIntensity: 100,
+  flashlightRange: 100,
+  ambientStrength: 28,
+  outlineVisibility: true,
+  interactableGlow: true,
+  enemySilhouettes: false,
+  reducedShadowOpacity: false,
+  wideBeam: false
+};
+const settings = { ...defaultSettings, ...readStoredJson("blacksite-lighting-settings", {}) };
+const presets = {
+  "Realistic Darkness": {
+    brightness: 82, gamma: 96, fogDensity: 82, contrast: 122, bloomIntensity: 42,
+    flashlightIntensity: 94, flashlightRange: 92, ambientStrength: 12,
+    outlineVisibility: false, interactableGlow: false, enemySilhouettes: false,
+    reducedShadowOpacity: false, wideBeam: false, shadowQuality: "high"
+  },
+  "Balanced Tactical": { ...defaultSettings },
+  "Exploration Mode": {
+    brightness: 130, gamma: 120, fogDensity: 48, contrast: 106, bloomIntensity: 64,
+    flashlightIntensity: 118, flashlightRange: 130, ambientStrength: 48,
+    outlineVisibility: true, interactableGlow: true, enemySilhouettes: false,
+    reducedShadowOpacity: true, wideBeam: true, shadowQuality: "medium"
+  },
+  "High Visibility": {
+    brightness: 164, gamma: 138, fogDensity: 30, contrast: 98, bloomIntensity: 38,
+    flashlightIntensity: 135, flashlightRange: 150, ambientStrength: 72,
+    outlineVisibility: true, interactableGlow: true, enemySilhouettes: true,
+    reducedShadowOpacity: true, wideBeam: true, shadowQuality: "low"
+  },
+  "Accessibility Enhanced": {
+    brightness: 185, gamma: 160, fogDensity: 18, contrast: 92, bloomIntensity: 25,
+    flashlightIntensity: 150, flashlightRange: 170, ambientStrength: 92,
+    outlineVisibility: true, interactableGlow: true, enemySilhouettes: true,
+    reducedShadowOpacity: true, wideBeam: true, shadowQuality: "low"
+  }
+};
+
 const keys = new Set();
 let waitingForBind = null;
 let mouse = { x: 0, y: 0, down: false, right: false, worldX: 0, worldY: 0 };
@@ -127,11 +188,62 @@ const equipmentNames = [
   ["Recovered intel", () => `${world.objectives.intel}/3`]
 ];
 
+const settingControls = [
+  ["brightness", "Brightness", "Ambient darkness, visibility radius, fog, and dark-area contrast.", 0, 200, 1, "%"],
+  ["gamma", "Gamma", "Raises black levels so dark scenes stay readable.", 50, 200, 1, "%"],
+  ["fogDensity", "Fog Density", "Controls how much darkness sits over distant interiors.", 0, 100, 1, "%"],
+  ["contrast", "Contrast", "Canvas contrast in dark areas.", 60, 160, 1, "%"],
+  ["bloomIntensity", "Bloom Intensity", "Glow strength from flashlights, muzzle flashes, lamps, and electronics.", 0, 120, 1, "%"],
+  ["flashlightIntensity", "Flashlight Intensity", "Light strength and battery cost.", 40, 200, 1, "%"],
+  ["flashlightRange", "Flashlight Range", "Beam reach and battery cost.", 50, 200, 1, "%"],
+  ["ambientStrength", "Ambient Light Strength", "Global minimum visibility without removing tension.", 0, 120, 1, "%"]
+];
+
+const assistControls = [
+  ["outlineVisibility", "Increase wall and object outlines"],
+  ["interactableGlow", "Edge glow on interactable items"],
+  ["enemySilhouettes", "Enemy silhouette visibility"],
+  ["reducedShadowOpacity", "Reduced shadow opacity"],
+  ["wideBeam", "Wider beam exploration mode"]
+];
+
 function resize() {
   const dpr = window.devicePixelRatio || 1;
   canvas.width = Math.floor(window.innerWidth * dpr);
   canvas.height = Math.floor(window.innerHeight * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function brightnessScale() {
+  return settings.brightness / 100;
+}
+
+function gammaScale() {
+  return settings.gamma / 100;
+}
+
+function ambientScale() {
+  return settings.ambientStrength / 100;
+}
+
+function flashlightPower() {
+  return settings.flashlightIntensity / 100;
+}
+
+function flashlightReach() {
+  return settings.flashlightRange / 100;
+}
+
+function bloomScale() {
+  return settings.bloomIntensity / 100;
+}
+
+function nearVisibilityRadius() {
+  return 62 + settings.brightness * 0.26 + settings.gamma * 0.11 + settings.ambientStrength * 0.28;
+}
+
+function beamSpread() {
+  return settings.wideBeam ? 1.34 : 1;
 }
 
 function addWall(x, y, w, h, type = "concrete") {
@@ -359,14 +471,15 @@ function lineUsesOpenDoorway(a, b, wall) {
 }
 
 function lightVisible(point) {
-  if (dist(point, player) < 64 && hasLineOfSight(player, point)) return true;
+  if (dist(point, player) < nearVisibilityRadius() && hasLineOfSight(player, point)) return true;
   const flashlightAngle = angleDiff(player.angle, angleTo(player, point));
   const focusBonus = player.focus ? 0.18 : 0;
-  const cone = player.focus ? 0.34 : 0.52;
-  const range = player.focus ? 500 : 375;
+  const cone = (player.focus ? 0.34 : 0.52) * beamSpread();
+  const range = (player.focus ? 500 : 375) * flashlightReach() * (0.82 + flashlightPower() * 0.24);
   if (Math.abs(flashlightAngle) < cone + focusBonus && dist(player, point) < range && hasLineOfSight(player, point)) return true;
   for (const light of world.lights) {
-    if (light.active && dist(light, point) < light.radius * 0.88 && hasLineOfSight(light, point)) return true;
+    const interiorBoost = 0.72 + ambientScale() * 0.38 + brightnessScale() * 0.18 + gammaScale() * 0.1;
+    if (light.active && dist(light, point) < light.radius * 0.88 * interiorBoost && hasLineOfSight(light, point)) return true;
   }
   for (const p of world.particles) {
     if (p.light && dist(p, point) < p.light && hasLineOfSight(p, point)) return true;
@@ -413,8 +526,9 @@ function update(dt) {
     player.noise = Math.max(player.noise, player.crouch ? 15 : sprinting ? 86 : 38);
   }
 
+  const lightDrain = (0.45 + flashlightPower() * 0.55 + flashlightReach() * 0.38 + (settings.wideBeam ? 0.22 : 0)) * (player.focus ? 1.45 : 0.72);
   if (sprinting) player.battery = Math.max(0, player.battery - dt * 2.2);
-  player.battery = Math.max(0, player.battery - dt * (player.focus ? 1.6 : 0.72));
+  player.battery = Math.max(0, player.battery - dt * lightDrain);
 
   if (mouse.down) fireWeapon();
 
@@ -904,7 +1018,8 @@ function drawWorld() {
     };
     ctx.fillStyle = colors[wall.type] || "#303536";
     ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
-    ctx.strokeStyle = "rgba(180,210,205,0.08)";
+    const outlineAlpha = settings.outlineVisibility ? 0.08 + settings.brightness * 0.00055 + settings.gamma * 0.00035 : 0.04;
+    ctx.strokeStyle = `rgba(180,210,205,${clamp(outlineAlpha, 0.035, 0.22)})`;
     ctx.strokeRect(wall.x + 0.5, wall.y + 0.5, wall.w - 1, wall.h - 1);
   }
 
@@ -915,7 +1030,8 @@ function drawWorld() {
     } else {
       ctx.fillStyle = door.locked ? "#51333a" : "#4c514d";
       ctx.fillRect(door.x, door.y, door.w, door.h);
-      ctx.strokeStyle = door.locked ? "rgba(239,102,95,0.5)" : "rgba(220,230,220,0.25)";
+      const doorAlpha = settings.outlineVisibility ? 0.36 : 0.18;
+      ctx.strokeStyle = door.locked ? "rgba(239,102,95,0.5)" : `rgba(220,230,220,${doorAlpha})`;
       ctx.strokeRect(door.x + 1, door.y + 1, door.w - 2, door.h - 2);
     }
   }
@@ -951,7 +1067,17 @@ function drawLootAndNotes() {
     ctx.fillStyle = colors[loot.type] || "#fff";
     ctx.globalAlpha = 0.7 + Math.sin(loot.pulse) * 0.25;
     ctx.fillRect(loot.x - 7, loot.y - 7, 14, 14);
-    ctx.strokeStyle = "rgba(255,255,255,0.45)";
+    if (settings.interactableGlow) {
+      ctx.globalAlpha = 0.25 + Math.sin(loot.pulse) * 0.12;
+      ctx.strokeStyle = colors[loot.type] || "#fff";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(loot.x, loot.y, 20, 0, TAU);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.9;
+    }
+    ctx.strokeStyle = settings.interactableGlow ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.45)";
     ctx.strokeRect(loot.x - 10, loot.y - 10, 20, 20);
   }
   for (const note of world.notes) {
@@ -975,12 +1101,13 @@ function drawEntities() {
       continue;
     }
     const visible = lightVisible(enemy);
-    if (!visible && !canHearEnemy(enemy)) continue;
+    const silhouette = settings.enemySilhouettes && dist(enemy, player) < 360 && hasLineOfSight(enemy, player);
+    if (!visible && !canHearEnemy(enemy) && !silhouette) continue;
     ctx.save();
     ctx.translate(enemy.x, enemy.y);
     ctx.rotate(enemy.angle);
-    ctx.globalAlpha = visible ? 1 : 0.28;
-    ctx.fillStyle = visible ? enemy.color : "#9a3b3f";
+    ctx.globalAlpha = visible ? 1 : silhouette ? 0.38 : 0.28;
+    ctx.fillStyle = visible ? enemy.color : silhouette ? "#ef665f" : "#9a3b3f";
     ctx.beginPath();
     ctx.moveTo(17, 0);
     ctx.lineTo(-11, -10);
@@ -1026,29 +1153,41 @@ function drawEntities() {
 function drawDarkness() {
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
-  ctx.fillStyle = "rgba(0,0,0,0.98)";
+  let darknessAlpha = 0.98 - settings.brightness * 0.0022 - settings.gamma * 0.00115 - settings.ambientStrength * 0.0016;
+  darknessAlpha += settings.fogDensity * 0.00085;
+  if (settings.reducedShadowOpacity) darknessAlpha -= 0.12;
+  ctx.fillStyle = `rgba(0,0,0,${clamp(darknessAlpha, 0.2, 0.94)})`;
   ctx.fillRect(camera.x, camera.y, window.innerWidth, window.innerHeight);
   ctx.globalCompositeOperation = "destination-out";
 
-  radialLight(player.x, player.y, 78, 0.92);
-  coneLight(player.x, player.y, player.angle, player.focus ? 530 : 405, player.focus ? 0.38 : 0.58);
+  const nearAlpha = clamp(0.68 + brightnessScale() * 0.18 + gammaScale() * 0.08, 0.68, 1);
+  radialLight(player.x, player.y, nearVisibilityRadius(), nearAlpha);
+  coneLight(
+    player.x,
+    player.y,
+    player.angle,
+    (player.focus ? 530 : 405) * flashlightReach() * (0.88 + flashlightPower() * 0.22),
+    (player.focus ? 0.38 : 0.58) * beamSpread()
+  );
 
   for (const light of world.lights) {
     if (!light.active) continue;
     const flicker = light.flicker ? 0.72 + Math.sin(light.phase) * 0.22 + Math.random() * 0.12 : 1;
-    radialLight(light.x, light.y, light.radius * flicker, 0.7);
+    const interior = 0.72 + ambientScale() * 0.46 + brightnessScale() * 0.16;
+    radialLight(light.x, light.y, light.radius * flicker * interior, 0.56 + ambientScale() * 0.22);
   }
   for (const p of world.particles) {
-    if (p.light) radialLight(p.x, p.y, p.light, clamp(p.life / p.maxLife, 0, 1));
+    if (p.light) radialLight(p.x, p.y, p.light * (0.82 + bloomScale() * 0.5), clamp(p.life / p.maxLife, 0, 1));
   }
   if (world.alarm > 0) {
-    for (const light of world.lights.filter((_, i) => i % 3 === 0)) radialLight(light.x, light.y, 90 + Math.sin(performance.now() / 120) * 40, 0.4);
+    for (const light of world.lights.filter((_, i) => i % 3 === 0)) radialLight(light.x, light.y, (90 + Math.sin(performance.now() / 120) * 40) * (0.8 + bloomScale() * 0.45), 0.4);
   }
   ctx.restore();
 
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
-  ctx.fillStyle = "rgba(0,0,0,0.22)";
+  const wallShadow = settings.reducedShadowOpacity ? 0.09 : settings.shadowQuality === "low" ? 0.12 : settings.shadowQuality === "medium" ? 0.18 : 0.22;
+  ctx.fillStyle = `rgba(0,0,0,${wallShadow})`;
   for (const wall of world.walls) {
     ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
   }
@@ -1057,8 +1196,9 @@ function drawDarkness() {
 
 function radialLight(x, y, radius, alpha) {
   const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-  gradient.addColorStop(0, `rgba(255,255,255,${alpha})`);
-  gradient.addColorStop(0.55, `rgba(255,255,255,${alpha * 0.42})`);
+  const bloom = 0.86 + bloomScale() * 0.35;
+  gradient.addColorStop(0, `rgba(255,255,255,${clamp(alpha * bloom, 0, 1)})`);
+  gradient.addColorStop(0.55, `rgba(255,255,255,${clamp(alpha * 0.42 * bloom, 0, 1)})`);
   gradient.addColorStop(1, "rgba(255,255,255,0)");
   ctx.fillStyle = gradient;
   ctx.beginPath();
@@ -1068,8 +1208,9 @@ function radialLight(x, y, radius, alpha) {
 
 function coneLight(x, y, angle, range, spread) {
   const gradient = ctx.createRadialGradient(x, y, 18, x, y, range);
-  gradient.addColorStop(0, "rgba(255,255,255,0.96)");
-  gradient.addColorStop(0.68, "rgba(255,255,255,0.34)");
+  const strength = clamp(0.72 + flashlightPower() * 0.28 + bloomScale() * 0.12, 0.55, 1);
+  gradient.addColorStop(0, `rgba(255,255,255,${strength})`);
+  gradient.addColorStop(0.68, `rgba(255,255,255,${strength * 0.36})`);
   gradient.addColorStop(1, "rgba(255,255,255,0)");
   ctx.fillStyle = gradient;
   ctx.beginPath();
@@ -1111,13 +1252,28 @@ function drawForegroundEffects() {
 }
 
 function drawScreenEffects(w, h) {
+  const sceneLift = clamp(settings.brightness * 0.00055 + (settings.gamma - 100) * 0.0011 + settings.ambientStrength * 0.00045, 0.02, 0.26);
+  ctx.fillStyle = `rgba(125,165,158,${sceneLift})`;
+  ctx.fillRect(0, 0, w, h);
+  const gammaLift = clamp((gammaScale() - 1) * 0.12 + ambientScale() * 0.04, 0, 0.18);
+  if (gammaLift > 0) {
+    ctx.fillStyle = `rgba(160,190,185,${gammaLift})`;
+    ctx.fillRect(0, 0, w, h);
+  }
+  const fog = clamp(settings.fogDensity / 100, 0, 1);
+  if (fog > 0.02) {
+    const fogAlpha = fog * clamp(0.12 - ambientScale() * 0.05 - (brightnessScale() - 1) * 0.05, 0.015, 0.14);
+    ctx.fillStyle = `rgba(3,6,7,${fogAlpha})`;
+    ctx.fillRect(0, 0, w, h);
+  }
   const injury = 1 - player.health / 100;
   if (injury > 0.05) {
     ctx.fillStyle = `rgba(110,12,18,${injury * 0.42})`;
     ctx.fillRect(0, 0, w, h);
   }
   if (player.battery < 16) {
-    ctx.fillStyle = `rgba(0,0,0,${(16 - player.battery) / 44})`;
+    const lowBatteryShadow = settings.reducedShadowOpacity ? 72 : 44;
+    ctx.fillStyle = `rgba(0,0,0,${(16 - player.battery) / lowBatteryShadow})`;
     ctx.fillRect(0, 0, w, h);
   }
   if (extractionMessageTimer > 0 || player.health <= 0) {
@@ -1134,7 +1290,14 @@ function drawScreenEffects(w, h) {
   }
 }
 
+function applyCanvasFilter() {
+  const brightness = clamp(0.62 + brightnessScale() * 0.38 + (gammaScale() - 1) * 0.12, 0.45, 1.55);
+  const contrast = clamp(settings.contrast / 100, 0.6, 1.6);
+  canvas.style.filter = `brightness(${brightness}) contrast(${contrast})`;
+}
+
 function updateUI() {
+  applyCanvasFilter();
   ui.healthText.textContent = Math.max(0, Math.round(player.health));
   ui.healthBar.style.width = `${clamp(player.health, 0, 100)}%`;
   ui.batteryText.textContent = Math.round(player.battery);
@@ -1175,8 +1338,106 @@ function renderBinds() {
   });
 }
 
+function closeAllPanels() {
+  ui.inventory.classList.add("hidden");
+  ui.settings.classList.add("hidden");
+  paused = false;
+}
+
+function renderSettings() {
+  ui.presetList.innerHTML = "";
+  Object.keys(presets).forEach(name => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = name;
+    button.addEventListener("click", () => applyPreset(name));
+    ui.presetList.append(button);
+  });
+
+  ui.settingsList.innerHTML = "";
+  settingControls.forEach(([key, label, help, min, max, step, suffix]) => {
+    const row = document.createElement("div");
+    row.className = "setting-row";
+    const labelNode = document.createElement("label");
+    labelNode.htmlFor = `setting-${key}`;
+    labelNode.innerHTML = `${label}<small>${help}</small>`;
+    const output = document.createElement("output");
+    output.htmlFor = `setting-${key}`;
+    output.textContent = `${settings[key]}${suffix}`;
+    const input = document.createElement("input");
+    input.id = `setting-${key}`;
+    input.type = "range";
+    input.min = min;
+    input.max = max;
+    input.step = step;
+    input.value = settings[key];
+    input.addEventListener("input", () => {
+      settings[key] = Number(input.value);
+      output.textContent = `${settings[key]}${suffix}`;
+      saveSettings();
+    });
+    row.append(labelNode, output, input);
+    ui.settingsList.append(row);
+  });
+
+  const shadowRow = document.createElement("div");
+  shadowRow.className = "setting-row";
+  const shadowLabel = document.createElement("label");
+  shadowLabel.htmlFor = "setting-shadowQuality";
+  shadowLabel.innerHTML = "Shadow Quality<small>Changes extra wall-shadow density and lighting cost.</small>";
+  const shadowOutput = document.createElement("output");
+  shadowOutput.textContent = settings.shadowQuality;
+  const select = document.createElement("select");
+  select.id = "setting-shadowQuality";
+  ["low", "medium", "high"].forEach(value => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    option.selected = settings.shadowQuality === value;
+    select.append(option);
+  });
+  select.addEventListener("change", () => {
+    settings.shadowQuality = select.value;
+    shadowOutput.textContent = settings.shadowQuality;
+    saveSettings();
+  });
+  shadowRow.append(shadowLabel, shadowOutput, select);
+  ui.settingsList.append(shadowRow);
+
+  ui.assistList.innerHTML = "";
+  assistControls.forEach(([key, label]) => {
+    const row = document.createElement("div");
+    row.className = "toggle-row";
+    const labelNode = document.createElement("label");
+    labelNode.htmlFor = `assist-${key}`;
+    labelNode.textContent = label;
+    const input = document.createElement("input");
+    input.id = `assist-${key}`;
+    input.type = "checkbox";
+    input.checked = Boolean(settings[key]);
+    input.addEventListener("change", () => {
+      settings[key] = input.checked;
+      saveSettings();
+    });
+    row.append(labelNode, input);
+    ui.assistList.append(row);
+  });
+}
+
+function applyPreset(name) {
+  Object.assign(settings, presets[name]);
+  saveSettings();
+  renderSettings();
+  addRadio(`${name} lighting preset applied.`);
+}
+
+function saveSettings() {
+  localStorage.setItem("blacksite-lighting-settings", JSON.stringify(settings));
+  applyCanvasFilter();
+}
+
 function readableKey(code) {
-  return code.replace("Key", "").replace("Digit", "").replace("Left", "").replace("Right", "");
+  return (code || "Unbound").replace("Key", "").replace("Digit", "").replace("Left", "").replace("Right", "");
 }
 
 function loop(now) {
@@ -1188,6 +1449,7 @@ function loop(now) {
 
 function openInventory() {
   ui.inventory.classList.remove("hidden");
+  ui.settings.classList.add("hidden");
   paused = true;
   renderBinds();
   renderEquipment();
@@ -1195,6 +1457,18 @@ function openInventory() {
 
 function closeInventory() {
   ui.inventory.classList.add("hidden");
+  paused = false;
+}
+
+function openSettings() {
+  ui.settings.classList.remove("hidden");
+  ui.inventory.classList.add("hidden");
+  paused = true;
+  renderSettings();
+}
+
+function closeSettings() {
+  ui.settings.classList.add("hidden");
   paused = false;
 }
 
@@ -1232,6 +1506,16 @@ window.addEventListener("keydown", event => {
     ui.inventory.classList.contains("hidden") ? openInventory() : closeInventory();
     return;
   }
+  if (event.code === binds.settings) {
+    event.preventDefault();
+    ui.settings.classList.contains("hidden") ? openSettings() : closeSettings();
+    return;
+  }
+  if (event.code === "Escape" && (!ui.inventory.classList.contains("hidden") || !ui.settings.classList.contains("hidden"))) {
+    event.preventDefault();
+    closeAllPanels();
+    return;
+  }
   keys.add(event.code);
   if (paused) return;
   if (event.code === binds.reload) reload();
@@ -1249,6 +1533,8 @@ ui.startButton.addEventListener("click", () => {
   addRadio("Entry team one, you are alone. Find a way out.");
 });
 ui.closeInventory.addEventListener("click", closeInventory);
+ui.openSettings.addEventListener("click", openSettings);
+ui.closeSettings.addEventListener("click", closeSettings);
 
 resize();
 makeWorld();

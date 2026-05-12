@@ -36,6 +36,7 @@
         <div><kbd>E</kbd><span>Medkit</span></div>
         <div><kbd>Q</kbd><span>Motion sensor</span></div>
         <div><kbd>Tab</kbd><span>Inventory</span></div>
+        <button id="openSettings" class="tool-button" type="button"><kbd>O</kbd><span>Lighting</span></button>
       </div>
       <div class="log" id="radioLog"></div>
     </section>
@@ -53,6 +54,7 @@
           <span>WASD move</span><span>Mouse aim</span><span>LMB fire</span><span>RMB focus</span>
           <span>R reload</span><span>F interact</span><span>E medkit</span><span>Q sensor</span>
           <span>Shift sprint</span><span>Ctrl crouch</span><span>Space vault</span><span>Tab inventory</span>
+          <span>O lighting</span>
         </div>
       </div>
     </section>
@@ -71,6 +73,29 @@
           <div>
             <h3>Rebind Controls</h3>
             <div class="binds" id="bindList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="overlay panel hidden" id="settingsPanel">
+      <div class="sheet settings-sheet">
+        <header>
+          <h2>Dynamic Lighting / Accessibility</h2>
+          <button id="closeSettings" aria-label="Close settings">x</button>
+        </header>
+        <div class="settings-body">
+          <div>
+            <h3>Presets</h3>
+            <div class="preset-grid" id="presetList"></div>
+          </div>
+          <div>
+            <h3>Lighting</h3>
+            <div class="settings-grid" id="settingsList"></div>
+          </div>
+          <div>
+            <h3>Visibility Assistance</h3>
+            <div class="toggle-grid" id="assistList"></div>
           </div>
         </div>
       </div>

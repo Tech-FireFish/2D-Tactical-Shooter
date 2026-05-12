@@ -25,10 +25,14 @@ Then visit `http://127.0.0.1:5173`.
 - `Ctrl`: crouch
 - `Tab`: inventory and key rebinding
 - `Space`: dodge / vault
+- `O`: dynamic lighting and accessibility settings
 
 ## Prototype Features
 
 - Directional flashlight vision with near-total darkness outside visible range
+- Persistent brightness, gamma, fog, contrast, bloom, ambient light, flashlight range, and flashlight intensity settings
+- Lighting presets for Realistic Darkness, Balanced Tactical, Exploration Mode, High Visibility, and Accessibility Enhanced
+- Visibility assistance toggles for outlines, interactable glow, enemy silhouettes, reduced shadow opacity, and wider exploration beam
 - Environmental lights, flicker, power restoration, muzzle flash lighting, and alarm pulses
 - Semi-open facility layout with locked sectors, notes, loot, card access, power objective, and extraction
 - Realistic-ish weapon pacing with recoil, reload timing, penetration against doors, suppression, and limited ammo
