@@ -9,6 +9,9 @@
 <body>
   <main class="shell">
     <canvas id="game" width="1280" height="720" aria-label="BLACKSITE EGRESS tactical top-down shooter"></canvas>
+    <div class="world-prompt hidden" id="worldPrompt"></div>
+    <div class="pickup-feed" id="pickupFeed" aria-live="polite"></div>
+    <div class="tutorial-hint hidden" id="tutorialHint"></div>
 
     <section class="hud hud-left" aria-label="mission status">
       <div class="brand">
@@ -21,6 +24,8 @@
       <div class="meters">
         <label><span>Health</span><b id="healthText">100</b></label>
         <div class="bar"><i id="healthBar"></i></div>
+        <label><span>Stamina</span><b id="staminaText">100</b></label>
+        <div class="bar stamina"><i id="staminaBar"></i></div>
         <label><span>Battery</span><b id="batteryText">100</b></label>
         <div class="bar battery"><i id="batteryBar"></i></div>
         <label><span>Noise</span><b id="noiseText">low</b></label>
@@ -38,7 +43,13 @@
         <div><kbd>Tab</kbd><span>Inventory</span></div>
         <button id="openSettings" class="tool-button" type="button"><kbd>O</kbd><span>Lighting</span></button>
       </div>
+      <div class="quick-slots" id="quickSlots"></div>
       <div class="log" id="radioLog"></div>
+    </section>
+
+    <section class="hud hud-map" aria-label="tactical map">
+      <canvas id="minimap" width="180" height="120"></canvas>
+      <div id="taskHint">Sweep rooms, recover access, restore power.</div>
     </section>
 
     <section class="overlay start" id="startOverlay">
@@ -67,7 +78,7 @@
         </header>
         <div class="columns">
           <div>
-            <h3>Equipment</h3>
+            <h3>Inventory</h3>
             <ul id="equipmentList"></ul>
           </div>
           <div>
