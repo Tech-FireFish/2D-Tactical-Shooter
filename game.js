@@ -1,5 +1,7 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+const minimap = document.getElementById("minimap");
+const miniCtx = minimap.getContext("2d");
 
 const ui = {
   start: document.getElementById("startOverlay"),
@@ -11,6 +13,8 @@ const ui = {
   closeSettings: document.getElementById("closeSettings"),
   healthText: document.getElementById("healthText"),
   healthBar: document.getElementById("healthBar"),
+  staminaText: document.getElementById("staminaText"),
+  staminaBar: document.getElementById("staminaBar"),
   batteryText: document.getElementById("batteryText"),
   batteryBar: document.getElementById("batteryBar"),
   noiseText: document.getElementById("noiseText"),
@@ -20,6 +24,11 @@ const ui = {
   interactHint: document.getElementById("interactHint"),
   radioLog: document.getElementById("radioLog"),
   equipmentList: document.getElementById("equipmentList"),
+  quickSlots: document.getElementById("quickSlots"),
+  pickupFeed: document.getElementById("pickupFeed"),
+  worldPrompt: document.getElementById("worldPrompt"),
+  tutorialHint: document.getElementById("tutorialHint"),
+  taskHint: document.getElementById("taskHint"),
   bindList: document.getElementById("bindList"),
   settingsList: document.getElementById("settingsList"),
   assistList: document.getElementById("assistList"),
@@ -83,11 +92,16 @@ const defaultSettings = {
   flashlightIntensity: 100,
   flashlightRange: 100,
   ambientStrength: 28,
+  cameraZoom: 100,
+  cameraSmoothing: 72,
+  hudScale: 100,
+  hudPosition: "corners",
   outlineVisibility: true,
   interactableGlow: true,
   enemySilhouettes: false,
   reducedShadowOpacity: false,
-  wideBeam: false
+  wideBeam: false,
+  showMinimap: true
 };
 const settings = { ...defaultSettings, ...readStoredJson("blacksite-lighting-settings", {}) };
 const presets = {
@@ -95,26 +109,26 @@ const presets = {
     brightness: 82, gamma: 96, fogDensity: 82, contrast: 122, bloomIntensity: 42,
     flashlightIntensity: 94, flashlightRange: 92, ambientStrength: 12,
     outlineVisibility: false, interactableGlow: false, enemySilhouettes: false,
-    reducedShadowOpacity: false, wideBeam: false, shadowQuality: "high"
+    reducedShadowOpacity: false, wideBeam: false, showMinimap: true, shadowQuality: "high"
   },
   "Balanced Tactical": { ...defaultSettings },
   "Exploration Mode": {
     brightness: 130, gamma: 120, fogDensity: 48, contrast: 106, bloomIntensity: 64,
     flashlightIntensity: 118, flashlightRange: 130, ambientStrength: 48,
     outlineVisibility: true, interactableGlow: true, enemySilhouettes: false,
-    reducedShadowOpacity: true, wideBeam: true, shadowQuality: "medium"
+    reducedShadowOpacity: true, wideBeam: true, showMinimap: true, shadowQuality: "medium"
   },
   "High Visibility": {
     brightness: 164, gamma: 138, fogDensity: 30, contrast: 98, bloomIntensity: 38,
     flashlightIntensity: 135, flashlightRange: 150, ambientStrength: 72,
     outlineVisibility: true, interactableGlow: true, enemySilhouettes: true,
-    reducedShadowOpacity: true, wideBeam: true, shadowQuality: "low"
+    reducedShadowOpacity: true, wideBeam: true, showMinimap: true, shadowQuality: "low"
   },
   "Accessibility Enhanced": {
     brightness: 185, gamma: 160, fogDensity: 18, contrast: 92, bloomIntensity: 25,
     flashlightIntensity: 150, flashlightRange: 170, ambientStrength: 92,
     outlineVisibility: true, interactableGlow: true, enemySilhouettes: true,
-    reducedShadowOpacity: true, wideBeam: true, shadowQuality: "low"
+    reducedShadowOpacity: true, wideBeam: true, showMinimap: true, shadowQuality: "low"
   }
 };
 
@@ -124,9 +138,22 @@ let mouse = { x: 0, y: 0, down: false, right: false, worldX: 0, worldY: 0 };
 let running = false;
 let paused = true;
 let lastTime = performance.now();
-let camera = { x: 0, y: 0 };
+let camera = { x: 0, y: 0, zoom: 1, initialized: false };
 let radioTimer = 0;
 let extractionMessageTimer = 0;
+let notifications = [];
+let tutorialText = "";
+let tutorialTimer = 0;
+let explored = new Set();
+const tutorial = {
+  started: false,
+  moved: false,
+  aimed: false,
+  door: false,
+  loot: false,
+  inventory: false,
+  map: false
+};
 
 const world = {
   width: 2650,
@@ -160,6 +187,7 @@ const player = {
   vx: 0,
   vy: 0,
   health: 100,
+  stamina: 100,
   battery: 100,
   ammo: 12,
   reserve: 36,
@@ -196,7 +224,10 @@ const settingControls = [
   ["bloomIntensity", "Bloom Intensity", "Glow strength from flashlights, muzzle flashes, lamps, and electronics.", 0, 120, 1, "%"],
   ["flashlightIntensity", "Flashlight Intensity", "Light strength and battery cost.", 40, 200, 1, "%"],
   ["flashlightRange", "Flashlight Range", "Beam reach and battery cost.", 50, 200, 1, "%"],
-  ["ambientStrength", "Ambient Light Strength", "Global minimum visibility without removing tension.", 0, 120, 1, "%"]
+  ["ambientStrength", "Ambient Light Strength", "Global minimum visibility without removing tension.", 0, 120, 1, "%"],
+  ["cameraZoom", "Camera Zoom", "Adjusts tactical view distance around the player.", 70, 145, 1, "%"],
+  ["cameraSmoothing", "Camera Smoothing", "Higher values follow the player more gently.", 0, 100, 1, "%"],
+  ["hudScale", "HUD Scale", "Scales tactical HUD zones without covering the player.", 75, 130, 1, "%"]
 ];
 
 const assistControls = [
@@ -204,8 +235,24 @@ const assistControls = [
   ["interactableGlow", "Edge glow on interactable items"],
   ["enemySilhouettes", "Enemy silhouette visibility"],
   ["reducedShadowOpacity", "Reduced shadow opacity"],
-  ["wideBeam", "Wider beam exploration mode"]
+  ["wideBeam", "Wider beam exploration mode"],
+  ["showMinimap", "Show tactical minimap"]
 ];
+
+const lootInfo = {
+  ammo: { name: "9mm Ammunition", category: "Ammo", hint: "Reload with R.", desc: "Loose boxed ammunition for the sidearm." },
+  battery: { name: "Battery Pack", category: "Tools", hint: "Extends flashlight operation.", desc: "A sealed power cell for weapon lights and electronics." },
+  medkit: { name: "Medical Kit", category: "Medical supplies", hint: "Use with E when injured.", desc: "Field dressing, clotting agent, and pain suppression." },
+  card: { name: "Access Card", category: "Key items", hint: "Unlocks keycard security doors.", desc: "Security credential from the eastern office wing." },
+  power: { name: "Auxiliary Power Terminal", category: "Mission items", hint: "Restores lighting and gate motors.", desc: "A manual override station for the facility power grid." },
+  extraction: { name: "Extraction Gate", category: "Mission items", hint: "Use after restoring power.", desc: "Flood tunnel access to the outside perimeter." },
+  sensor: { name: "Motion Sensor", category: "Tools", hint: "Deploy with Q.", desc: "Short pulse sensor that reveals movement through darkness." },
+  charge: { name: "Breaching Charge", category: "Tools", hint: "Use on locked armory shutters.", desc: "Compact explosive frame charge for reinforced doors." }
+};
+
+function itemInfo(type) {
+  return lootInfo[type] || { name: type, category: "Items", hint: "Inspect in inventory.", desc: "Unknown item." };
+}
 
 function resize() {
   const dpr = window.devicePixelRatio || 1;
@@ -251,7 +298,7 @@ function addWall(x, y, w, h, type = "concrete") {
 }
 
 function addDoor(x, y, w, h, locked = false, label = "Door") {
-  world.doors.push({ x, y, w, h, locked, open: false, hp: 80, label });
+  world.doors.push({ x, y, w, h, locked, open: false, anim: 0, hp: 80, label });
 }
 
 function makeWorld() {
@@ -519,15 +566,18 @@ function update(dt) {
   const mx = (keys.has(binds.right) ? 1 : 0) - (keys.has(binds.left) ? 1 : 0);
   const my = (keys.has(binds.down) ? 1 : 0) - (keys.has(binds.up) ? 1 : 0);
   const len = Math.hypot(mx, my) || 1;
-  const sprinting = keys.has(binds.sprint) && player.battery > 0 && !player.crouch;
+  const sprinting = keys.has(binds.sprint) && player.stamina > 4 && !player.crouch;
   const speed = (player.crouch ? 72 : sprinting ? 178 : player.focus ? 86 : 122) * (player.reload > 0 ? 0.72 : 1);
   if (mx || my) {
     moveCircle(player, (mx / len) * speed * dt, (my / len) * speed * dt);
     player.noise = Math.max(player.noise, player.crouch ? 15 : sprinting ? 86 : 38);
+    tutorial.moved = true;
   }
+  if (player.focus) tutorial.aimed = true;
 
   const lightDrain = (0.45 + flashlightPower() * 0.55 + flashlightReach() * 0.38 + (settings.wideBeam ? 0.22 : 0)) * (player.focus ? 1.45 : 0.72);
-  if (sprinting) player.battery = Math.max(0, player.battery - dt * 2.2);
+  if (sprinting) player.stamina = Math.max(0, player.stamina - dt * 24);
+  else player.stamina = Math.min(100, player.stamina + dt * (player.crouch ? 18 : 12));
   player.battery = Math.max(0, player.battery - dt * lightDrain);
 
   if (mouse.down) fireWeapon();
@@ -536,8 +586,11 @@ function update(dt) {
   updateEnemies(dt);
   updateParticles(dt);
   updateLights(dt);
+  updateDoors(dt);
   updateCamera();
   updateInteractionHint();
+  updateTutorial(dt);
+  updateNotifications(dt);
   updateUI();
   maybeRandomEvent(dt);
 }
@@ -590,6 +643,7 @@ function useUtility() {
     player.medkits--;
     player.health = Math.min(100, player.health + 42);
     addRadio("Hemostatic applied.");
+    notify("Medical kit used", "Quantity: 1", "Health restored. Keep distance while recovering.");
     pulse(player.x, player.y, "#b8ece1", 52, 0.55);
   } else {
     addRadio("No medical use right now.");
@@ -603,6 +657,7 @@ function useGadget() {
   }
   player.sensors--;
   addRadio("Sensor ping deployed.");
+  notify("Motion sensor deployed", "Quantity: 1", "Nearby movement is briefly highlighted.");
   addSoundPing(player.x, player.y, 620, "sensor");
   for (const enemy of world.enemies) {
     if (!enemy.dead && dist(enemy, player) < 620) {
@@ -628,19 +683,19 @@ function interact() {
   if (target.kind === "door") {
     const door = target.item;
     if (door.locked && door.label.includes("Keycard") && !world.objectives.card) {
-      addRadio("Keycard required.");
+      failedInteraction("Keycard required.", "Find the access card in the eastern office wing.");
       return;
     }
     if (door.locked && door.label.includes("Powered") && !world.objectives.power) {
-      addRadio("Auxiliary power is offline.");
+      failedInteraction("Auxiliary power is offline.", "Restore power at the auxiliary terminal.");
       return;
     }
     if (door.locked && door.label.includes("Armory") && player.charges <= 0) {
-      addRadio("Breaching charge required.");
+      failedInteraction("Breaching charge required.", "Search industrial storage for a charge.");
       return;
     }
     if (door.locked && door.label.includes("Extraction") && !world.objectives.power) {
-      addRadio("Gate motor has no power.");
+      failedInteraction("Gate motor has no power.", "Restore power before extraction.");
       return;
     }
     if (door.locked && door.label.includes("Armory")) {
@@ -651,6 +706,7 @@ function interact() {
     door.open = !door.open;
     addSoundPing(door.x, door.y, 300, "door");
     addRadio(door.open ? `${door.label} opened.` : `${door.label} closed.`);
+    notify(door.open ? "Door opened" : "Door closed", door.label, doorRequirement(door));
   }
   if (target.kind === "loot") {
     collectLoot(target.item);
@@ -659,7 +715,14 @@ function interact() {
     target.item.read = true;
     addRadio(target.item.text);
     world.objectives.intel = Math.min(3, world.objectives.intel + 1);
+    notify("Document recovered", "Field note", "Added to Notes/Documents.");
   }
+}
+
+function failedInteraction(title, detail) {
+  addRadio(title);
+  notify("Interaction failed", title, detail);
+  addSoundPing(player.x, player.y, 160, "failed interaction");
 }
 
 function breachDoor(door) {
@@ -692,6 +755,7 @@ function nearestInteractable() {
 
 function collectLoot(item) {
   item.taken = true;
+  const info = itemInfo(item.type);
   if (item.type === "ammo") {
     player.reserve += item.amount;
     addRadio(`Recovered ${item.amount} rounds.`);
@@ -726,6 +790,10 @@ function collectLoot(item) {
       item.taken = false;
       addRadio("Extraction gate is dead. Restore power.");
     }
+  }
+  if (item.taken) {
+    tutorial.loot = true;
+    notify(info.name, `Quantity: ${item.amount}`, `${info.desc} ${info.hint}`);
   }
   pulse(item.x, item.y, "#73f4d6", 72, 0.7);
 }
@@ -885,26 +953,90 @@ function updateLights(dt) {
   }
 }
 
+function updateDoors(dt) {
+  for (const door of world.doors) {
+    const target = door.open ? 1 : 0;
+    door.anim += (target - door.anim) * Math.min(1, dt * 9);
+  }
+}
+
 function updateCamera() {
   const w = window.innerWidth;
   const h = window.innerHeight;
   const sx = world.shake ? rnd(-world.shake, world.shake) : 0;
   const sy = world.shake ? rnd(-world.shake, world.shake) : 0;
-  camera.x = clamp(player.x - w / 2 + sx, 0, world.width - w);
-  camera.y = clamp(player.y - h / 2 + sy, 0, world.height - h);
-  mouse.worldX = mouse.x + camera.x;
-  mouse.worldY = mouse.y + camera.y;
+  camera.zoom = settings.cameraZoom / 100;
+  const viewW = w / camera.zoom;
+  const viewH = h / camera.zoom;
+  const targetX = player.x - viewW / 2 + sx;
+  const targetY = player.y - viewH / 2 + sy;
+  const smoothing = settings.cameraSmoothing <= 0 ? 1 : clamp(1 - Math.pow(0.001, (1 - settings.cameraSmoothing / 115) * 0.12), 0.08, 1);
+  if (!camera.initialized) {
+    camera.x = targetX;
+    camera.y = targetY;
+    camera.initialized = true;
+  } else {
+    camera.x += (targetX - camera.x) * smoothing;
+    camera.y += (targetY - camera.y) * smoothing;
+  }
+  mouse.worldX = mouse.x / camera.zoom + camera.x;
+  mouse.worldY = mouse.y / camera.zoom + camera.y;
+  explored.add(`${Math.floor(player.x / 260)}:${Math.floor(player.y / 220)}`);
 }
 
 function updateInteractionHint() {
   const target = nearestInteractable();
   if (!target) {
     ui.interactHint.textContent = "Interact";
+    ui.worldPrompt.classList.add("hidden");
     return;
   }
-  if (target.kind === "door") ui.interactHint.textContent = target.item.open ? "Close door" : target.item.locked ? target.item.label : "Open door";
-  if (target.kind === "loot") ui.interactHint.textContent = target.item.type === "extraction" ? "Extract" : `Take ${target.item.type}`;
-  if (target.kind === "note") ui.interactHint.textContent = "Read";
+  const text = interactionLabel(target);
+  ui.interactHint.textContent = text.replace("[F] ", "");
+  const pos = targetPosition(target.item);
+  const screen = worldToScreen(pos.x, pos.y - 18);
+  ui.worldPrompt.innerHTML = `${text}<small>${interactionDetail(target)}</small>`;
+  ui.worldPrompt.style.left = `${screen.x}px`;
+  ui.worldPrompt.style.top = `${screen.y}px`;
+  ui.worldPrompt.classList.toggle("hidden", screen.x < 0 || screen.y < 0 || screen.x > window.innerWidth || screen.y > window.innerHeight);
+  if (target.kind === "door") tutorial.door = true;
+}
+
+function targetPosition(item) {
+  return { x: item.x + (item.w || 0) / 2, y: item.y + (item.h || 0) / 2 };
+}
+
+function worldToScreen(x, y) {
+  return { x: (x - camera.x) * camera.zoom, y: (y - camera.y) * camera.zoom };
+}
+
+function interactionLabel(target) {
+  if (target.kind === "door") {
+    const door = target.item;
+    if (door.locked) return `[F] ${door.label} locked`;
+    return door.open ? "[F] Close door" : "[F] Open door";
+  }
+  if (target.kind === "loot") {
+    const info = itemInfo(target.item.type);
+    return target.item.type === "extraction" ? "[F] Extract" : `[F] Pick up ${info.name}`;
+  }
+  if (target.kind === "note") return "[F] Read document";
+  return "[F] Interact";
+}
+
+function interactionDetail(target) {
+  if (target.kind === "door") return doorRequirement(target.item) || "Room transition clear.";
+  if (target.kind === "loot") return itemInfo(target.item.type).hint;
+  if (target.kind === "note") return "Adds document to Notes.";
+  return "";
+}
+
+function doorRequirement(door) {
+  if (!door.locked) return door.open ? "Path open." : "Unlocked.";
+  if (door.label.includes("Keycard")) return world.objectives.card ? "Access card accepted." : "Requires access card.";
+  if (door.label.includes("Powered") || door.label.includes("Extraction")) return world.objectives.power ? "Power restored." : "Requires auxiliary power.";
+  if (door.label.includes("Armory")) return player.charges > 0 ? "Use breaching charge." : "Requires breaching charge.";
+  return "Locked.";
 }
 
 function maybeRandomEvent(dt) {
@@ -960,17 +1092,66 @@ function addRadio(text) {
   ui.radioLog.textContent = text;
 }
 
+function notify(title, quantity, detail) {
+  notifications.unshift({ title, quantity, detail, life: 4.5 });
+  notifications = notifications.slice(0, 4);
+  renderNotifications();
+}
+
+function updateNotifications(dt) {
+  for (const notification of notifications) notification.life -= dt;
+  notifications = notifications.filter(notification => notification.life > 0);
+  renderNotifications();
+}
+
+function renderNotifications() {
+  ui.pickupFeed.innerHTML = notifications.map(notification => (
+    `<div class="pickup-card"><b>${notification.title}</b><span>${notification.quantity}</span><span>${notification.detail}</span></div>`
+  )).join("");
+}
+
+function showTutorial(text, duration = 5) {
+  tutorialText = text;
+  tutorialTimer = duration;
+  ui.tutorialHint.textContent = text;
+  ui.tutorialHint.classList.remove("hidden");
+}
+
+function updateTutorial(dt) {
+  if (!tutorial.started) {
+    tutorial.started = true;
+    showTutorial("Move with WASD. Keep your flashlight cone on doorways before crossing thresholds.");
+  } else if (tutorial.moved && !tutorial.aimed && tutorialTimer <= 0) {
+    showTutorial("Hold right mouse to focus your aim and tighten the flashlight beam.");
+  } else if (tutorial.door && !tutorial.inventory && tutorialTimer <= 0) {
+    showTutorial("Press F near doors and objects. Locked prompts explain the required key, power, or tool.");
+    tutorial.inventory = true;
+  } else if (tutorial.loot && !tutorial.map && tutorialTimer <= 0) {
+    showTutorial("Press Tab to inspect categorized inventory. Critical objectives are marked on the tactical map.");
+    tutorial.map = true;
+  }
+  tutorialTimer = Math.max(0, tutorialTimer - dt);
+  if (tutorialTimer <= 0 && tutorialText) {
+    tutorialText = "";
+    ui.tutorialHint.classList.add("hidden");
+  }
+}
+
 function draw() {
   const w = window.innerWidth;
   const h = window.innerHeight;
   ctx.clearRect(0, 0, w, h);
   ctx.save();
+  ctx.scale(camera.zoom, camera.zoom);
   ctx.translate(-camera.x, -camera.y);
   drawWorld();
   drawEntities();
+  drawInteractionAids();
   drawDarkness();
   drawForegroundEffects();
   ctx.restore();
+  drawObjectivePointer(w, h);
+  drawMinimap();
   drawScreenEffects(w, h);
   requestAnimationFrame(loop);
 }
@@ -1024,7 +1205,13 @@ function drawWorld() {
   }
 
   for (const door of world.doors) {
-    if (door.open) {
+    const cx = door.x + door.w / 2;
+    const cy = door.y + door.h / 2;
+    const horizontal = door.w >= door.h;
+    const openOffset = door.anim * (horizontal ? door.w * 0.72 : door.h * 0.72);
+    ctx.save();
+    ctx.translate(horizontal ? openOffset : 0, horizontal ? 0 : openOffset);
+    if (door.open || door.anim > 0.04) {
       ctx.fillStyle = "rgba(115,244,214,0.16)";
       ctx.fillRect(door.x, door.y, door.w, door.h);
     } else {
@@ -1034,6 +1221,11 @@ function drawWorld() {
       ctx.strokeStyle = door.locked ? "rgba(239,102,95,0.5)" : `rgba(220,230,220,${doorAlpha})`;
       ctx.strokeRect(door.x + 1, door.y + 1, door.w - 2, door.h - 2);
     }
+    ctx.restore();
+    ctx.fillStyle = door.locked ? "#ef665f" : door.open ? "#73f4d6" : "#f1bd6a";
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, TAU);
+    ctx.fill();
   }
 
   for (const light of world.lights) {
@@ -1128,6 +1320,16 @@ function drawEntities() {
   ctx.save();
   ctx.translate(player.x, player.y);
   ctx.rotate(player.angle + player.recoil * 0.12);
+  const lowVisibility = player.battery < 18 || settings.brightness < 85 || settings.gamma < 95;
+  if (lowVisibility) {
+    ctx.shadowColor = "#73f4d6";
+    ctx.shadowBlur = 16;
+    ctx.strokeStyle = "rgba(115,244,214,0.82)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, 18, 0, TAU);
+    ctx.stroke();
+  }
   ctx.fillStyle = player.invulnerable > 0 ? "#ffffff" : "#dbe8e5";
   ctx.beginPath();
   ctx.moveTo(18, 0);
@@ -1150,6 +1352,98 @@ function drawEntities() {
   }
 }
 
+function drawInteractionAids() {
+  const target = nearestInteractable();
+  if (!target) return;
+  const pos = targetPosition(target.item);
+  ctx.save();
+  ctx.strokeStyle = target.kind === "door" && target.item.locked ? "rgba(239,102,95,0.78)" : "rgba(115,244,214,0.72)";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 5]);
+  ctx.beginPath();
+  ctx.arc(pos.x, pos.y, target.kind === "door" ? 36 : 28, 0, TAU);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = "rgba(115,244,214,0.18)";
+  ctx.beginPath();
+  ctx.arc(pos.x, pos.y, 5, 0, TAU);
+  ctx.fill();
+  ctx.restore();
+}
+
+function nextObjectivePoint() {
+  if (!world.objectives.card) return world.loot.find(item => item.type === "card" && !item.taken);
+  if (!world.objectives.power) return world.loot.find(item => item.type === "power" && !item.taken);
+  return world.loot.find(item => item.type === "extraction");
+}
+
+function drawObjectivePointer(w, h) {
+  const objective = nextObjectivePoint();
+  if (!objective) return;
+  const screen = worldToScreen(objective.x, objective.y);
+  if (screen.x > 40 && screen.x < w - 40 && screen.y > 40 && screen.y < h - 40) return;
+  const cx = w / 2;
+  const cy = h / 2;
+  const angle = Math.atan2(screen.y - cy, screen.x - cx);
+  const x = clamp(cx + Math.cos(angle) * (w * 0.38), 36, w - 36);
+  const y = clamp(cy + Math.sin(angle) * (h * 0.38), 36, h - 36);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.fillStyle = "rgba(241,189,106,0.88)";
+  ctx.beginPath();
+  ctx.moveTo(15, 0);
+  ctx.lineTo(-10, -8);
+  ctx.lineTo(-6, 0);
+  ctx.lineTo(-10, 8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawMinimap() {
+  ui.taskHint.textContent = currentTaskHint();
+  ui.taskHint.parentElement.classList.toggle("hidden", !settings.showMinimap);
+  if (!settings.showMinimap) return;
+  const w = minimap.width;
+  const h = minimap.height;
+  miniCtx.clearRect(0, 0, w, h);
+  miniCtx.fillStyle = "#071011";
+  miniCtx.fillRect(0, 0, w, h);
+  const sx = w / world.width;
+  const sy = h / world.height;
+  miniCtx.fillStyle = "rgba(115,244,214,0.1)";
+  for (const key of explored) {
+    const [gx, gy] = key.split(":").map(Number);
+    miniCtx.fillRect(gx * 260 * sx, gy * 220 * sy, 260 * sx, 220 * sy);
+  }
+  miniCtx.strokeStyle = "rgba(190,210,205,0.26)";
+  miniCtx.lineWidth = 1;
+  for (const wall of world.walls) miniCtx.strokeRect(wall.x * sx, wall.y * sy, wall.w * sx, wall.h * sy);
+  for (const door of world.doors) {
+    miniCtx.fillStyle = door.locked ? "#ef665f" : door.open ? "#73f4d6" : "#f1bd6a";
+    miniCtx.fillRect((door.x + door.w / 2) * sx - 1.5, (door.y + door.h / 2) * sy - 1.5, 3, 3);
+  }
+  const objective = nextObjectivePoint();
+  if (objective) {
+    miniCtx.fillStyle = "#ffffff";
+    miniCtx.beginPath();
+    miniCtx.arc(objective.x * sx, objective.y * sy, 3, 0, TAU);
+    miniCtx.fill();
+  }
+  miniCtx.fillStyle = "#73f4d6";
+  miniCtx.beginPath();
+  miniCtx.arc(player.x * sx, player.y * sy, 3.5, 0, TAU);
+  miniCtx.fill();
+}
+
+function currentTaskHint() {
+  if (!world.objectives.card) return "Task: locate access card in the eastern offices.";
+  if (!world.objectives.power) return "Task: restore auxiliary power in the reactor sector.";
+  if (!player.extracted) return "Task: move to the east extraction gate.";
+  return "Task complete: extracted.";
+}
+
 function drawDarkness() {
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
@@ -1157,7 +1451,7 @@ function drawDarkness() {
   darknessAlpha += settings.fogDensity * 0.00085;
   if (settings.reducedShadowOpacity) darknessAlpha -= 0.12;
   ctx.fillStyle = `rgba(0,0,0,${clamp(darknessAlpha, 0.2, 0.94)})`;
-  ctx.fillRect(camera.x, camera.y, window.innerWidth, window.innerHeight);
+  ctx.fillRect(camera.x, camera.y, window.innerWidth / camera.zoom, window.innerHeight / camera.zoom);
   ctx.globalCompositeOperation = "destination-out";
 
   const nearAlpha = clamp(0.68 + brightnessScale() * 0.18 + gammaScale() * 0.08, 0.68, 1);
@@ -1294,12 +1588,16 @@ function applyCanvasFilter() {
   const brightness = clamp(0.62 + brightnessScale() * 0.38 + (gammaScale() - 1) * 0.12, 0.45, 1.55);
   const contrast = clamp(settings.contrast / 100, 0.6, 1.6);
   canvas.style.filter = `brightness(${brightness}) contrast(${contrast})`;
+  document.documentElement.style.setProperty("--hud-scale", settings.hudScale / 100);
+  document.body.dataset.hudPosition = settings.hudPosition;
 }
 
 function updateUI() {
   applyCanvasFilter();
   ui.healthText.textContent = Math.max(0, Math.round(player.health));
   ui.healthBar.style.width = `${clamp(player.health, 0, 100)}%`;
+  ui.staminaText.textContent = Math.round(player.stamina);
+  ui.staminaBar.style.width = `${clamp(player.stamina, 0, 100)}%`;
   ui.batteryText.textContent = Math.round(player.battery);
   ui.batteryBar.style.width = `${clamp(player.battery, 0, 100)}%`;
   ui.noiseText.textContent = player.noise > 70 ? "loud" : player.noise > 35 ? "audible" : "low";
@@ -1312,12 +1610,33 @@ function updateUI() {
   if (world.objectives.intel < 3) tasks.push(`recover intel ${world.objectives.intel}/3`);
   tasks.push("reach east extraction");
   ui.objectiveText.textContent = player.extracted ? "Extraction complete." : `Objective: ${tasks.join(" / ")}`;
+  ui.taskHint.textContent = currentTaskHint();
 
   renderEquipment();
 }
 
 function renderEquipment() {
-  ui.equipmentList.innerHTML = equipmentNames.map(([name, get]) => `<li><span>${name}</span><b>${get()}</b></li>`).join("");
+  const categories = [
+    ["Weapons", [["Pistol", "1", "Suppressed 9mm sidearm. Left mouse fires."]]],
+    ["Ammo", [["9mm ammunition", `${player.ammo}/${player.reserve}`, "Limited rounds. Reload with R."]]],
+    ["Medical supplies", [["Medical kit", player.medkits, "Use with E when wounded."]]],
+    ["Tools", [
+      ["Motion sensor", player.sensors, "Deploy with Q to reveal nearby movement."],
+      ["Breaching charge", player.charges, "Used on reinforced armory shutters."],
+      ["Weapon light battery", `${Math.round(player.battery)}%`, "Drains based on flashlight intensity and range."]
+    ]],
+    ["Key items", [["Access card", world.objectives.card ? "secured" : "missing", "Unlocks keycard doors."]]],
+    ["Notes/documents", [["Recovered intel", `${world.objectives.intel}/3`, "Documents reveal routes and facility events."]]]
+  ];
+  ui.equipmentList.innerHTML = categories.map(([category, items]) => (
+    `<li class="category"><h4>${category}</h4>${items.map(([name, qty, desc]) => `<div><span>${name}</span><b>${qty}</b><small>${desc}</small></div>`).join("")}</li>`
+  )).join("");
+  ui.quickSlots.innerHTML = [
+    ["Med", player.medkits],
+    ["Sens", player.sensors],
+    ["Breach", player.charges],
+    ["Key", world.objectives.card ? "yes" : "no"]
+  ].map(([label, value]) => `<div class="slot">${label}<b>${value}</b></div>`).join("");
 }
 
 function renderBinds() {
@@ -1404,6 +1723,30 @@ function renderSettings() {
   shadowRow.append(shadowLabel, shadowOutput, select);
   ui.settingsList.append(shadowRow);
 
+  const hudRow = document.createElement("div");
+  hudRow.className = "setting-row";
+  const hudLabel = document.createElement("label");
+  hudLabel.htmlFor = "setting-hudPosition";
+  hudLabel.innerHTML = "HUD Position<small>Moves compact HUD zones away from the player view.</small>";
+  const hudOutput = document.createElement("output");
+  hudOutput.textContent = settings.hudPosition;
+  const hudSelect = document.createElement("select");
+  hudSelect.id = "setting-hudPosition";
+  [["corners", "Screen corners"], ["bottom", "Bottom status layout"]].forEach(([value, text]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = text;
+    option.selected = settings.hudPosition === value;
+    hudSelect.append(option);
+  });
+  hudSelect.addEventListener("change", () => {
+    settings.hudPosition = hudSelect.value;
+    hudOutput.textContent = settings.hudPosition;
+    saveSettings();
+  });
+  hudRow.append(hudLabel, hudOutput, hudSelect);
+  ui.settingsList.append(hudRow);
+
   ui.assistList.innerHTML = "";
   assistControls.forEach(([key, label]) => {
     const row = document.createElement("div");
@@ -1477,8 +1820,8 @@ window.addEventListener("mousemove", event => {
   const rect = canvas.getBoundingClientRect();
   mouse.x = event.clientX - rect.left;
   mouse.y = event.clientY - rect.top;
-  mouse.worldX = mouse.x + camera.x;
-  mouse.worldY = mouse.y + camera.y;
+  mouse.worldX = mouse.x / camera.zoom + camera.x;
+  mouse.worldY = mouse.y / camera.zoom + camera.y;
 });
 window.addEventListener("mousedown", event => {
   if (!running) return;
