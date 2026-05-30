@@ -8,48 +8,87 @@
   </head>
   <body>
     <main class="shell">
-      <section class="topbar" aria-label="Game status">
+      <header class="brandbar" aria-label="Game title">
         <div>
           <p class="eyebrow">Breachline 2D</p>
           <h1 id="levelTitle">Ridge House Entry</h1>
-          <label class="level-picker" for="levelSelect">
-            <span>Level</span>
-            <select id="levelSelect"></select>
-          </label>
         </div>
-        <div class="status-grid">
-          <div>
-            <span>Mode</span>
-            <strong id="modeLabel">Planning</strong>
-          </div>
-          <div>
-            <span>Clock</span>
-            <strong id="clockLabel">00.0</strong>
-          </div>
-          <div>
-            <span>Objective</span>
-            <strong id="objectiveLabel">Secure</strong>
-          </div>
-        </div>
-        <div class="actions" aria-label="Game actions">
-          <button id="runButton" type="button" title="Toggle pause and execute">Execute</button>
-          <button id="restartButton" type="button" title="Restart level">Restart</button>
-          <button id="debugButton" type="button" title="Toggle tactical debug overlay">Debug</button>
-        </div>
-      </section>
+      </header>
 
-      <section class="game-panel">
-        <canvas id="game" width="960" height="640" aria-label="Breachline 2D tactical map"></canvas>
-        <div id="banner" class="banner hidden" role="status" aria-live="polite">
-          <strong id="bannerTitle">Mission Complete</strong>
-          <span id="bannerText">Restart to run the plan again.</span>
-          <div class="banner-actions" aria-label="Mission result actions">
-            <button id="nextLevelButton" type="button">Next Level</button>
-            <button id="bannerRestartButton" type="button">Restart</button>
+      <section class="play-layout">
+        <aside class="side-panel left-panel" aria-label="Operator status and loadout">
+          <section class="control-card">
+            <p class="panel-label">Loadout</p>
+            <label class="field-stack" for="weaponSelect">
+              <span id="selectedOperatorLabel">Selected Operator</span>
+              <select id="weaponSelect"></select>
+            </label>
+            <div id="weaponStats" class="weapon-stats"></div>
+          </section>
+
+          <section class="control-card">
+            <p class="panel-label">Operator Health</p>
+            <div id="operatorHealthBoard" class="health-board" aria-live="polite"></div>
+          </section>
+        </aside>
+
+        <section class="game-panel">
+          <canvas id="game" width="960" height="640" aria-label="Breachline 2D tactical map"></canvas>
+          <div id="banner" class="banner hidden" role="status" aria-live="polite">
+            <strong id="bannerTitle">Mission Complete</strong>
+            <span id="bannerText">Restart to run the plan again.</span>
+            <div class="banner-actions" aria-label="Mission result actions">
+              <button id="nextLevelButton" type="button">Next Level</button>
+              <button id="bannerRestartButton" type="button">Restart</button>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <aside class="side-panel right-panel" aria-label="Mission controls">
+          <section class="control-card">
+            <p class="panel-label">Mission Setup</p>
+            <label class="level-picker" for="levelSelect">
+              <span>Level</span>
+              <select id="levelSelect"></select>
+            </label>
+            <label class="level-picker" for="operatorCountSelect">
+              <span>Operators</span>
+              <select id="operatorCountSelect">
+                <option value="2">Two</option>
+                <option value="1">One</option>
+              </select>
+            </label>
+          </section>
+
+          <section class="control-card">
+            <p class="panel-label">Mission Status</p>
+            <div class="status-grid">
+              <div>
+                <span>Mode</span>
+                <strong id="modeLabel">Planning</strong>
+              </div>
+              <div>
+                <span>Clock</span>
+                <strong id="clockLabel">Off</strong>
+              </div>
+              <div>
+                <span>Objective</span>
+                <strong id="objectiveLabel">Secure</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="control-card">
+            <p class="panel-label">Actions</p>
+            <div class="actions" aria-label="Game actions">
+              <button id="runButton" type="button" title="Toggle pause and execute">Execute</button>
+              <button id="restartButton" type="button" title="Restart level">Restart</button>
+              <button id="debugButton" type="button" title="Toggle tactical debug overlay">Debug</button>
+            </div>
+          </section>
+        </aside>
       </section>
     </main>
-    <script src="main.js?v=6"></script>
+    <script src="main.js?v=12"></script>
   </body>
 </html>

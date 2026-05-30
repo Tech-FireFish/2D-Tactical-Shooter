@@ -7,16 +7,32 @@ const UNIT_RADIUS = 12;
 const TWO_PI = Math.PI * 2;
 const DT = 1 / 30;
 const CELL = 10;
+const WEAPON_FILES = [
+  "rifle.json",
+  "smg.json",
+  "pistol.json"
+];
 const LEVEL_FILES = [
   "ridge-house-entry.json",
   "warehouse-pinch.json",
-  "hardpoint-gallery.json"
+  "hardpoint-gallery.json",
+  "terminal-breach.json"
 ];
+const weapons = new Map(WEAPON_FILES.map((file) => {
+  const weapon = JSON.parse(fs.readFileSync(path.join("Weapons", file), "utf8"));
+  return [weapon.id, weapon];
+}));
+
+function weaponById(id) {
+  return weapons.get(id) || weapons.get("rifle");
+}
 
 function cloneLevel(level) {
   return {
     id: level.id,
     title: level.title,
+    width: level.width || 960,
+    height: level.height || 640,
     walls: level.walls.map((wall) => ({ ...wall })),
     doors: level.doors.map((door) => ({ ...door })),
     operators: level.operators.map((op) => ({
@@ -24,6 +40,8 @@ function cloneLevel(level) {
       radius: UNIT_RADIUS,
       health: 100,
       speed: 92,
+      weaponId: weaponById(op.weaponId || "rifle").id,
+      fireTimer: 0,
       path: [],
       aim: 0,
       action: null,
@@ -33,10 +51,13 @@ function cloneLevel(level) {
     })),
     enemies: level.enemies.map((enemy) => ({
       ...enemy,
+      watch: enemy.watch ? { ...enemy.watch } : null,
       radius: 12,
       health: 100,
       speed: 34,
-      sightRange: 190,
+      weaponId: weaponById(enemy.weaponId || "rifle").id,
+      fireTimer: 0,
+      sightRange: enemy.sightRange || Math.max(190, weaponById(enemy.weaponId || "rifle").range),
       fov: Math.PI * 0.78,
       reaction: 0,
       targetId: null,
@@ -78,6 +99,21 @@ function pointRectDistance(point, rect) {
   const closestX = clamp(point.x, rect.x, rect.x + rect.w);
   const closestY = clamp(point.y, rect.y, rect.y + rect.h);
   return Math.hypot(point.x - closestX, point.y - closestY);
+}
+
+function rectCenter(rect) {
+  return { x: rect.x + rect.w / 2, y: rect.y + rect.h / 2 };
+}
+
+function normalizedVector(from, to) {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.hypot(dx, dy) || 1;
+  return { x: dx / length, y: dy / length };
+}
+
+function dot(a, b) {
+  return a.x * b.x + a.y * b.y;
 }
 
 function pointInRect(point, rect) {
@@ -175,6 +211,7 @@ function damageEnemy(enemy, amount) {
     enemy.health = 0;
     enemy.down = true;
     enemy.targetId = null;
+    enemy.fireTimer = 0;
   }
 }
 
@@ -185,7 +222,23 @@ function damageOperator(op, amount) {
     op.down = true;
     op.path = [];
     op.action = null;
+    op.fireTimer = 0;
   }
+}
+
+function fireAutomatic(shooter, target, weapon, dt, damageTarget) {
+  if (shooter.targetId !== target.id) {
+    shooter.targetId = target.id;
+    shooter.reaction = 0;
+    shooter.fireTimer = 0;
+  }
+
+  shooter.reaction += dt;
+  shooter.fireTimer = Math.max(0, shooter.fireTimer - dt);
+  if (shooter.reaction < weapon.reactionDelay || shooter.fireTimer > 0) return;
+
+  damageTarget(target, weapon.damage);
+  shooter.fireTimer = weapon.fireInterval;
 }
 
 function updateOperator(level, op, dt) {
@@ -229,9 +282,10 @@ function updateOperator(level, op, dt) {
 
 function updateOperatorCombat(level, op, dt) {
   if (op.down) return;
+  const weapon = weaponById(op.weaponId);
   const visible = level.enemies
     .filter((enemy) => !enemy.down)
-    .filter((enemy) => pointDistance(op, enemy) < 210)
+    .filter((enemy) => pointDistance(op, enemy) <= weapon.range)
     .filter((enemy) => hasLineOfSight(op, enemy, level))
     .sort((a, b) => pointDistance(op, a) - pointDistance(op, b));
 
@@ -239,35 +293,34 @@ function updateOperatorCombat(level, op, dt) {
   if (!target) {
     op.targetId = null;
     op.reaction = Math.max(0, op.reaction - dt * 0.9);
+    op.fireTimer = Math.max(0, op.fireTimer - dt);
     return;
   }
 
-  op.targetId = target.id;
   op.aim = angleTo(op, target);
-  op.reaction += dt;
-  if (op.reaction > 0.42) {
-    damageEnemy(target, 38);
-    op.reaction = 0.04;
-  }
+  fireAutomatic(op, target, weapon, dt, damageEnemy);
 }
 
 function updateEnemy(level, enemy, dt) {
   if (enemy.down) return;
+  const weapon = weaponById(enemy.weaponId);
   const liveOps = level.operators.filter((op) => !op.down);
-  const seen = liveOps.find((op) => inFieldOfView(enemy, op) && hasLineOfSight(enemy, op, level));
+  const seen = liveOps
+    .filter((op) => pointDistance(enemy, op) <= weapon.range)
+    .find((op) => inFieldOfView(enemy, op) && hasLineOfSight(enemy, op, level));
   if (seen) {
-    enemy.targetId = seen.id;
-    enemy.reaction += dt;
     enemy.angle = angleTo(enemy, seen);
-    if (enemy.reaction > 0.7) {
-      damageOperator(seen, 34);
-      enemy.reaction = 0.1;
-    }
+    fireAutomatic(enemy, seen, weapon, dt, damageOperator);
     return;
   }
 
   enemy.targetId = null;
   enemy.reaction = Math.max(0, enemy.reaction - dt * 0.8);
+  enemy.fireTimer = Math.max(0, enemy.fireTimer - dt);
+  if (enemy.watch) {
+    enemy.angle = angleTo(enemy, enemy.watch);
+    return;
+  }
   updateEnemyPatrol(level, enemy, dt);
 }
 
@@ -314,8 +367,8 @@ function simplifyPath(points) {
 }
 
 function findPath(level, start, goal) {
-  const cols = Math.floor(960 / CELL);
-  const rows = Math.floor(640 / CELL);
+  const cols = Math.floor((level.width || 960) / CELL);
+  const rows = Math.floor((level.height || 640) / CELL);
   const key = (c, r) => `${c},${r}`;
   const toCell = (p) => ({
     c: clamp(Math.round(p.x / CELL), 0, cols - 1),
@@ -381,12 +434,64 @@ function findPath(level, start, goal) {
   return null;
 }
 
+function assessDoorFacing(level) {
+  const openLevel = cloneLevel(level);
+  for (const door of openLevel.doors) door.state = "open";
+
+  return openLevel.enemies.map((enemy) => {
+    const best = openLevel.doors
+      .map((door) => {
+        const center = rectCenter(door);
+        const operatorScore = openLevel.operators.reduce((score, op) => {
+          const missionVector = normalizedVector(op, openLevel.objective);
+          const doorVector = normalizedVector(op, center);
+          return Math.max(score, dot(missionVector, doorVector));
+        }, -Infinity);
+        const enemyDistance = pointDistance(enemy, center);
+        return {
+          door,
+          center,
+          score: operatorScore * 280 - enemyDistance
+        };
+      })
+      .sort((a, b) => b.score - a.score)[0];
+
+    const expectedAngle = angleTo(enemy, best.center);
+    const watch = enemy.watch || { x: enemy.x + Math.cos(enemy.angle) * 80, y: enemy.y + Math.sin(enemy.angle) * 80 };
+    const watchAngle = angleTo(enemy, watch);
+    const angleDelta = Math.abs(normalizeAngle(watchAngle - expectedAngle));
+    const closeEquivalent = pointDistance(watch, best.center) <= 95;
+    const facing = angleDelta <= 0.45 || closeEquivalent;
+
+    return {
+      id: enemy.id,
+      expectedDoor: best.door.id,
+      watch,
+      angleDelta: Number(angleDelta.toFixed(3)),
+      facing
+    };
+  });
+}
+
 function simulate(levelRaw) {
   const level = cloneLevel(levelRaw);
+  const watchLevel = cloneLevel(levelRaw);
+  for (const door of watchLevel.doors) door.state = "open";
+  const watchCoverage = watchLevel.enemies
+    .filter((enemy) => enemy.watch)
+    .map((enemy) => {
+      enemy.angle = angleTo(enemy, enemy.watch);
+      return {
+        id: enemy.id,
+        watch: enemy.watch,
+        covered: inFieldOfView(enemy, enemy.watch) && hasLineOfSight(enemy, enemy.watch, watchLevel)
+      };
+    });
   const enemyReachability = level.enemies.map((enemy) => ({
     id: enemy.id,
     reachable: level.operators.some((op) => Boolean(findPath(level, op, enemy)))
   }));
+  const doorFacing = assessDoorFacing(levelRaw);
 
   for (const op of level.operators) {
     const route = findPath(level, op, level.objective);
@@ -421,6 +526,8 @@ function simulate(levelRaw) {
     t: Number(t.toFixed(2)),
     objective: level.objective.secured,
     enemiesDown: `${level.enemies.filter((enemy) => enemy.down).length}/${level.enemies.length}`,
+    watchCoverage,
+    doorFacing,
     enemyReachability,
     operators: level.operators.map((op) => ({
       id: op.id,
@@ -439,7 +546,14 @@ for (const file of LEVEL_FILES) {
   const level = JSON.parse(fs.readFileSync(path.join("level", file), "utf8"));
   const result = simulate(level);
   console.log(JSON.stringify(result, null, 2));
-  if (result.result !== "success") failed = true;
+  if (
+    result.result !== "success"
+    || result.watchCoverage.some((watch) => !watch.covered)
+    || result.doorFacing.some((door) => !door.facing)
+    || result.enemyReachability.some((enemy) => !enemy.reachable)
+  ) {
+    failed = true;
+  }
 }
 
 process.exitCode = failed ? 1 : 0;

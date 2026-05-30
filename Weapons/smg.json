@@ -1,0 +1,10 @@
+{
+  "id": "smg",
+  "name": "SMG",
+  "role": "Fast close-quarters weapon",
+  "range": 185,
+  "damage": 12,
+  "fireInterval": 0.08,
+  "reactionDelay": 0.32,
+  "tracerTtl": 0.06
+}

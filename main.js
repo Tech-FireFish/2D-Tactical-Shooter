@@ -4,19 +4,25 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const levelTitle = document.getElementById("levelTitle");
 const levelSelect = document.getElementById("levelSelect");
+const operatorCountSelect = document.getElementById("operatorCountSelect");
 const modeLabel = document.getElementById("modeLabel");
 const clockLabel = document.getElementById("clockLabel");
 const objectiveLabel = document.getElementById("objectiveLabel");
 const runButton = document.getElementById("runButton");
 const restartButton = document.getElementById("restartButton");
 const debugButton = document.getElementById("debugButton");
+const weaponSelect = document.getElementById("weaponSelect");
+const selectedOperatorLabel = document.getElementById("selectedOperatorLabel");
+const weaponStats = document.getElementById("weaponStats");
+const operatorHealthBoard = document.getElementById("operatorHealthBoard");
 const banner = document.getElementById("banner");
 const bannerTitle = document.getElementById("bannerTitle");
 const bannerText = document.getElementById("bannerText");
 const nextLevelButton = document.getElementById("nextLevelButton");
 const bannerRestartButton = document.getElementById("bannerRestartButton");
 
-const WORLD = { w: 960, h: 640 };
+const DEFAULT_WORLD = { w: 960, h: 640 };
+const WORLD = { ...DEFAULT_WORLD };
 const TWO_PI = Math.PI * 2;
 const UNIT_RADIUS = 12;
 const MANUAL_KEYS = new Set(["w", "a", "s", "d"]);
@@ -45,14 +51,60 @@ const colors = {
 let state;
 let currentLevel;
 let currentLevelMeta;
+let activeOperatorCount = 2;
 let lastTime = performance.now();
 const keysDown = new Set();
+const weapons = new Map();
+const operatorLoadouts = {};
+let lastHealthBoardHtml = "";
 
 const LEVEL_OPTIONS = [
   { id: "ridge-house-entry", title: "Ridge House Entry", file: "level/ridge-house-entry.json" },
   { id: "warehouse-pinch", title: "Warehouse Pinch", file: "level/warehouse-pinch.json" },
-  { id: "hardpoint-gallery", title: "Hardpoint Gallery", file: "level/hardpoint-gallery.json" }
+  { id: "hardpoint-gallery", title: "Hardpoint Gallery", file: "level/hardpoint-gallery.json" },
+  { id: "terminal-breach", title: "Terminal Breach", file: "level/terminal-breach.json" }
 ];
+
+const WEAPON_OPTIONS = [
+  { id: "rifle", file: "Weapons/rifle.json" },
+  { id: "smg", file: "Weapons/smg.json" },
+  { id: "pistol", file: "Weapons/pistol.json" }
+];
+
+function weaponById(id) {
+  return weapons.get(id) || weapons.get("rifle");
+}
+
+function validWeaponId(id) {
+  return weapons.has(id) ? id : "rifle";
+}
+
+async function loadWeapons() {
+  weapons.clear();
+  const loaded = await Promise.all(WEAPON_OPTIONS.map(async (meta) => {
+    const response = await fetch(meta.file, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Unable to load ${meta.file}: ${response.status}`);
+    }
+    return response.json();
+  }));
+  for (const weapon of loaded) {
+    weapons.set(weapon.id, weapon);
+  }
+  populateWeaponSelect();
+}
+
+function populateWeaponSelect() {
+  weaponSelect.innerHTML = "";
+  for (const meta of WEAPON_OPTIONS) {
+    const weapon = weapons.get(meta.id);
+    if (!weapon) continue;
+    const option = document.createElement("option");
+    option.value = weapon.id;
+    option.textContent = weapon.name;
+    weaponSelect.append(option);
+  }
+}
 
 function createGameState(level) {
   const firstOperator = level.operators[0];
@@ -71,16 +123,22 @@ function createGameState(level) {
 }
 
 function cloneLevel(level) {
+  const maxOperators = Math.max(1, Math.min(activeOperatorCount, level.operators.length));
   return {
     id: level.id,
     title: level.title,
+    width: level.width || DEFAULT_WORLD.w,
+    height: level.height || DEFAULT_WORLD.h,
+    floorZones: (level.floorZones || []).map((zone) => ({ ...zone })),
     walls: level.walls.map((wall) => ({ ...wall })),
     doors: level.doors.map((door) => ({ ...door })),
-    operators: level.operators.map((op) => ({
+    operators: level.operators.slice(0, maxOperators).map((op) => ({
       ...op,
       radius: UNIT_RADIUS,
       health: 100,
       speed: 92,
+      weaponId: validWeaponId(operatorLoadouts[op.id] || op.weaponId || "rifle"),
+      fireTimer: 0,
       path: [],
       aim: 0,
       action: null,
@@ -91,10 +149,13 @@ function cloneLevel(level) {
     })),
     enemies: level.enemies.map((enemy) => ({
       ...enemy,
+      watch: enemy.watch ? { ...enemy.watch } : null,
       radius: 12,
       health: 100,
       speed: 34,
-      sightRange: 190,
+      weaponId: validWeaponId(enemy.weaponId || "rifle"),
+      fireTimer: 0,
+      sightRange: enemy.sightRange || Math.max(190, weaponById(enemy.weaponId || "rifle").range),
       fov: Math.PI * 0.78,
       reaction: 0,
       targetId: null,
@@ -109,10 +170,19 @@ function restart() {
   if (!currentLevel) return;
   keysDown.clear();
   state = createGameState(currentLevel);
+  resizeWorld(state.level.width, state.level.height);
   lastTime = performance.now();
   banner.classList.add("hidden");
   levelTitle.textContent = currentLevel.title || currentLevelMeta.title;
   updateHud();
+}
+
+function resizeWorld(width, height) {
+  WORLD.w = width || DEFAULT_WORLD.w;
+  WORLD.h = height || DEFAULT_WORLD.h;
+  canvas.width = WORLD.w;
+  canvas.height = WORLD.h;
+  canvas.style.aspectRatio = `${WORLD.w} / ${WORLD.h}`;
 }
 
 function currentLevelIndex() {
@@ -178,6 +248,85 @@ function hasManualInput() {
 function selectedOperator() {
   if (!state) return null;
   return state.level.operators.find((op) => op.id === state.selectedId);
+}
+
+function selectOperator(id) {
+  if (!state) return;
+  const op = state.level.operators.find((item) => item.id === id && !item.down);
+  if (!op) return;
+  state.selectedId = op.id;
+  updateHud();
+}
+
+function renderLoadoutPanel() {
+  if (!state) {
+    weaponSelect.disabled = true;
+    selectedOperatorLabel.textContent = "Selected Operator";
+    weaponStats.textContent = "Loading...";
+    return;
+  }
+  const op = selectedOperator();
+  weaponSelect.disabled = !op || op.down || state.gameOver;
+  selectedOperatorLabel.textContent = op ? `${op.id} Weapon` : "Selected Operator";
+
+  if (!op) {
+    weaponStats.textContent = "No operator selected.";
+    return;
+  }
+
+  weaponSelect.value = validWeaponId(op.weaponId);
+  const weapon = weaponById(op.weaponId);
+  if (!weapon) {
+    weaponStats.textContent = "Weapon data unavailable.";
+    return;
+  }
+
+  weaponStats.innerHTML = `
+    <div>${weapon.role}</div>
+    <div class="weapon-stat-row"><span>Range</span><strong>${weapon.range}</strong></div>
+    <div class="weapon-stat-row"><span>Damage</span><strong>${weapon.damage}</strong></div>
+    <div class="weapon-stat-row"><span>Fire Rate</span><strong>${(1 / weapon.fireInterval).toFixed(1)}/s</strong></div>
+  `;
+}
+
+function renderHealthBoard() {
+  if (!state) {
+    if (lastHealthBoardHtml) {
+      operatorHealthBoard.innerHTML = "";
+      lastHealthBoardHtml = "";
+    }
+    return;
+  }
+
+  const html = state.level.operators.map((op) => {
+    const weapon = weaponById(op.weaponId);
+    const health = Math.max(0, Math.min(100, op.health));
+    const classes = [
+      "operator-card",
+      op.id === state.selectedId ? "selected" : "",
+      op.down ? "down" : ""
+    ].filter(Boolean).join(" ");
+    return `
+      <button class="${classes}" type="button" data-operator-id="${op.id}">
+        <span class="operator-row">
+          <strong>${op.id}</strong>
+          <span>${op.down ? "Down" : "Alive"}</span>
+        </span>
+        <span class="health-meter" aria-hidden="true">
+          <span class="health-fill" style="width: ${health}%"></span>
+        </span>
+        <span class="operator-row">
+          <span>${weapon ? weapon.name : "Rifle"}</span>
+          <span>${health.toFixed(0)} HP</span>
+        </span>
+      </button>
+    `;
+  }).join("");
+
+  if (html !== lastHealthBoardHtml) {
+    operatorHealthBoard.innerHTML = html;
+    lastHealthBoardHtml = html;
+  }
 }
 
 function getMouseWorld(event) {
@@ -297,6 +446,24 @@ function nearestClosedDoorOnRoute(op, next) {
   return best;
 }
 
+function nearestClosedDoorToOperator(op, maxDistance = 52) {
+  let best = null;
+  let bestDist = Infinity;
+  for (const door of state.level.doors) {
+    if (!doorBlocks(door)) continue;
+    const distance = pointRectDistance(op, door);
+    if (distance < maxDistance && distance < bestDist) {
+      best = door;
+      bestDist = distance;
+    }
+  }
+  return best;
+}
+
+function doorAtPoint(point) {
+  return state.level.doors.find((door) => doorBlocks(door) && pointInRect(point, inflateRect(door, 6)));
+}
+
 function inflateRect(rect, amount) {
   return {
     x: rect.x - amount,
@@ -306,12 +473,42 @@ function inflateRect(rect, amount) {
   };
 }
 
-function tryOpenDoor(op, door) {
-  if (!door || !doorBlocks(door)) return false;
-  if (!op.action) {
-    op.action = { type: "breach", doorId: door.id, timer: 0.34 };
-    state.message = `${op.id} breaching`;
+// Automatic door opening is disabled. Doors open only through E or direct door clicks.
+// function tryOpenDoor(op, door) {
+//   if (!door || !doorBlocks(door)) return false;
+//   if (!op.action) {
+//     op.action = { type: "breach", doorId: door.id, timer: 0.34 };
+//     state.message = `${op.id} breaching`;
+//   }
+//   return true;
+// }
+
+function openNearestDoor() {
+  if (!state || state.gameOver) return;
+  const op = selectedOperator();
+  if (!op || op.down) return;
+  const door = nearestClosedDoorToOperator(op);
+  if (!door) {
+    state.message = "No door in reach";
+    return;
   }
+  door.state = "open";
+  op.action = null;
+  state.message = `${op.id} opened ${door.id}`;
+}
+
+function openDoorByClick(door) {
+  const op = selectedOperator();
+  if (!op || op.down) return false;
+  if (pointRectDistance(op, door) > 52) {
+    state.message = "Move closer to the door";
+    updateHud();
+    return true;
+  }
+  door.state = "open";
+  op.action = null;
+  state.message = `${op.id} opened ${door.id}`;
+  updateHud();
   return true;
 }
 
@@ -335,8 +532,9 @@ function updateOperator(op, dt) {
   const target = op.path[0];
   if (!target) return;
 
-  const door = nearestClosedDoorOnRoute(op, target);
-  if (door && tryOpenDoor(op, door)) return;
+  // Automatic door opening is disabled; routes stop at closed doors until E or a door click opens them.
+  // const door = nearestClosedDoorOnRoute(op, target);
+  // if (door && tryOpenDoor(op, door)) return;
 
   const dist = pointDistance(op, target);
   if (dist < 4) {
@@ -380,8 +578,9 @@ function updateManualOperator(op, dt) {
     radius: op.radius
   };
 
-  const door = nearestClosedDoorOnRoute(op, next);
-  if (door && tryOpenDoor(op, door)) return;
+  // Automatic door opening is disabled; WASD movement cannot open doors without E or a door click.
+  // const door = nearestClosedDoorOnRoute(op, next);
+  // if (door && tryOpenDoor(op, door)) return;
   if (!collidesWithMap(state.level, next)) {
     op.x = next.x;
     op.y = next.y;
@@ -391,22 +590,24 @@ function updateManualOperator(op, dt) {
 function updateEnemy(enemy, dt) {
   if (enemy.down) return;
 
+  const weapon = weaponById(enemy.weaponId);
   const liveOps = state.level.operators.filter((op) => !op.down);
-  const seen = liveOps.find((op) => inFieldOfView(enemy, op) && hasLineOfSight(enemy, op, state.level));
+  const seen = liveOps
+    .filter((op) => pointDistance(enemy, op) <= weapon.range)
+    .find((op) => inFieldOfView(enemy, op) && hasLineOfSight(enemy, op, state.level));
   if (seen) {
-    enemy.targetId = seen.id;
-    enemy.reaction += dt;
     enemy.angle = angleTo(enemy, seen);
-    if (enemy.reaction > 0.7) {
-      damageOperator(seen, 34);
-      addShot(enemy, seen, colors.enemy);
-      enemy.reaction = 0.1;
-    }
+    fireAutomatic(enemy, seen, weapon, dt, damageOperator, colors.enemy);
     return;
   }
 
   enemy.targetId = null;
   enemy.reaction = Math.max(0, enemy.reaction - dt * 0.8);
+  enemy.fireTimer = Math.max(0, enemy.fireTimer - dt);
+  if (enemy.watch) {
+    enemy.angle = angleTo(enemy, enemy.watch);
+    return;
+  }
   updateEnemyPatrol(enemy, dt);
 }
 
@@ -433,9 +634,10 @@ function updateEnemyPatrol(enemy, dt) {
 
 function updateOperatorCombat(op, dt) {
   if (op.down) return;
+  const weapon = weaponById(op.weaponId);
   const visible = state.level.enemies
     .filter((enemy) => !enemy.down)
-    .filter((enemy) => pointDistance(op, enemy) < 210)
+    .filter((enemy) => pointDistance(op, enemy) <= weapon.range)
     .filter((enemy) => hasLineOfSight(op, enemy, state.level))
     .sort((a, b) => pointDistance(op, a) - pointDistance(op, b));
 
@@ -443,17 +645,30 @@ function updateOperatorCombat(op, dt) {
   if (!target) {
     op.targetId = null;
     op.reaction = Math.max(0, op.reaction - dt * 0.9);
+    op.fireTimer = Math.max(0, op.fireTimer - dt);
     return;
   }
 
-  op.targetId = target.id;
   op.aim = angleTo(op, target);
-  op.reaction += dt;
-  if (op.reaction > 0.42) {
-    damageEnemy(target, 38);
-    addShot(op, target, op.color);
-    op.reaction = 0.04;
+  fireAutomatic(op, target, weapon, dt, damageEnemy, op.color);
+}
+
+function fireAutomatic(shooter, target, weapon, dt, damageTarget, color) {
+  if (shooter.targetId !== target.id) {
+    shooter.targetId = target.id;
+    shooter.reaction = 0;
+    shooter.fireTimer = 0;
   }
+
+  shooter.reaction += dt;
+  shooter.fireTimer = Math.max(0, shooter.fireTimer - dt);
+  if (shooter.reaction < weapon.reactionDelay || shooter.fireTimer > 0) {
+    return;
+  }
+
+  damageTarget(target, weapon.damage);
+  addShot(shooter, target, color, weapon.tracerTtl);
+  shooter.fireTimer = weapon.fireInterval;
 }
 
 function damageEnemy(enemy, amount) {
@@ -462,6 +677,7 @@ function damageEnemy(enemy, amount) {
     enemy.health = 0;
     enemy.down = true;
     enemy.targetId = null;
+    enemy.fireTimer = 0;
   }
 }
 
@@ -472,15 +688,16 @@ function damageOperator(op, amount) {
     op.down = true;
     op.path = [];
     op.action = null;
+    op.fireTimer = 0;
   }
 }
 
-function addShot(from, to, color) {
+function addShot(from, to, color, ttl = 0.09) {
   state.shots.push({
     from: { x: from.x, y: from.y },
     to: { x: to.x, y: to.y },
     color,
-    ttl: 0.09
+    ttl
   });
 }
 
@@ -553,6 +770,8 @@ function updateHud() {
     clockLabel.textContent = "Off";
     objectiveLabel.textContent = "Loading";
     runButton.textContent = "Execute";
+    renderLoadoutPanel();
+    renderHealthBoard();
     return;
   }
   modeLabel.textContent = state.gameOver ? titleCase(state.result) : (hasManualInput() ? "Manual" : (state.running ? "Execute" : "Planning"));
@@ -568,6 +787,8 @@ function updateHud() {
     objectiveLabel.textContent = `${activeEnemies} hostiles`;
   }
   runButton.textContent = state.running ? "Pause" : "Execute";
+  renderLoadoutPanel();
+  renderHealthBoard();
 }
 
 function titleCase(value) {
@@ -588,6 +809,8 @@ function draw() {
   drawObjective();
   drawUnits();
   drawShots();
+  // Floating operator-door hint removed so it does not cover sight cones or nearby action.
+  // drawDoorHint();
   drawHudOverlay();
   if (state.debug) drawDebug();
 }
@@ -621,15 +844,20 @@ function drawFloor() {
   }
 
   ctx.fillStyle = colors.floorAlt;
-  ctx.fillRect(140, 110, 155, 230);
-  ctx.fillRect(315, 110, 185, 140);
-  ctx.fillRect(520, 110, 270, 140);
-  ctx.fillRect(315, 270, 185, 110);
-  ctx.fillRect(520, 270, 130, 110);
-  ctx.fillRect(670, 270, 120, 110);
-  ctx.fillRect(140, 360, 155, 150);
-  ctx.fillRect(315, 400, 185, 110);
-  ctx.fillRect(520, 400, 270, 110);
+  const zones = state.level.floorZones.length ? state.level.floorZones : [
+    { x: 140, y: 110, w: 155, h: 230 },
+    { x: 315, y: 110, w: 185, h: 140 },
+    { x: 520, y: 110, w: 270, h: 140 },
+    { x: 315, y: 270, w: 185, h: 110 },
+    { x: 520, y: 270, w: 130, h: 110 },
+    { x: 670, y: 270, w: 120, h: 110 },
+    { x: 140, y: 360, w: 155, h: 150 },
+    { x: 315, y: 400, w: 185, h: 110 },
+    { x: 520, y: 400, w: 270, h: 110 }
+  ];
+  for (const zone of zones) {
+    ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+  }
 }
 
 function drawRooms() {
@@ -691,7 +919,7 @@ function drawSight() {
 
   for (const op of state.level.operators) {
     if (op.down) continue;
-    drawCone(op, op.aim, 120, Math.PI * 0.52, colors.opSight);
+    drawCone(op, op.aim, weaponById(op.weaponId).range, Math.PI * 0.52, colors.opSight);
   }
 }
 
@@ -750,11 +978,12 @@ function drawUnit(unit, fill, label, isOperator) {
   ctx.textAlign = "center";
   ctx.fillText(label, unit.x, unit.y - unit.radius - 8);
 
-  const healthWidth = 30;
-  ctx.fillStyle = "rgba(0,0,0,0.45)";
-  ctx.fillRect(unit.x - healthWidth / 2, unit.y + unit.radius + 7, healthWidth, 4);
-  ctx.fillStyle = isOperator ? colors.op : colors.enemy;
-  ctx.fillRect(unit.x - healthWidth / 2, unit.y + unit.radius + 7, healthWidth * (unit.health / 100), 4);
+  // Canvas health bars removed so operator health lives in the left-side health board.
+  // const healthWidth = 30;
+  // ctx.fillStyle = "rgba(0,0,0,0.45)";
+  // ctx.fillRect(unit.x - healthWidth / 2, unit.y + unit.radius + 7, healthWidth, 4);
+  // ctx.fillStyle = isOperator ? colors.op : colors.enemy;
+  // ctx.fillRect(unit.x - healthWidth / 2, unit.y + unit.radius + 7, healthWidth * (unit.health / 100), 4);
 }
 
 function drawShots() {
@@ -768,12 +997,37 @@ function drawShots() {
   }
 }
 
+function drawDoorHint() {
+  const selected = selectedOperator();
+  if (!selected || selected.down || state.gameOver) return;
+  const door = nearestClosedDoorToOperator(selected);
+  if (!door) return;
+
+  // Floating operator-door hint removed so it does not cover sight cones or nearby action.
+  // const x = clamp(selected.x + 18, 24, WORLD.w - 190);
+  // const y = clamp(selected.y - 48, 24, WORLD.h - 50);
+  // ctx.fillStyle = "rgba(16,18,20,0.86)";
+  // ctx.strokeStyle = colors.doorClosed;
+  // ctx.lineWidth = 1;
+  // ctx.beginPath();
+  // ctx.roundRect(x, y, 166, 32, 6);
+  // ctx.fill();
+  // ctx.stroke();
+  //
+  // ctx.fillStyle = colors.doorClosed;
+  // ctx.font = "800 12px system-ui";
+  // ctx.textAlign = "center";
+  // ctx.textBaseline = "middle";
+  // ctx.fillText("Press E to open door", x + 83, y + 16);
+}
+
 function drawHudOverlay() {
   const selected = selectedOperator();
+  const nearDoor = selected && !selected.down ? nearestClosedDoorToOperator(selected) : null;
   ctx.fillStyle = "rgba(16,18,20,0.78)";
-  ctx.fillRect(22, 22, 278, 74);
+  ctx.fillRect(22, 22, 304, nearDoor ? 96 : 74);
   ctx.strokeStyle = "rgba(255,255,255,0.12)";
-  ctx.strokeRect(22, 22, 278, 74);
+  ctx.strokeRect(22, 22, 304, nearDoor ? 96 : 74);
   ctx.fillStyle = colors.text;
   ctx.font = "800 18px system-ui";
   ctx.textAlign = "left";
@@ -782,6 +1036,11 @@ function drawHudOverlay() {
   ctx.font = "600 13px system-ui";
   const pathCount = selected ? selected.path.length : 0;
   ctx.fillText(`Selected ${state.selectedId} | Waypoints ${pathCount}`, 38, 76);
+  if (nearDoor) {
+    ctx.fillStyle = colors.doorClosed;
+    ctx.font = "800 12px system-ui";
+    ctx.fillText("Door nearby: press E or click the door", 38, 98);
+  }
 }
 
 function drawDebug() {
@@ -815,6 +1074,9 @@ function onCanvasClick(event) {
   if (!state) return;
   if (state.gameOver) return;
   const pos = getMouseWorld(event);
+  const clickedDoor = doorAtPoint(pos);
+  if (clickedDoor && openDoorByClick(clickedDoor)) return;
+
   const clickedOp = state.level.operators.find((op) => !op.down && pointDistance(op, pos) <= op.radius + 8);
   if (clickedOp) {
     state.selectedId = clickedOp.id;
@@ -855,6 +1117,9 @@ function handleKey(event) {
     toggleRun();
   } else if (key === "r") {
     restart();
+  } else if (key === "e") {
+    event.preventDefault();
+    openNearestDoor();
   } else if (event.key === "F3") {
     event.preventDefault();
     state.debug = !state.debug;
@@ -881,6 +1146,21 @@ function loop(now) {
 
 canvas.addEventListener("click", onCanvasClick);
 canvas.addEventListener("contextmenu", onCanvasContext);
+operatorHealthBoard.addEventListener("click", (event) => {
+  const card = event.target.closest("[data-operator-id]");
+  if (!card) return;
+  selectOperator(card.dataset.operatorId);
+});
+weaponSelect.addEventListener("change", () => {
+  const op = selectedOperator();
+  if (!op) return;
+  op.weaponId = validWeaponId(weaponSelect.value);
+  op.fireTimer = 0;
+  op.reaction = 0;
+  operatorLoadouts[op.id] = op.weaponId;
+  state.message = `${op.id} equipped ${weaponById(op.weaponId).name}`;
+  updateHud();
+});
 window.addEventListener("keydown", handleKey);
 window.addEventListener("keyup", handleKeyUp);
 window.addEventListener("blur", () => {
@@ -899,15 +1179,34 @@ debugButton.addEventListener("click", () => {
 levelSelect.addEventListener("change", () => {
   loadLevel(levelSelect.value);
 });
+operatorCountSelect.addEventListener("change", () => {
+  activeOperatorCount = Number(operatorCountSelect.value);
+  restart();
+});
 
 window.__breachline = {
   getState: () => state,
+  getWeapons: () => [...weapons.values()],
   restart,
   loadLevel,
   loadNextLevel,
   toggleRun
 };
 
-populateLevelSelect();
-loadLevel(LEVEL_OPTIONS[0].id);
+async function boot() {
+  populateLevelSelect();
+  try {
+    await loadWeapons();
+    await loadLevel(LEVEL_OPTIONS[0].id);
+  } catch (error) {
+    state = null;
+    levelTitle.textContent = "Load Failed";
+    bannerTitle.textContent = "Load Failed";
+    bannerText.textContent = error.message;
+    banner.classList.remove("hidden");
+    updateHud();
+  }
+}
+
+boot();
 requestAnimationFrame(loop);
