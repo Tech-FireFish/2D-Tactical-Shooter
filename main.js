@@ -11,10 +11,22 @@ const objectiveLabel = document.getElementById("objectiveLabel");
 const runButton = document.getElementById("runButton");
 const restartButton = document.getElementById("restartButton");
 const debugButton = document.getElementById("debugButton");
+const settingsButton = document.getElementById("settingsButton");
 const weaponSelect = document.getElementById("weaponSelect");
+const armorSelect = document.getElementById("armorSelect");
 const selectedOperatorLabel = document.getElementById("selectedOperatorLabel");
 const weaponStats = document.getElementById("weaponStats");
 const operatorHealthBoard = document.getElementById("operatorHealthBoard");
+const settingsOverlay = document.getElementById("settingsOverlay");
+const closeSettingsButton = document.getElementById("closeSettingsButton");
+const difficultySelect = document.getElementById("difficultySelect");
+const enemyLoadoutList = document.getElementById("enemyLoadoutList");
+const digitalLockOverlay = document.getElementById("digitalLockOverlay");
+const digitalLockTitle = document.getElementById("digitalLockTitle");
+const digitalLockInput = document.getElementById("digitalLockInput");
+const digitalLockError = document.getElementById("digitalLockError");
+const unlockDigitalDoorButton = document.getElementById("unlockDigitalDoorButton");
+const cancelDigitalLockButton = document.getElementById("cancelDigitalLockButton");
 const banner = document.getElementById("banner");
 const bannerTitle = document.getElementById("bannerTitle");
 const bannerText = document.getElementById("bannerText");
@@ -25,6 +37,7 @@ const DEFAULT_WORLD = { w: 960, h: 640 };
 const WORLD = { ...DEFAULT_WORLD };
 const TWO_PI = Math.PI * 2;
 const UNIT_RADIUS = 12;
+const DIFFICULT_OPERATOR_SIGHT = 115;
 const MANUAL_KEYS = new Set(["w", "a", "s", "d"]);
 
 const colors = {
@@ -35,6 +48,8 @@ const colors = {
   wallEdge: "#2a3033",
   doorClosed: "#e0af56",
   doorOpen: "#70c58d",
+  doorLocked: "#e25f5f",
+  doorUnlocked: "#72b7ce",
   success: "#60c689",
   path: "#79c7dd",
   op: "#68c98f",
@@ -52,11 +67,22 @@ let state;
 let currentLevel;
 let currentLevelMeta;
 let activeOperatorCount = 2;
+let currentDifficulty = "normal";
+let settingsOpen = false;
+let settingsResumeRunning = false;
+let digitalLockOpen = false;
+let digitalLockResumeRunning = false;
+let activeDigitalDoorId = null;
 let lastTime = performance.now();
 const keysDown = new Set();
 const weapons = new Map();
+const armors = new Map();
 const operatorLoadouts = {};
+const operatorArmorLoadouts = {};
+const enemyLoadouts = {};
+const enemyArmorLoadouts = {};
 let lastHealthBoardHtml = "";
+let lastEnemyLoadoutHtml = "";
 
 const LEVEL_OPTIONS = [
   { id: "ridge-house-entry", title: "Ridge House Entry", file: "level/ridge-house-entry.json" },
@@ -66,9 +92,15 @@ const LEVEL_OPTIONS = [
 ];
 
 const WEAPON_OPTIONS = [
-  { id: "rifle", file: "Weapons/rifle.json" },
-  { id: "smg", file: "Weapons/smg.json" },
-  { id: "pistol", file: "Weapons/pistol.json" }
+  { id: "rifle", file: "equipment/rifle.json" },
+  { id: "smg", file: "equipment/smg.json" },
+  { id: "pistol", file: "equipment/pistol.json" }
+];
+
+const ARMOR_OPTIONS = [
+  { id: "light-armor", file: "equipment/light-armor.json" },
+  { id: "medium-armor", file: "equipment/medium-armor.json" },
+  { id: "heavy-armor", file: "equipment/heavy-armor.json" }
 ];
 
 function weaponById(id) {
@@ -79,22 +111,71 @@ function validWeaponId(id) {
   return weapons.has(id) ? id : "rifle";
 }
 
-async function loadWeapons() {
+function armorById(id) {
+  return armors.get(id) || armors.get("light-armor");
+}
+
+function validArmorId(id) {
+  return armors.has(id) ? id : "light-armor";
+}
+
+function currentLevelWeaponLoadouts() {
+  const levelId = currentLevelMeta ? currentLevelMeta.id : "default";
+  if (!enemyLoadouts[levelId]) enemyLoadouts[levelId] = {};
+  return enemyLoadouts[levelId];
+}
+
+function currentLevelArmorLoadouts() {
+  const levelId = currentLevelMeta ? currentLevelMeta.id : "default";
+  if (!enemyArmorLoadouts[levelId]) enemyArmorLoadouts[levelId] = {};
+  return enemyArmorLoadouts[levelId];
+}
+
+function weaponOptionsHtml(selectedId) {
+  return WEAPON_OPTIONS.map((meta) => {
+    const weapon = weapons.get(meta.id);
+    if (!weapon) return "";
+    const selected = weapon.id === selectedId ? " selected" : "";
+    return `<option value="${weapon.id}"${selected}>${weapon.name}</option>`;
+  }).join("");
+}
+
+function armorOptionsHtml(selectedId) {
+  return ARMOR_OPTIONS.map((meta) => {
+    const armor = armors.get(meta.id);
+    if (!armor) return "";
+    const selected = armor.id === selectedId ? " selected" : "";
+    return `<option value="${armor.id}"${selected}>${armor.name}</option>`;
+  }).join("");
+}
+
+async function loadEquipment() {
   weapons.clear();
-  const loaded = await Promise.all(WEAPON_OPTIONS.map(async (meta) => {
+  armors.clear();
+  const loadedWeapons = await Promise.all(WEAPON_OPTIONS.map(async (meta) => {
     const response = await fetch(meta.file, { cache: "no-store" });
     if (!response.ok) {
       throw new Error(`Unable to load ${meta.file}: ${response.status}`);
     }
     return response.json();
   }));
-  for (const weapon of loaded) {
+  const loadedArmors = await Promise.all(ARMOR_OPTIONS.map(async (meta) => {
+    const response = await fetch(meta.file, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Unable to load ${meta.file}: ${response.status}`);
+    }
+    return response.json();
+  }));
+  for (const weapon of loadedWeapons) {
     weapons.set(weapon.id, weapon);
   }
-  populateWeaponSelect();
+  for (const armor of loadedArmors) {
+    armors.set(armor.id, armor);
+  }
+  populateEquipmentSelects();
 }
 
-function populateWeaponSelect() {
+function populateEquipmentSelects() {
   weaponSelect.innerHTML = "";
   for (const meta of WEAPON_OPTIONS) {
     const weapon = weapons.get(meta.id);
@@ -104,6 +185,89 @@ function populateWeaponSelect() {
     option.textContent = weapon.name;
     weaponSelect.append(option);
   }
+  armorSelect.innerHTML = "";
+  for (const meta of ARMOR_OPTIONS) {
+    const armor = armors.get(meta.id);
+    if (!armor) continue;
+    const option = document.createElement("option");
+    option.value = armor.id;
+    option.textContent = armor.name;
+    armorSelect.append(option);
+  }
+}
+
+function renderEnemyLoadouts() {
+  if (!state) {
+    if (lastEnemyLoadoutHtml) {
+      enemyLoadoutList.innerHTML = "";
+      lastEnemyLoadoutHtml = "";
+    }
+    return;
+  }
+
+  const savedWeapons = currentLevelWeaponLoadouts();
+  const savedArmors = currentLevelArmorLoadouts();
+  const html = state.level.enemies.map((enemy) => {
+    const selectedWeaponId = validWeaponId(savedWeapons[enemy.id] || enemy.weaponId || "rifle");
+    const selectedArmorId = validArmorId(savedArmors[enemy.id] || enemy.armorId || "light-armor");
+    return `
+      <div class="enemy-loadout-row">
+        <strong>${enemy.id}</strong>
+        <select data-enemy-weapon-id="${enemy.id}" aria-label="${enemy.id} weapon">
+          ${weaponOptionsHtml(selectedWeaponId)}
+        </select>
+        <select data-enemy-armor-id="${enemy.id}" aria-label="${enemy.id} armor">
+          ${armorOptionsHtml(selectedArmorId)}
+        </select>
+      </div>
+    `;
+  }).join("");
+
+  if (html !== lastEnemyLoadoutHtml) {
+    enemyLoadoutList.innerHTML = html || "<p class=\"empty-note\">No enemies in this level.</p>";
+    lastEnemyLoadoutHtml = html;
+  }
+}
+
+function applyEnemyWeapon(enemyId, weaponId) {
+  const selectedWeaponId = validWeaponId(weaponId);
+  currentLevelWeaponLoadouts()[enemyId] = selectedWeaponId;
+  if (!state) return;
+  const enemy = state.level.enemies.find((item) => item.id === enemyId);
+  if (!enemy) return;
+  enemy.weaponId = selectedWeaponId;
+  enemy.fireTimer = 0;
+  enemy.reaction = 0;
+  enemy.sightRange = Math.max(190, weaponById(selectedWeaponId).range);
+  state.message = `${enemy.id} equipped ${weaponById(selectedWeaponId).name}`;
+  updateHud();
+}
+
+function applyEnemyArmor(enemyId, armorId) {
+  const selectedArmorId = validArmorId(armorId);
+  currentLevelArmorLoadouts()[enemyId] = selectedArmorId;
+  if (!state) return;
+  const enemy = state.level.enemies.find((item) => item.id === enemyId);
+  if (!enemy) return;
+  const armor = armorById(selectedArmorId);
+  enemy.armorId = selectedArmorId;
+  enemy.maxArmor = armor.armor;
+  enemy.armor = armor.armor;
+  enemy.speed = (enemy.baseSpeed || 34) * armor.speedMultiplier;
+  state.message = `${enemy.id} equipped ${armor.name}`;
+  updateHud();
+}
+
+function applyOperatorArmor(op, armorId) {
+  const selectedArmorId = validArmorId(armorId);
+  const armor = armorById(selectedArmorId);
+  op.armorId = selectedArmorId;
+  op.maxArmor = armor.armor;
+  op.armor = armor.armor;
+  op.speed = (op.baseSpeed || 92) * armor.speedMultiplier;
+  operatorArmorLoadouts[op.id] = selectedArmorId;
+  state.message = `${op.id} equipped ${armor.name}`;
+  updateHud();
 }
 
 function createGameState(level) {
@@ -114,8 +278,6 @@ function createGameState(level) {
     result: null,
     debug: false,
     selectedId: firstOperator ? firstOperator.id : null,
-    // Clock progression is disabled by request; mission rules no longer depend on elapsed time.
-    // clock: 0,
     message: "Draw routes, then execute",
     shots: [],
     level: cloneLevel(level)
@@ -124,6 +286,8 @@ function createGameState(level) {
 
 function cloneLevel(level) {
   const maxOperators = Math.max(1, Math.min(activeOperatorCount, level.operators.length));
+  const levelWeaponLoadouts = currentLevelWeaponLoadouts();
+  const levelArmorLoadouts = currentLevelArmorLoadouts();
   return {
     id: level.id,
     title: level.title,
@@ -131,37 +295,60 @@ function cloneLevel(level) {
     height: level.height || DEFAULT_WORLD.h,
     floorZones: (level.floorZones || []).map((zone) => ({ ...zone })),
     walls: level.walls.map((wall) => ({ ...wall })),
-    doors: level.doors.map((door) => ({ ...door })),
-    operators: level.operators.slice(0, maxOperators).map((op) => ({
-      ...op,
-      radius: UNIT_RADIUS,
-      health: 100,
-      speed: 92,
-      weaponId: validWeaponId(operatorLoadouts[op.id] || op.weaponId || "rifle"),
-      fireTimer: 0,
-      path: [],
-      aim: 0,
-      action: null,
-      reaction: 0,
-      targetId: null,
-      down: false,
-      routeIndex: 0
+    doors: level.doors.map((door) => ({
+      ...door,
+      password: door.lockType === "digital" ? (door.password || "0000") : door.password,
+      locked: door.lockType === "digital" ? door.locked !== false : Boolean(door.locked)
     })),
-    enemies: level.enemies.map((enemy) => ({
-      ...enemy,
-      watch: enemy.watch ? { ...enemy.watch } : null,
-      radius: 12,
-      health: 100,
-      speed: 34,
-      weaponId: validWeaponId(enemy.weaponId || "rifle"),
-      fireTimer: 0,
-      sightRange: enemy.sightRange || Math.max(190, weaponById(enemy.weaponId || "rifle").range),
-      fov: Math.PI * 0.78,
-      reaction: 0,
-      targetId: null,
-      down: false,
-      patrolIndex: 0
-    })),
+    operators: level.operators.slice(0, maxOperators).map((op) => {
+      const armorId = validArmorId(operatorArmorLoadouts[op.id] || op.armorId || "light-armor");
+      const armor = armorById(armorId);
+      const baseSpeed = op.speed || 92;
+      return {
+        ...op,
+        radius: UNIT_RADIUS,
+        health: 100,
+        armorId,
+        armor: armor.armor,
+        maxArmor: armor.armor,
+        baseSpeed,
+        speed: baseSpeed * armor.speedMultiplier,
+        weaponId: validWeaponId(operatorLoadouts[op.id] || op.weaponId || "rifle"),
+        fireTimer: 0,
+        path: [],
+        aim: 0,
+        action: null,
+        reaction: 0,
+        targetId: null,
+        down: false,
+        routeIndex: 0
+      };
+    }),
+    enemies: level.enemies.map((enemy) => {
+      const weaponId = validWeaponId(levelWeaponLoadouts[enemy.id] || enemy.weaponId || "rifle");
+      const armorId = validArmorId(levelArmorLoadouts[enemy.id] || enemy.armorId || "light-armor");
+      const armor = armorById(armorId);
+      const baseSpeed = enemy.speed || 34;
+      return {
+        ...enemy,
+        watch: enemy.watch ? { ...enemy.watch } : null,
+        radius: 12,
+        health: 100,
+        armorId,
+        armor: armor.armor,
+        maxArmor: armor.armor,
+        baseSpeed,
+        speed: baseSpeed * armor.speedMultiplier,
+        weaponId,
+        fireTimer: 0,
+        sightRange: enemy.sightRange || Math.max(190, weaponById(weaponId).range),
+        fov: Math.PI * 0.78,
+        reaction: 0,
+        targetId: null,
+        down: false,
+        patrolIndex: 0
+      };
+    }),
     objective: { ...level.objective }
   };
 }
@@ -236,6 +423,7 @@ function loadNextLevel() {
 function toggleRun() {
   if (!state) return;
   if (state.gameOver) return;
+  if (gameplayPausedByOverlay()) return;
   state.running = !state.running;
   state.message = state.running ? "Execute" : "Planning";
   updateHud();
@@ -261,12 +449,14 @@ function selectOperator(id) {
 function renderLoadoutPanel() {
   if (!state) {
     weaponSelect.disabled = true;
+    armorSelect.disabled = true;
     selectedOperatorLabel.textContent = "Selected Operator";
     weaponStats.textContent = "Loading...";
     return;
   }
   const op = selectedOperator();
   weaponSelect.disabled = !op || op.down || state.gameOver;
+  armorSelect.disabled = !op || op.down || state.gameOver;
   selectedOperatorLabel.textContent = op ? `${op.id} Weapon` : "Selected Operator";
 
   if (!op) {
@@ -275,9 +465,11 @@ function renderLoadoutPanel() {
   }
 
   weaponSelect.value = validWeaponId(op.weaponId);
+  armorSelect.value = validArmorId(op.armorId);
   const weapon = weaponById(op.weaponId);
-  if (!weapon) {
-    weaponStats.textContent = "Weapon data unavailable.";
+  const armor = armorById(op.armorId);
+  if (!weapon || !armor) {
+    weaponStats.textContent = "Equipment data unavailable.";
     return;
   }
 
@@ -286,6 +478,8 @@ function renderLoadoutPanel() {
     <div class="weapon-stat-row"><span>Range</span><strong>${weapon.range}</strong></div>
     <div class="weapon-stat-row"><span>Damage</span><strong>${weapon.damage}</strong></div>
     <div class="weapon-stat-row"><span>Fire Rate</span><strong>${(1 / weapon.fireInterval).toFixed(1)}/s</strong></div>
+    <div class="weapon-stat-row"><span>Armor</span><strong>${armor.armor}</strong></div>
+    <div class="weapon-stat-row"><span>Mobility</span><strong>${Math.round(armor.speedMultiplier * 100)}%</strong></div>
   `;
 }
 
@@ -301,6 +495,7 @@ function renderHealthBoard() {
   const html = state.level.operators.map((op) => {
     const weapon = weaponById(op.weaponId);
     const health = Math.max(0, Math.min(100, op.health));
+    const armorPercent = op.maxArmor > 0 ? Math.max(0, Math.min(100, (op.armor / op.maxArmor) * 100)) : 0;
     const classes = [
       "operator-card",
       op.id === state.selectedId ? "selected" : "",
@@ -311,6 +506,13 @@ function renderHealthBoard() {
         <span class="operator-row">
           <strong>${op.id}</strong>
           <span>${op.down ? "Down" : "Alive"}</span>
+        </span>
+        <span class="health-meter" aria-hidden="true">
+          <span class="armor-fill" style="width: ${armorPercent}%"></span>
+        </span>
+        <span class="operator-row">
+          <span>${armorById(op.armorId).name}</span>
+          <span>${op.armor.toFixed(0)} AR</span>
         </span>
         <span class="health-meter" aria-hidden="true">
           <span class="health-fill" style="width: ${health}%"></span>
@@ -327,6 +529,105 @@ function renderHealthBoard() {
     operatorHealthBoard.innerHTML = html;
     lastHealthBoardHtml = html;
   }
+}
+
+function openSettings() {
+  if (settingsOpen || digitalLockOpen) return;
+  settingsResumeRunning = Boolean(state && state.running);
+  if (state) state.running = false;
+  keysDown.clear();
+  settingsOpen = true;
+  settingsOverlay.classList.remove("hidden");
+  renderEnemyLoadouts();
+  updateHud();
+}
+
+function closeSettings() {
+  if (!settingsOpen) return;
+  settingsOpen = false;
+  settingsOverlay.classList.add("hidden");
+  if (state && !state.gameOver && settingsResumeRunning) {
+    state.running = true;
+  }
+  settingsResumeRunning = false;
+  updateHud();
+}
+
+function toggleSettings() {
+  if (settingsOpen) {
+    closeSettings();
+  } else {
+    openSettings();
+  }
+}
+
+function gameplayPausedByOverlay() {
+  return settingsOpen || digitalLockOpen;
+}
+
+function openDigitalLock(door) {
+  if (!state || !door || digitalLockOpen || settingsOpen) return;
+  digitalLockResumeRunning = Boolean(state.running);
+  state.running = false;
+  keysDown.clear();
+  activeDigitalDoorId = door.id;
+  digitalLockTitle.textContent = `${door.id} Locked`;
+  digitalLockInput.value = "";
+  digitalLockError.textContent = "";
+  digitalLockOpen = true;
+  digitalLockOverlay.classList.remove("hidden");
+  digitalLockInput.focus();
+  updateHud();
+}
+
+function closeDigitalLock(restoreRunning = true) {
+  if (!digitalLockOpen) return;
+  digitalLockOpen = false;
+  digitalLockOverlay.classList.add("hidden");
+  activeDigitalDoorId = null;
+  if (restoreRunning && state && !state.gameOver && digitalLockResumeRunning) {
+    state.running = true;
+  }
+  digitalLockResumeRunning = false;
+  updateHud();
+}
+
+function submitDigitalLock() {
+  if (!state || !activeDigitalDoorId) return;
+  const door = state.level.doors.find((item) => item.id === activeDigitalDoorId);
+  if (!door) {
+    closeDigitalLock(false);
+    return;
+  }
+  if (digitalLockInput.value === (door.password || "0000")) {
+    door.locked = false;
+    door.state = "closed";
+    state.message = `${door.id} unlocked`;
+    closeDigitalLock();
+  } else {
+    digitalLockError.textContent = "Incorrect password";
+    digitalLockInput.select();
+  }
+}
+
+function operatorSightRange(op) {
+  if (currentDifficulty === "difficult") return DIFFICULT_OPERATOR_SIGHT;
+  return weaponById(op.weaponId).range;
+}
+
+function visibleToOperators(target) {
+  if (currentDifficulty !== "difficult") return true;
+  return state.level.operators.some((op) => {
+    if (op.down) return false;
+    return pointDistance(op, target) <= operatorSightRange(op)
+      && hasLineOfSight(op, target, state.level);
+  });
+}
+
+function objectiveVisible() {
+  if (!state) return false;
+  const obj = state.level.objective;
+  return currentDifficulty !== "difficult" || obj.secured || obj.harmed || visibleToOperators(obj);
 }
 
 function getMouseWorld(event) {
@@ -473,15 +774,28 @@ function inflateRect(rect, amount) {
   };
 }
 
-// Automatic door opening is disabled. Doors open only through E or direct door clicks.
-// function tryOpenDoor(op, door) {
-//   if (!door || !doorBlocks(door)) return false;
-//   if (!op.action) {
-//     op.action = { type: "breach", doorId: door.id, timer: 0.34 };
-//     state.message = `${op.id} breaching`;
-//   }
-//   return true;
-// }
+function isDigitalLockDoor(door) {
+  return door && door.lockType === "digital";
+}
+
+function isLockedDigitalDoor(door) {
+  return isDigitalLockDoor(door) && door.locked !== false;
+}
+
+function interactWithDoor(op, door) {
+  if (!door || !op || op.down) return false;
+  if (isLockedDigitalDoor(door)) {
+    openDigitalLock(door);
+    state.message = `${door.id} locked`;
+    updateHud();
+    return true;
+  }
+  door.state = "open";
+  op.action = null;
+  state.message = `${op.id} opened ${door.id}`;
+  updateHud();
+  return true;
+}
 
 function openNearestDoor() {
   if (!state || state.gameOver) return;
@@ -492,9 +806,7 @@ function openNearestDoor() {
     state.message = "No door in reach";
     return;
   }
-  door.state = "open";
-  op.action = null;
-  state.message = `${op.id} opened ${door.id}`;
+  interactWithDoor(op, door);
 }
 
 function openDoorByClick(door) {
@@ -505,11 +817,7 @@ function openDoorByClick(door) {
     updateHud();
     return true;
   }
-  door.state = "open";
-  op.action = null;
-  state.message = `${op.id} opened ${door.id}`;
-  updateHud();
-  return true;
+  return interactWithDoor(op, door);
 }
 
 function updateOperator(op, dt) {
@@ -531,10 +839,6 @@ function updateOperator(op, dt) {
 
   const target = op.path[0];
   if (!target) return;
-
-  // Automatic door opening is disabled; routes stop at closed doors until E or a door click opens them.
-  // const door = nearestClosedDoorOnRoute(op, target);
-  // if (door && tryOpenDoor(op, door)) return;
 
   const dist = pointDistance(op, target);
   if (dist < 4) {
@@ -578,9 +882,6 @@ function updateManualOperator(op, dt) {
     radius: op.radius
   };
 
-  // Automatic door opening is disabled; WASD movement cannot open doors without E or a door click.
-  // const door = nearestClosedDoorOnRoute(op, next);
-  // if (door && tryOpenDoor(op, door)) return;
   if (!collidesWithMap(state.level, next)) {
     op.x = next.x;
     op.y = next.y;
@@ -637,7 +938,7 @@ function updateOperatorCombat(op, dt) {
   const weapon = weaponById(op.weaponId);
   const visible = state.level.enemies
     .filter((enemy) => !enemy.down)
-    .filter((enemy) => pointDistance(op, enemy) <= weapon.range)
+    .filter((enemy) => pointDistance(op, enemy) <= Math.min(weapon.range, operatorSightRange(op)))
     .filter((enemy) => hasLineOfSight(op, enemy, state.level))
     .sort((a, b) => pointDistance(op, a) - pointDistance(op, b));
 
@@ -672,7 +973,7 @@ function fireAutomatic(shooter, target, weapon, dt, damageTarget, color) {
 }
 
 function damageEnemy(enemy, amount) {
-  enemy.health -= amount;
+  applyDamage(enemy, amount);
   if (enemy.health <= 0) {
     enemy.health = 0;
     enemy.down = true;
@@ -682,13 +983,25 @@ function damageEnemy(enemy, amount) {
 }
 
 function damageOperator(op, amount) {
-  op.health -= amount;
+  applyDamage(op, amount);
   if (op.health <= 0) {
     op.health = 0;
     op.down = true;
     op.path = [];
     op.action = null;
     op.fireTimer = 0;
+  }
+}
+
+function applyDamage(unit, amount) {
+  let remaining = amount;
+  if (unit.armor > 0) {
+    const absorbed = Math.min(unit.armor, remaining);
+    unit.armor -= absorbed;
+    remaining -= absorbed;
+  }
+  if (remaining > 0) {
+    unit.health -= remaining;
   }
 }
 
@@ -705,12 +1018,7 @@ function updateObjective() {
   const obj = state.level.objective;
   if (obj.secured || obj.harmed) return;
 
-  // Clock-based VIP harm is disabled; enemies no longer fail the mission after a timer expires.
-  // const enemyNear = state.level.enemies.some((enemy) => !enemy.down && pointDistance(enemy, obj) < 26);
   const opNear = state.level.operators.some((op) => !op.down && pointDistance(op, obj) < 34);
-  // if (enemyNear && state.clock > 8) {
-  //   obj.harmed = true;
-  // }
   if (opNear) {
     obj.secured = true;
   }
@@ -742,10 +1050,9 @@ function finishMission(result, title, text) {
 
 function update(dt) {
   if (!state) return;
+  if (gameplayPausedByOverlay()) return;
   const manualInput = hasManualInput();
   if (state.gameOver) return;
-  // Clock progression is disabled.
-  // state.clock += dt;
 
   for (const op of state.level.operators) {
     const isManualOperator = op.id === state.selectedId && manualInput;
@@ -772,11 +1079,10 @@ function updateHud() {
     runButton.textContent = "Execute";
     renderLoadoutPanel();
     renderHealthBoard();
+    renderEnemyLoadouts();
     return;
   }
-  modeLabel.textContent = state.gameOver ? titleCase(state.result) : (hasManualInput() ? "Manual" : (state.running ? "Execute" : "Planning"));
-  // Clock display is disabled.
-  // clockLabel.textContent = state.clock.toFixed(1).padStart(4, "0");
+  modeLabel.textContent = digitalLockOpen ? "Digital Lock" : (settingsOpen ? "Settings" : (state.gameOver ? titleCase(state.result) : (hasManualInput() ? "Manual" : (state.running ? "Execute" : "Planning"))));
   clockLabel.textContent = "Off";
   if (state.level.objective.secured) {
     objectiveLabel.textContent = "Secured";
@@ -787,8 +1093,10 @@ function updateHud() {
     objectiveLabel.textContent = `${activeEnemies} hostiles`;
   }
   runButton.textContent = state.running ? "Pause" : "Execute";
+  difficultySelect.value = currentDifficulty;
   renderLoadoutPanel();
   renderHealthBoard();
+  renderEnemyLoadouts();
 }
 
 function titleCase(value) {
@@ -809,8 +1117,6 @@ function draw() {
   drawObjective();
   drawUnits();
   drawShots();
-  // Floating operator-door hint removed so it does not cover sight cones or nearby action.
-  // drawDoorHint();
   drawHudOverlay();
   if (state.debug) drawDebug();
 }
@@ -884,7 +1190,27 @@ function drawDoors() {
       ctx.fillRect(-doorLong(door) / 2, -4, doorLong(door), 8);
     }
     ctx.restore();
+    drawDoorIndicator(door, center);
   }
+}
+
+function drawDoorIndicator(door, center) {
+  if (!isDigitalLockDoor(door) || door.state !== "closed") return;
+  const locked = isLockedDigitalDoor(door);
+  ctx.save();
+  ctx.fillStyle = locked ? colors.doorLocked : colors.doorUnlocked;
+  ctx.strokeStyle = "rgba(0,0,0,0.65)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, 9, 0, TWO_PI);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = "#101214";
+  ctx.font = "900 10px system-ui";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(locked ? "L" : "U", center.x, center.y + 0.5);
+  ctx.restore();
 }
 
 function doorLong(door) {
@@ -914,12 +1240,13 @@ function drawPaths() {
 function drawSight() {
   for (const enemy of state.level.enemies) {
     if (enemy.down) continue;
+    if (currentDifficulty === "difficult" && !visibleToOperators(enemy)) continue;
     drawCone(enemy, enemy.angle, enemy.sightRange, enemy.fov, colors.sight);
   }
 
   for (const op of state.level.operators) {
     if (op.down) continue;
-    drawCone(op, op.aim, weaponById(op.weaponId).range, Math.PI * 0.52, colors.opSight);
+    drawCone(op, op.aim, operatorSightRange(op), Math.PI * 0.52, colors.opSight);
   }
 }
 
@@ -933,6 +1260,7 @@ function drawCone(origin, angle, length, fov, fill) {
 }
 
 function drawObjective() {
+  if (!objectiveVisible()) return;
   const obj = state.level.objective;
   ctx.fillStyle = obj.harmed ? colors.enemy : colors.hostage;
   ctx.strokeStyle = obj.secured ? colors.success : "#5d5330";
@@ -949,7 +1277,10 @@ function drawObjective() {
 }
 
 function drawUnits() {
-  for (const enemy of state.level.enemies) drawUnit(enemy, enemy.down ? "#573030" : colors.enemy, enemy.id, false);
+  for (const enemy of state.level.enemies) {
+    if (currentDifficulty === "difficult" && !visibleToOperators(enemy)) continue;
+    drawUnit(enemy, enemy.down ? "#573030" : colors.enemy, enemy.id, false);
+  }
   for (const op of state.level.operators) drawUnit(op, op.down ? "#2d4035" : op.color, op.id, true);
 }
 
@@ -977,13 +1308,6 @@ function drawUnit(unit, fill, label, isOperator) {
   ctx.font = "800 10px system-ui";
   ctx.textAlign = "center";
   ctx.fillText(label, unit.x, unit.y - unit.radius - 8);
-
-  // Canvas health bars removed so operator health lives in the left-side health board.
-  // const healthWidth = 30;
-  // ctx.fillStyle = "rgba(0,0,0,0.45)";
-  // ctx.fillRect(unit.x - healthWidth / 2, unit.y + unit.radius + 7, healthWidth, 4);
-  // ctx.fillStyle = isOperator ? colors.op : colors.enemy;
-  // ctx.fillRect(unit.x - healthWidth / 2, unit.y + unit.radius + 7, healthWidth * (unit.health / 100), 4);
 }
 
 function drawShots() {
@@ -995,30 +1319,6 @@ function drawShots() {
     ctx.lineTo(shot.to.x, shot.to.y);
     ctx.stroke();
   }
-}
-
-function drawDoorHint() {
-  const selected = selectedOperator();
-  if (!selected || selected.down || state.gameOver) return;
-  const door = nearestClosedDoorToOperator(selected);
-  if (!door) return;
-
-  // Floating operator-door hint removed so it does not cover sight cones or nearby action.
-  // const x = clamp(selected.x + 18, 24, WORLD.w - 190);
-  // const y = clamp(selected.y - 48, 24, WORLD.h - 50);
-  // ctx.fillStyle = "rgba(16,18,20,0.86)";
-  // ctx.strokeStyle = colors.doorClosed;
-  // ctx.lineWidth = 1;
-  // ctx.beginPath();
-  // ctx.roundRect(x, y, 166, 32, 6);
-  // ctx.fill();
-  // ctx.stroke();
-  //
-  // ctx.fillStyle = colors.doorClosed;
-  // ctx.font = "800 12px system-ui";
-  // ctx.textAlign = "center";
-  // ctx.textBaseline = "middle";
-  // ctx.fillText("Press E to open door", x + 83, y + 16);
 }
 
 function drawHudOverlay() {
@@ -1039,7 +1339,10 @@ function drawHudOverlay() {
   if (nearDoor) {
     ctx.fillStyle = colors.doorClosed;
     ctx.font = "800 12px system-ui";
-    ctx.fillText("Door nearby: press E or click the door", 38, 98);
+    const hint = isLockedDigitalDoor(nearDoor)
+      ? "Door locked: press E or click to enter code"
+      : (isDigitalLockDoor(nearDoor) ? "Door unlocked: press E or click to open" : "Door nearby: press E or click the door");
+    ctx.fillText(hint, 38, 98);
   }
 }
 
@@ -1106,8 +1409,18 @@ function onCanvasContext(event) {
 }
 
 function handleKey(event) {
-  if (!state) return;
   const key = event.key.toLowerCase();
+  if (event.key === "Escape") {
+    event.preventDefault();
+    if (digitalLockOpen) {
+      closeDigitalLock();
+    } else {
+      toggleSettings();
+    }
+    return;
+  }
+  if (!state) return;
+  if (gameplayPausedByOverlay()) return;
   if (MANUAL_KEYS.has(key)) {
     event.preventDefault();
     keysDown.add(key);
@@ -1129,6 +1442,7 @@ function handleKey(event) {
 
 function handleKeyUp(event) {
   const key = event.key.toLowerCase();
+  if (gameplayPausedByOverlay()) return;
   if (MANUAL_KEYS.has(key)) {
     event.preventDefault();
     keysDown.delete(key);
@@ -1161,6 +1475,11 @@ weaponSelect.addEventListener("change", () => {
   state.message = `${op.id} equipped ${weaponById(op.weaponId).name}`;
   updateHud();
 });
+armorSelect.addEventListener("change", () => {
+  const op = selectedOperator();
+  if (!op) return;
+  applyOperatorArmor(op, armorSelect.value);
+});
 window.addEventListener("keydown", handleKey);
 window.addEventListener("keyup", handleKeyUp);
 window.addEventListener("blur", () => {
@@ -1171,15 +1490,50 @@ runButton.addEventListener("click", toggleRun);
 restartButton.addEventListener("click", restart);
 bannerRestartButton.addEventListener("click", restart);
 nextLevelButton.addEventListener("click", loadNextLevel);
+settingsButton.addEventListener("click", openSettings);
+closeSettingsButton.addEventListener("click", closeSettings);
+settingsOverlay.addEventListener("click", (event) => {
+  if (event.target === settingsOverlay) closeSettings();
+});
 debugButton.addEventListener("click", () => {
   if (!state) return;
+  if (gameplayPausedByOverlay()) return;
   state.debug = !state.debug;
   debugButton.classList.toggle("active", state.debug);
 });
+difficultySelect.addEventListener("change", () => {
+  currentDifficulty = difficultySelect.value === "difficult" ? "difficult" : "normal";
+  if (state) {
+    state.message = currentDifficulty === "difficult" ? "Difficult visibility enabled" : "Normal visibility enabled";
+  }
+  updateHud();
+});
+enemyLoadoutList.addEventListener("change", (event) => {
+  const weaponSelectEl = event.target.closest("[data-enemy-weapon-id]");
+  const armorSelectEl = event.target.closest("[data-enemy-armor-id]");
+  if (weaponSelectEl) {
+    applyEnemyWeapon(weaponSelectEl.dataset.enemyWeaponId, weaponSelectEl.value);
+  } else if (armorSelectEl) {
+    applyEnemyArmor(armorSelectEl.dataset.enemyArmorId, armorSelectEl.value);
+  }
+});
+unlockDigitalDoorButton.addEventListener("click", submitDigitalLock);
+cancelDigitalLockButton.addEventListener("click", () => closeDigitalLock());
+digitalLockOverlay.addEventListener("click", (event) => {
+  if (event.target === digitalLockOverlay) closeDigitalLock();
+});
+digitalLockInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    submitDigitalLock();
+  }
+});
 levelSelect.addEventListener("change", () => {
+  settingsResumeRunning = false;
   loadLevel(levelSelect.value);
 });
 operatorCountSelect.addEventListener("change", () => {
+  settingsResumeRunning = false;
   activeOperatorCount = Number(operatorCountSelect.value);
   restart();
 });
@@ -1187,6 +1541,7 @@ operatorCountSelect.addEventListener("change", () => {
 window.__breachline = {
   getState: () => state,
   getWeapons: () => [...weapons.values()],
+  getArmors: () => [...armors.values()],
   restart,
   loadLevel,
   loadNextLevel,
@@ -1196,7 +1551,7 @@ window.__breachline = {
 async function boot() {
   populateLevelSelect();
   try {
-    await loadWeapons();
+    await loadEquipment();
     await loadLevel(LEVEL_OPTIONS[0].id);
   } catch (error) {
     state = null;

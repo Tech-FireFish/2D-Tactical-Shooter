@@ -23,6 +23,10 @@
               <span id="selectedOperatorLabel">Selected Operator</span>
               <select id="weaponSelect"></select>
             </label>
+            <label class="field-stack" for="armorSelect">
+              <span>Armor</span>
+              <select id="armorSelect"></select>
+            </label>
             <div id="weaponStats" class="weapon-stats"></div>
           </section>
 
@@ -45,21 +49,6 @@
         </section>
 
         <aside class="side-panel right-panel" aria-label="Mission controls">
-          <section class="control-card">
-            <p class="panel-label">Mission Setup</p>
-            <label class="level-picker" for="levelSelect">
-              <span>Level</span>
-              <select id="levelSelect"></select>
-            </label>
-            <label class="level-picker" for="operatorCountSelect">
-              <span>Operators</span>
-              <select id="operatorCountSelect">
-                <option value="2">Two</option>
-                <option value="1">One</option>
-              </select>
-            </label>
-          </section>
-
           <section class="control-card">
             <p class="panel-label">Mission Status</p>
             <div class="status-grid">
@@ -84,11 +73,84 @@
               <button id="runButton" type="button" title="Toggle pause and execute">Execute</button>
               <button id="restartButton" type="button" title="Restart level">Restart</button>
               <button id="debugButton" type="button" title="Toggle tactical debug overlay">Debug</button>
+              <button id="settingsButton" type="button" title="Open settings">Settings</button>
             </div>
           </section>
         </aside>
       </section>
+
+      <section id="settingsOverlay" class="settings-overlay hidden" aria-label="Settings menu" aria-modal="true" role="dialog">
+        <div class="settings-panel">
+          <header class="settings-header">
+            <div>
+              <p class="eyebrow">Settings</p>
+              <h2>Controls And Mission Setup</h2>
+            </div>
+            <button id="closeSettingsButton" type="button" title="Close settings">Close</button>
+          </header>
+
+          <div class="settings-grid">
+            <section class="control-card">
+              <p class="panel-label">Keys</p>
+              <dl class="key-list">
+                <div><dt>WASD</dt><dd>Move selected operator</dd></div>
+                <div><dt>E</dt><dd>Open nearby door</dd></div>
+                <div><dt>Space</dt><dd>Execute or pause plan</dd></div>
+                <div><dt>R</dt><dd>Restart current level</dd></div>
+                <div><dt>F3</dt><dd>Toggle debug overlay</dd></div>
+                <div><dt>Esc</dt><dd>Open or close settings</dd></div>
+                <div><dt>Left Click</dt><dd>Select operator, add waypoint, or click nearby door</dd></div>
+                <div><dt>Right Click</dt><dd>Clear selected operator route</dd></div>
+              </dl>
+            </section>
+
+            <section class="control-card">
+              <p class="panel-label">Mission Setup</p>
+              <label class="level-picker" for="levelSelect">
+                <span>Level</span>
+                <select id="levelSelect"></select>
+              </label>
+              <label class="level-picker" for="operatorCountSelect">
+                <span>Operators</span>
+                <select id="operatorCountSelect">
+                  <option value="2">Two</option>
+                  <option value="1">One</option>
+                </select>
+              </label>
+              <label class="level-picker" for="difficultySelect">
+                <span>Difficulty</span>
+                <select id="difficultySelect">
+                  <option value="normal">Normal</option>
+                  <option value="difficult">Difficult</option>
+                </select>
+              </label>
+              <div class="enemy-loadouts">
+                <p class="panel-label">Enemy Loadouts</p>
+                <div id="enemyLoadoutList" class="enemy-loadout-list"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="digitalLockOverlay" class="settings-overlay hidden" aria-label="Digital lock" aria-modal="true" role="dialog">
+        <div class="lock-panel">
+          <header class="settings-header">
+            <div>
+              <p class="eyebrow">Digital Lock</p>
+              <h2 id="digitalLockTitle">Door Locked</h2>
+            </div>
+            <button id="cancelDigitalLockButton" type="button" title="Cancel unlock">Cancel</button>
+          </header>
+          <label class="field-stack" for="digitalLockInput">
+            <span>Password</span>
+            <input id="digitalLockInput" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="0000">
+          </label>
+          <p id="digitalLockError" class="lock-error" aria-live="polite"></p>
+          <button id="unlockDigitalDoorButton" type="button">Unlock</button>
+        </div>
+      </section>
     </main>
-    <script src="main.js?v=12"></script>
+    <script src="main.js?v=14"></script>
   </body>
 </html>

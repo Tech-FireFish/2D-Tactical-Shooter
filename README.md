@@ -30,7 +30,7 @@ node server.js
 
 ## Why A Dev Server Is Needed
 
-The game loads level files from `level/` and weapon files from `Weapons/` using browser `fetch()` requests. Many browsers block or restrict those requests when opening `index.html` directly through `file://`, so a local HTTP server makes the game behave like a normal web app.
+The game loads level files from `level/` and equipment files from `equipment/` using browser `fetch()` requests. Many browsers block or restrict those requests when opening `index.html` directly through `file://`, so a local HTTP server makes the game behave like a normal web app.
 
 The included server is only a static localhost server. It does not run gameplay logic on the backend.
 

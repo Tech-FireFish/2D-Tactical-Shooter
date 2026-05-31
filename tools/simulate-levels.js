@@ -12,6 +12,11 @@ const WEAPON_FILES = [
   "smg.json",
   "pistol.json"
 ];
+const ARMOR_FILES = [
+  "light-armor.json",
+  "medium-armor.json",
+  "heavy-armor.json"
+];
 const LEVEL_FILES = [
   "ridge-house-entry.json",
   "warehouse-pinch.json",
@@ -19,12 +24,20 @@ const LEVEL_FILES = [
   "terminal-breach.json"
 ];
 const weapons = new Map(WEAPON_FILES.map((file) => {
-  const weapon = JSON.parse(fs.readFileSync(path.join("Weapons", file), "utf8"));
+  const weapon = JSON.parse(fs.readFileSync(path.join("equipment", file), "utf8"));
   return [weapon.id, weapon];
+}));
+const armors = new Map(ARMOR_FILES.map((file) => {
+  const armor = JSON.parse(fs.readFileSync(path.join("equipment", file), "utf8"));
+  return [armor.id, armor];
 }));
 
 function weaponById(id) {
   return weapons.get(id) || weapons.get("rifle");
+}
+
+function armorById(id) {
+  return armors.get(id) || armors.get("light-armor");
 }
 
 function cloneLevel(level) {
@@ -34,36 +47,56 @@ function cloneLevel(level) {
     width: level.width || 960,
     height: level.height || 640,
     walls: level.walls.map((wall) => ({ ...wall })),
-    doors: level.doors.map((door) => ({ ...door })),
-    operators: level.operators.map((op) => ({
-      ...op,
-      radius: UNIT_RADIUS,
-      health: 100,
-      speed: 92,
-      weaponId: weaponById(op.weaponId || "rifle").id,
-      fireTimer: 0,
-      path: [],
-      aim: 0,
-      action: null,
-      reaction: 0,
-      targetId: null,
-      down: false
+    doors: level.doors.map((door) => ({
+      ...door,
+      password: door.lockType === "digital" ? (door.password || "0000") : door.password,
+      locked: door.lockType === "digital" ? door.locked !== false : Boolean(door.locked)
     })),
-    enemies: level.enemies.map((enemy) => ({
-      ...enemy,
-      watch: enemy.watch ? { ...enemy.watch } : null,
-      radius: 12,
-      health: 100,
-      speed: 34,
-      weaponId: weaponById(enemy.weaponId || "rifle").id,
-      fireTimer: 0,
-      sightRange: enemy.sightRange || Math.max(190, weaponById(enemy.weaponId || "rifle").range),
-      fov: Math.PI * 0.78,
-      reaction: 0,
-      targetId: null,
-      down: false,
-      patrolIndex: 0
-    })),
+    operators: level.operators.map((op) => {
+      const armor = armorById(op.armorId || "light-armor");
+      const baseSpeed = op.speed || 92;
+      return {
+        ...op,
+        radius: UNIT_RADIUS,
+        health: 100,
+        armorId: armor.id,
+        armor: armor.armor,
+        maxArmor: armor.armor,
+        baseSpeed,
+        speed: baseSpeed * armor.speedMultiplier,
+        weaponId: weaponById(op.weaponId || "rifle").id,
+        fireTimer: 0,
+        path: [],
+        aim: 0,
+        action: null,
+        reaction: 0,
+        targetId: null,
+        down: false
+      };
+    }),
+    enemies: level.enemies.map((enemy) => {
+      const armor = armorById(enemy.armorId || "light-armor");
+      const baseSpeed = enemy.speed || 34;
+      return {
+        ...enemy,
+        watch: enemy.watch ? { ...enemy.watch } : null,
+        radius: 12,
+        health: 100,
+        armorId: armor.id,
+        armor: armor.armor,
+        maxArmor: armor.armor,
+        baseSpeed,
+        speed: baseSpeed * armor.speedMultiplier,
+        weaponId: weaponById(enemy.weaponId || "rifle").id,
+        fireTimer: 0,
+        sightRange: enemy.sightRange || Math.max(190, weaponById(enemy.weaponId || "rifle").range),
+        fov: Math.PI * 0.78,
+        reaction: 0,
+        targetId: null,
+        down: false,
+        patrolIndex: 0
+      };
+    }),
     objective: { ...level.objective }
   };
 }
@@ -199,14 +232,30 @@ function nearestClosedDoorOnRoute(level, op, next) {
 
 function tryOpenDoor(op, door) {
   if (!door || !doorBlocks(door)) return false;
+  if (door.lockType === "digital" && door.locked !== false) {
+    door.locked = false;
+    return true;
+  }
   if (!op.action) {
     op.action = { type: "breach", doorId: door.id, timer: 0.34 };
   }
   return true;
 }
 
+function applyDamage(unit, amount) {
+  let remaining = amount;
+  if (unit.armor > 0) {
+    const absorbed = Math.min(unit.armor, remaining);
+    unit.armor -= absorbed;
+    remaining -= absorbed;
+  }
+  if (remaining > 0) {
+    unit.health -= remaining;
+  }
+}
+
 function damageEnemy(enemy, amount) {
-  enemy.health -= amount;
+  applyDamage(enemy, amount);
   if (enemy.health <= 0) {
     enemy.health = 0;
     enemy.down = true;
@@ -216,7 +265,7 @@ function damageEnemy(enemy, amount) {
 }
 
 function damageOperator(op, amount) {
-  op.health -= amount;
+  applyDamage(op, amount);
   if (op.health <= 0) {
     op.health = 0;
     op.down = true;
@@ -532,6 +581,7 @@ function simulate(levelRaw) {
     operators: level.operators.map((op) => ({
       id: op.id,
       hp: Number(op.health.toFixed(1)),
+      armor: Number(op.armor.toFixed(1)),
       down: op.down,
       x: Number(op.x.toFixed(1)),
       y: Number(op.y.toFixed(1)),
