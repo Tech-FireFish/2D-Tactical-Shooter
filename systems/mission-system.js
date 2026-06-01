@@ -37,6 +37,7 @@
       state.gameOver = true;
       state.running = false;
       state.result = result;
+      deps.audio.play(result === "success" ? "mission-success" : "mission-failed");
       const nextIndex = (deps.currentLevelIndex() + 1) % deps.levelOptions.length;
       const nextLevel = deps.levelOptions[nextIndex];
       elements.bannerTitle.textContent = title;

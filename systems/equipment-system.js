@@ -13,6 +13,38 @@
     const elements = deps.elements;
     let lastHealthBoardHtml = "";
     let lastEnemyLoadoutHtml = "";
+    const weaponPixelArt = {
+      rifle: [
+        "................",
+        "............aa..",
+        "..bbbccccccccaa.",
+        ".bbccccddddddaaa",
+        "bbbccccccccccaa.",
+        "...cc..ee........",
+        "...cc...ee.......",
+        "....c....ee......"
+      ],
+      smg: [
+        "................",
+        ".......aaa......",
+        "..bbbccccccaaa..",
+        ".bbbccccddddaaa.",
+        "..bbccccccaaa...",
+        ".....cc.ee......",
+        ".....cc..ee.....",
+        "..........ee...."
+      ],
+      pistol: [
+        "................",
+        "................",
+        "....bbbccaaa....",
+        "...bbbccccaaa...",
+        ".....ccccaa.....",
+        "......cc........",
+        "......cee.......",
+        ".......ee......."
+      ]
+    };
 
     // Resolves a weapon definition, falling back to rifle.
     function weaponById(id) {
@@ -206,6 +238,7 @@
         elements.armorSelect.disabled = true;
         elements.selectedOperatorLabel.textContent = "Selected Operator";
         elements.weaponStats.textContent = "Loading...";
+        renderWeaponPixelPreview(null);
         return;
       }
       const op = deps.selectedOperator();
@@ -215,6 +248,7 @@
 
       if (!op) {
         elements.weaponStats.textContent = "No operator selected.";
+        renderWeaponPixelPreview(null);
         return;
       }
 
@@ -224,9 +258,11 @@
       const armor = armorById(op.armorId);
       if (!weapon || !armor) {
         elements.weaponStats.textContent = "Equipment data unavailable.";
+        renderWeaponPixelPreview(null);
         return;
       }
 
+      renderWeaponPixelPreview(weapon.id);
       elements.weaponStats.innerHTML = `
         <div>${weapon.role}</div>
         <div class="weapon-stat-row"><span>Range</span><strong>${weapon.range}</strong></div>
@@ -234,6 +270,27 @@
         <div class="weapon-stat-row"><span>Fire Rate</span><strong>${(1 / weapon.fireInterval).toFixed(1)}/s</strong></div>
         <div class="weapon-stat-row"><span>Armor</span><strong>${armor.armor}</strong></div>
         <div class="weapon-stat-row"><span>Mobility</span><strong>${Math.round(armor.speedMultiplier * 100)}%</strong></div>
+      `;
+    }
+
+    // Renders the selected weapon as compact CSS pixel art.
+    function renderWeaponPixelPreview(weaponId) {
+      const selectedWeaponId = weaponId && weaponPixelArt[weaponId] ? weaponId : null;
+      const pattern = selectedWeaponId ? weaponPixelArt[selectedWeaponId] : null;
+      if (!pattern || !elements.weaponPixelPreview) {
+        elements.weaponPixelPreview.innerHTML = "<span class=\"weapon-pixel-empty\">No Weapon</span>";
+        elements.weaponPixelPreview.classList.add("empty");
+        return;
+      }
+      const pixels = pattern.flatMap((row) => row.split("")).map((cell) => {
+        const className = cell === "." ? "px empty-pixel" : `px tone-${cell}`;
+        return `<span class="${className}" aria-hidden="true"></span>`;
+      }).join("");
+      elements.weaponPixelPreview.classList.remove("empty");
+      elements.weaponPixelPreview.innerHTML = `
+        <div class="weapon-pixel-grid weapon-pixel-${selectedWeaponId}" role="img" aria-label="${weaponById(selectedWeaponId).name} pixel preview">
+          ${pixels}
+        </div>
       `;
     }
 
@@ -303,7 +360,8 @@
       applyEnemyArmor,
       applyOperatorArmor,
       renderLoadoutPanel,
-      renderHealthBoard
+      renderHealthBoard,
+      renderWeaponPixelPreview
     };
   }
 

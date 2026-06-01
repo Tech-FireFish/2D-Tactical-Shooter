@@ -14,6 +14,7 @@ const elements = {
   settingsButton: document.getElementById("settingsButton"),
   weaponSelect: document.getElementById("weaponSelect"),
   armorSelect: document.getElementById("armorSelect"),
+  weaponPixelPreview: document.getElementById("weaponPixelPreview"),
   selectedOperatorLabel: document.getElementById("selectedOperatorLabel"),
   weaponStats: document.getElementById("weaponStats"),
   operatorHealthBoard: document.getElementById("operatorHealthBoard"),
@@ -23,7 +24,8 @@ const elements = {
   enemyLoadoutList: document.getElementById("enemyLoadoutList"),
   digitalLockOverlay: document.getElementById("digitalLockOverlay"),
   digitalLockTitle: document.getElementById("digitalLockTitle"),
-  digitalLockInput: document.getElementById("digitalLockInput"),
+  digitalLockDisplay: document.getElementById("digitalLockDisplay"),
+  digitalLockKeypad: document.getElementById("digitalLockKeypad"),
   digitalLockError: document.getElementById("digitalLockError"),
   unlockDigitalDoorButton: document.getElementById("unlockDigitalDoorButton"),
   cancelDigitalLockButton: document.getElementById("cancelDigitalLockButton"),
@@ -84,6 +86,19 @@ const ARMOR_OPTIONS = [
   { id: "heavy-armor", file: "equipment/heavy-armor.json" }
 ];
 
+const SOUND_OPTIONS = [
+  { id: "door-open", file: "sounds/door-open.wav" },
+  { id: "door-locked", file: "sounds/door-locked.wav" },
+  { id: "rifle-shot", file: "sounds/rifle-shot.wav" },
+  { id: "smg-shot", file: "sounds/smg-shot.wav" },
+  { id: "pistol-shot", file: "sounds/pistol-shot.wav" },
+  { id: "operator-down", file: "sounds/operator-down.wav" },
+  { id: "mission-success", file: "sounds/mission-success.wav" },
+  { id: "mission-failed", file: "sounds/mission-failed.wav" },
+  { id: "operator-walk", file: "sounds/armed-cement-walk.wav" },
+  { id: "enemy-walk", file: "sounds/enemy-walk.wav" }
+];
+
 const runtime = {
   state: null,
   currentLevel: null,
@@ -106,12 +121,14 @@ const operatorArmorLoadouts = {};
 const enemyLoadouts = {};
 const enemyArmorLoadouts = {};
 
+let audio;
 let geometry;
 let equipment;
 let level;
 let visibility;
 let settings;
 let digitalLock;
+let enemyBehavior;
 let mission;
 let renderer;
 let input;
@@ -162,6 +179,7 @@ function setDifficulty(value) {
 // Advances gameplay simulation for one frame.
 function update(dt) {
   const state = runtime.state;
+  audio.update(dt);
   if (!state) return;
   if (settings.gameplayPausedByOverlay()) return;
   const manualInput = hasManualInput();
@@ -245,15 +263,23 @@ function assertSystem(name, system) {
 // Creates each system and wires shared runtime dependencies between them.
 function initializeSystems() {
   assertSystem("Geometry system", window.GeometrySystem);
+  assertSystem("Audio system", window.AudioSystem);
   assertSystem("Equipment system", window.EquipmentSystem);
   assertSystem("Level system", window.LevelSystem);
   assertSystem("Visibility system", window.VisibilitySystem);
   assertSystem("Settings system", window.SettingsSystem);
   assertSystem("Digital lock system", window.DigitalLockSystem);
+  assertSystem("Enemy behavior system", window.EnemyBehaviorSystem);
   assertSystem("Mission system", window.MissionSystem);
   assertSystem("Render system", window.RenderSystem);
   assertSystem("Input system", window.InputSystem);
   assertSystem("Action system", window.ActionSystem);
+
+  audio = window.AudioSystem.create({
+    soundOptions: SOUND_OPTIONS,
+    volume: 0.55,
+    loopVolume: 0.34
+  });
 
   geometry = window.GeometrySystem.create({
     runtime,
@@ -295,6 +321,7 @@ function initializeSystems() {
     runtime,
     elements,
     keysDown,
+    audio,
     updateHud
   });
 
@@ -312,10 +339,23 @@ function initializeSystems() {
     updateHud
   });
 
+  enemyBehavior = window.EnemyBehaviorSystem.create({
+    getState: () => runtime.state,
+    weaponById: equipment.weaponById,
+    pointDistance: geometry.pointDistance,
+    angleTo: geometry.angleTo,
+    hasLineOfSight: geometry.hasLineOfSight,
+    inFieldOfView: geometry.inFieldOfView,
+    collidesWithMap: geometry.collidesWithMap,
+    rectCenter: geometry.rectCenter,
+    audio
+  });
+
   mission = window.MissionSystem.create({
     runtime,
     elements,
     geometry,
+    audio,
     levelOptions: LEVEL_OPTIONS,
     currentLevelIndex: () => level.currentLevelIndex(),
     updateHud
@@ -337,6 +377,8 @@ function initializeSystems() {
     weaponById: equipment.weaponById,
     operatorSightRange: visibility.operatorSightRange,
     openDigitalLock: digitalLock.openDigitalLock,
+    enemyBehavior,
+    audio,
     updateHud,
     colors
   });
@@ -364,6 +406,7 @@ function initializeSystems() {
     level,
     settings,
     digitalLock,
+    audio,
     selectedOperator,
     selectOperator,
     toggleRun,

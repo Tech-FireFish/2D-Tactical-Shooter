@@ -148,6 +148,67 @@ h2 {
   line-height: 1.35;
 }
 
+.weapon-pixel-preview {
+  display: grid;
+  place-items: center;
+  min-height: 74px;
+  margin-top: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+    #101417;
+  overflow: hidden;
+}
+
+.weapon-pixel-preview.empty {
+  border-style: dashed;
+}
+
+.weapon-pixel-empty {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.weapon-pixel-grid {
+  display: grid;
+  grid-template-columns: repeat(16, 6px);
+  grid-template-rows: repeat(8, 6px);
+  gap: 0;
+  image-rendering: pixelated;
+}
+
+.weapon-pixel-grid .px {
+  width: 6px;
+  height: 6px;
+}
+
+.weapon-pixel-grid .empty-pixel {
+  background: transparent;
+}
+
+.weapon-pixel-grid .tone-a {
+  background: #e9d18a;
+}
+
+.weapon-pixel-grid .tone-b {
+  background: #5c6870;
+}
+
+.weapon-pixel-grid .tone-c {
+  background: #aab5b8;
+}
+
+.weapon-pixel-grid .tone-d {
+  background: #30383c;
+}
+
+.weapon-pixel-grid .tone-e {
+  background: #6c4e36;
+}
+
 .weapon-stat-row {
   display: flex;
   justify-content: space-between;
@@ -292,6 +353,54 @@ h2 {
   padding: 16px;
   background: #121619;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.lock-entry {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.lock-display {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px;
+  background: #0f1316;
+}
+
+.lock-cell {
+  display: block;
+  min-height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.lock-cell.filled {
+  background:
+    radial-gradient(circle at center, var(--cyan) 0 36%, transparent 38%),
+    rgba(114, 183, 206, 0.1);
+  border-color: rgba(114, 183, 206, 0.62);
+}
+
+.lock-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.lock-keypad button {
+  min-height: 46px;
+  padding: 0 8px;
 }
 
 .settings-header {

@@ -13,6 +13,8 @@
       const state = getState();
       if (!state || !door || !op || op.down) return false;
       if (deps.isLockedDigitalDoor(door)) {
+        deps.audio.play("door-locked");
+        deps.enemyBehavior.noticeDoor(door, op);
         deps.openDigitalLock(door);
         state.message = `${door.id} locked`;
         deps.updateHud();
@@ -20,6 +22,8 @@
       }
       door.state = "open";
       op.action = null;
+      deps.audio.play("door-open");
+      deps.enemyBehavior.noticeDoor(door, op);
       state.message = `${op.id} opened ${door.id}`;
       deps.updateHud();
       return true;
@@ -93,6 +97,7 @@
       if (!deps.collidesWithMap(state.level, next)) {
         op.x = next.x;
         op.y = next.y;
+        deps.audio.noteLoopActivity("operator-walk");
       }
     }
 
@@ -123,56 +128,22 @@
       if (!deps.collidesWithMap(state.level, next)) {
         op.x = next.x;
         op.y = next.y;
+        deps.audio.noteLoopActivity("operator-walk");
       }
     }
 
     // Updates enemy targeting, watch direction, patrol, and firing.
     function updateEnemy(enemy, dt) {
-      const state = getState();
-      if (!state || enemy.down) return;
-
-      const weapon = deps.weaponById(enemy.weaponId);
-      const liveOps = state.level.operators.filter((op) => !op.down);
-      const seen = liveOps
-        .filter((op) => deps.pointDistance(enemy, op) <= weapon.range)
-        .find((op) => deps.inFieldOfView(enemy, op) && deps.hasLineOfSight(enemy, op, state.level));
-      if (seen) {
-        enemy.angle = deps.angleTo(enemy, seen);
-        fireAutomatic(enemy, seen, weapon, dt, damageOperator, deps.colors.enemy);
-        return;
-      }
-
-      enemy.targetId = null;
-      enemy.reaction = Math.max(0, enemy.reaction - dt * 0.8);
-      enemy.fireTimer = Math.max(0, enemy.fireTimer - dt);
-      if (enemy.watch) {
-        enemy.angle = deps.angleTo(enemy, enemy.watch);
-        return;
-      }
-      updateEnemyPatrol(enemy, dt);
+      deps.enemyBehavior.updateEnemy(enemy, dt, {
+        fireAtOperator: (shooter, target, weapon, frameDt) => {
+          fireAutomatic(shooter, target, weapon, frameDt, damageOperator, deps.colors.enemy);
+        }
+      });
     }
 
     // Moves an enemy through its patrol route when no target is visible.
     function updateEnemyPatrol(enemy, dt) {
-      const state = getState();
-      if (!state || !enemy.patrol || enemy.patrol.length < 2) return;
-      const target = enemy.patrol[enemy.patrolIndex];
-      const dist = deps.pointDistance(enemy, target);
-      if (dist < 5) {
-        enemy.patrolIndex = (enemy.patrolIndex + 1) % enemy.patrol.length;
-        return;
-      }
-      const direction = deps.angleTo(enemy, target);
-      enemy.angle = direction;
-      const next = {
-        x: enemy.x + Math.cos(direction) * enemy.speed * dt,
-        y: enemy.y + Math.sin(direction) * enemy.speed * dt,
-        radius: enemy.radius
-      };
-      if (!deps.collidesWithMap(state.level, next)) {
-        enemy.x = next.x;
-        enemy.y = next.y;
-      }
+      deps.enemyBehavior.updateEnemyPatrol(enemy, dt);
     }
 
     // Finds visible hostile targets and fires the operator weapon automatically.
@@ -212,24 +183,33 @@
         return;
       }
 
-      damageTarget(target, weapon.damage);
+      damageTarget(target, weapon.damage, shooter);
       addShot(shooter, target, color, weapon.tracerTtl);
+      deps.audio.playWeapon(weapon.id || shooter.weaponId);
+      deps.enemyBehavior.noticeShot(shooter, target);
       shooter.fireTimer = weapon.fireInterval;
     }
 
     // Applies damage to an enemy and marks it down at zero health.
-    function damageEnemy(enemy, amount) {
+    function damageEnemy(enemy, amount, source) {
+      const wasDown = enemy.down;
       applyDamage(enemy, amount);
+      deps.enemyBehavior.noticeDamage(enemy, source);
       if (enemy.health <= 0) {
         enemy.health = 0;
         enemy.down = true;
+        enemy.status = "down";
         enemy.targetId = null;
         enemy.fireTimer = 0;
+        if (!wasDown) {
+          deps.enemyBehavior.noticeEnemyDown(enemy, source);
+        }
       }
     }
 
     // Applies damage to an operator and clears active behavior when downed.
     function damageOperator(op, amount) {
+      const wasDown = op.down;
       applyDamage(op, amount);
       if (op.health <= 0) {
         op.health = 0;
@@ -237,6 +217,9 @@
         op.path = [];
         op.action = null;
         op.fireTimer = 0;
+        if (!wasDown) {
+          deps.audio.play("operator-down");
+        }
       }
     }
 

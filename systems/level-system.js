@@ -85,7 +85,11 @@
             reaction: 0,
             targetId: null,
             down: false,
-            patrolIndex: 0
+            patrolIndex: 0,
+            status: "calm",
+            lastKnownOperator: null,
+            suspicionTimer: 0,
+            searchTarget: null
           };
         }),
         objective: { ...level.objective }

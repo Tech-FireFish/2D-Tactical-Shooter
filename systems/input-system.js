@@ -8,6 +8,7 @@
 
     // Handles selecting operators, clicking doors, and adding waypoints.
     function onCanvasClick(event) {
+      deps.audio.unlock();
       const state = runtime.state;
       if (!state) return;
       if (state.gameOver) return;
@@ -47,6 +48,7 @@
 
     // Handles keyboard controls for overlays, movement, run state, doors, and debug.
     function handleKey(event) {
+      deps.audio.unlock();
       const key = event.key.toLowerCase();
       if (event.key === "Escape") {
         event.preventDefault();
@@ -153,10 +155,15 @@
       elements.digitalLockOverlay.addEventListener("click", (event) => {
         if (event.target === elements.digitalLockOverlay) deps.digitalLock.closeDigitalLock();
       });
-      elements.digitalLockInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          deps.digitalLock.submitDigitalLock();
+      elements.digitalLockKeypad.addEventListener("click", (event) => {
+        const digitButton = event.target.closest("[data-lock-digit]");
+        const actionButton = event.target.closest("[data-lock-action]");
+        if (digitButton) {
+          deps.digitalLock.appendDigit(digitButton.dataset.lockDigit);
+        } else if (actionButton && actionButton.dataset.lockAction === "clear") {
+          deps.digitalLock.clearCode();
+        } else if (actionButton && actionButton.dataset.lockAction === "delete") {
+          deps.digitalLock.deleteDigit();
         }
       });
       elements.levelSelect.addEventListener("change", () => {
