@@ -116,6 +116,38 @@ h2 {
   align-items: start;
 }
 
+.top-status-bar {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.top-status-bar div {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: rgba(23, 27, 30, 0.96);
+}
+
+.top-status-bar span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.top-status-bar strong {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+}
+
 .side-panel {
   display: grid;
   gap: 12px;
@@ -133,6 +165,14 @@ h2 {
   display: grid;
   gap: 7px;
   margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.selected-loadout-label {
+  display: block;
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
@@ -174,10 +214,53 @@ h2 {
 
 .weapon-pixel-grid {
   display: grid;
-  grid-template-columns: repeat(16, 6px);
+  grid-template-columns: repeat(20, 6px);
   grid-template-rows: repeat(8, 6px);
   gap: 0;
   image-rendering: pixelated;
+}
+
+.ammo-board,
+.inventory-summary {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bullet-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+}
+
+.bullet {
+  display: block;
+  height: 12px;
+  border: 1px solid rgba(227, 180, 86, 0.22);
+  border-radius: 2px;
+  background: rgba(227, 180, 86, 0.08);
+}
+
+.bullet.filled {
+  background: var(--amber);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.ammo-count,
+.reload-label,
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.reload-label {
+  color: var(--amber);
+  justify-content: flex-start;
+  text-transform: uppercase;
 }
 
 .weapon-pixel-grid .px {
@@ -225,6 +308,23 @@ h2 {
   display: grid;
   gap: 10px;
   margin-top: 10px;
+}
+
+.panel-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.panel-heading-row .panel-label {
+  margin: 0;
+}
+
+.panel-heading-row button {
+  min-height: 28px;
+  padding: 0 9px;
+  font-size: 11px;
 }
 
 .operator-card {
@@ -346,6 +446,17 @@ h2 {
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
 }
 
+.inventory-panel {
+  width: min(620px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+  background: #121619;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
 .lock-panel {
   width: min(420px, 100%);
   border: 1px solid var(--line);
@@ -413,8 +524,29 @@ h2 {
 
 .settings-grid {
   display: grid;
-  grid-template-columns: minmax(260px, 0.9fr) minmax(300px, 1.1fr);
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
   gap: 12px;
+}
+
+.keybinding-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.keybinding-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.keybinding-row button {
+  min-height: 32px;
+  padding: 0 8px;
 }
 
 .key-list {
@@ -439,6 +571,70 @@ h2 {
   align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 9px;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.inventory-grid div {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px;
+  background: var(--panel);
+}
+
+.inventory-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.inventory-grid strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.inventory-items {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: 14px 0 0;
+  list-style: none;
+}
+
+.inventory-items li {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+}
+
+.inventory-items span {
+  color: var(--muted);
+}
+
+.equipment-table-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.equipment-table-options section {
+  display: grid;
+  gap: 8px;
+}
+
+.equipment-table-options h3 {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: 12px;
+  text-transform: uppercase;
 }
 
 .key-list dt,
@@ -546,6 +742,10 @@ canvas {
     grid-template-columns: 1fr;
   }
 
+  .top-status-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .left-panel,
   .right-panel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -568,7 +768,10 @@ canvas {
   .left-panel,
   .right-panel,
   .actions,
-  .settings-grid {
+  .settings-grid,
+  .top-status-bar,
+  .equipment-table-options,
+  .inventory-grid {
     grid-template-columns: 1fr;
   }
 

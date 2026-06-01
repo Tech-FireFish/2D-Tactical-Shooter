@@ -4,6 +4,9 @@
   "role": "Controlled sidearm",
   "range": 165,
   "damage": 24,
+  "magSize": 12,
+  "reserveBullets": 60,
+  "reloadTime": 1.0,
   "fireInterval": 0.38,
   "reactionDelay": 0.28,
   "tracerTtl": 0.1

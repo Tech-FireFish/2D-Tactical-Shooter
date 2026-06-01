@@ -31,16 +31,7 @@
 
     // Attempts to interact with the nearest closed door to the selected operator.
     function openNearestDoor() {
-      const state = getState();
-      if (!state || state.gameOver) return;
-      const op = deps.selectedOperator();
-      if (!op || op.down) return;
-      const door = deps.nearestClosedDoorToOperator(op);
-      if (!door) {
-        state.message = "No door in reach";
-        return;
-      }
-      interactWithDoor(op, door);
+      deps.interaction.interactNearest();
     }
 
     // Attempts door interaction from a mouse click, including range checks.
@@ -97,6 +88,7 @@
       if (!deps.collidesWithMap(state.level, next)) {
         op.x = next.x;
         op.y = next.y;
+        op.movedBefore = true;
         deps.audio.noteLoopActivity("operator-walk");
       }
     }
@@ -107,10 +99,10 @@
       if (!state) return;
       let dx = 0;
       let dy = 0;
-      if (deps.isKeyDown("w")) dy -= 1;
-      if (deps.isKeyDown("s")) dy += 1;
-      if (deps.isKeyDown("a")) dx -= 1;
-      if (deps.isKeyDown("d")) dx += 1;
+      if (deps.isActionDown("moveUp")) dy -= 1;
+      if (deps.isActionDown("moveDown")) dy += 1;
+      if (deps.isActionDown("moveLeft")) dx -= 1;
+      if (deps.isActionDown("moveRight")) dx += 1;
       if (dx === 0 && dy === 0) return;
 
       const length = Math.hypot(dx, dy);
@@ -119,21 +111,24 @@
       op.path = [];
       op.aim = Math.atan2(dy, dx);
 
+      const speedMultiplier = deps.isActionDown("sprint") ? 1.55 : (deps.isActionDown("sneak") ? 0.48 : 1);
       const next = {
-        x: op.x + dx * op.speed * dt,
-        y: op.y + dy * op.speed * dt,
+        x: op.x + dx * op.speed * speedMultiplier * dt,
+        y: op.y + dy * op.speed * speedMultiplier * dt,
         radius: op.radius
       };
 
       if (!deps.collidesWithMap(state.level, next)) {
         op.x = next.x;
         op.y = next.y;
+        op.movedBefore = true;
         deps.audio.noteLoopActivity("operator-walk");
       }
     }
 
     // Updates enemy targeting, watch direction, patrol, and firing.
     function updateEnemy(enemy, dt) {
+      deps.shooting.updateReload(enemy, dt);
       deps.enemyBehavior.updateEnemy(enemy, dt, {
         fireAtOperator: (shooter, target, weapon, frameDt) => {
           fireAutomatic(shooter, target, weapon, frameDt, damageOperator, deps.colors.enemy);
@@ -150,6 +145,9 @@
     function updateOperatorCombat(op, dt) {
       const state = getState();
       if (!state || op.down) return;
+      deps.shooting.updateReload(op, dt);
+      op.fireTimer = Math.max(0, (op.fireTimer || 0) - dt);
+      if (state.shootingMode === "manual") return;
       const weapon = deps.weaponById(op.weaponId);
       const visible = state.level.enemies
         .filter((enemy) => !enemy.down)
@@ -178,13 +176,15 @@
       }
 
       shooter.reaction += dt;
+      deps.shooting.updateReload(shooter, dt);
       shooter.fireTimer = Math.max(0, shooter.fireTimer - dt);
       if (shooter.reaction < weapon.reactionDelay || shooter.fireTimer > 0) {
         return;
       }
 
+      if (!deps.shooting.consumeRound(shooter, weapon)) return;
       damageTarget(target, weapon.damage, shooter);
-      addShot(shooter, target, color, weapon.tracerTtl);
+      deps.shooting.addShot(shooter, target, color, weapon.tracerTtl);
       deps.audio.playWeapon(weapon.id || shooter.weaponId);
       deps.enemyBehavior.noticeShot(shooter, target);
       shooter.fireTimer = weapon.fireInterval;
@@ -234,18 +234,6 @@
       if (remaining > 0) {
         unit.health -= remaining;
       }
-    }
-
-    // Adds a short-lived tracer line to the shared shot list.
-    function addShot(from, to, color, ttl = 0.09) {
-      const state = getState();
-      if (!state) return;
-      state.shots.push({
-        from: { x: from.x, y: from.y },
-        to: { x: to.x, y: to.y },
-        color,
-        ttl
-      });
     }
 
     return {

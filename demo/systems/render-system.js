@@ -11,27 +11,40 @@
 
     // Draws one full frame of the current game state.
     function draw() {
-      ctx.clearRect(0, 0, world.w, world.h);
+      deps.camera.reset(ctx);
+      ctx.clearRect(0, 0, deps.canvas.width, deps.canvas.height);
       if (!runtime.state) {
         drawLoading();
         return;
       }
+      deps.camera.apply(ctx);
       drawFloor();
       drawRooms();
+      drawWindows();
+      drawStairs();
+      drawItems();
+      drawEquipmentTables();
       drawPaths();
       drawSight();
       drawDoors();
       drawObjective();
       drawUnits();
       drawShots();
+      deps.camera.reset(ctx);
+      // Visibility fog disabled per user request.
+      // drawFog();
       drawHudOverlay();
-      if (runtime.state.debug) drawDebug();
+      if (runtime.state.debug) {
+        deps.camera.apply(ctx);
+        drawDebug();
+        deps.camera.reset(ctx);
+      }
     }
 
     // Draws the loading screen when no level state is available.
     function drawLoading() {
       ctx.fillStyle = colors.floor;
-      ctx.fillRect(0, 0, world.w, world.h);
+      ctx.fillRect(0, 0, deps.canvas.width, deps.canvas.height);
       ctx.fillStyle = colors.text;
       ctx.font = "800 24px system-ui";
       ctx.textAlign = "center";
@@ -84,6 +97,99 @@
         ctx.strokeStyle = colors.wallEdge;
         ctx.lineWidth = 2;
         ctx.strokeRect(wall.x, wall.y, wall.w, wall.h);
+      }
+      drawLabels();
+    }
+
+    // Draws room and zone labels from level data.
+    function drawLabels() {
+      const labels = [
+        ...(runtime.state.level.rooms || []).map((room) => ({ x: room.x + room.w / 2, y: room.y + 18, text: room.label || room.id })),
+        ...(runtime.state.level.labels || [])
+      ];
+      ctx.fillStyle = "rgba(238,243,239,0.56)";
+      ctx.font = "800 13px system-ui";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (const label of labels) {
+        ctx.fillText(label.text, label.x, label.y);
+      }
+    }
+
+    // Draws windows with open, closed, and broken states.
+    function drawWindows() {
+      for (const win of runtime.state.level.windows || []) {
+        ctx.save();
+        ctx.fillStyle = win.state === "broken" ? "#92d5e9" : (win.state === "open" ? "#72b7ce" : "#b9e8f3");
+        ctx.strokeStyle = win.state === "broken" ? "#ffffff" : "#24434b";
+        ctx.lineWidth = 2;
+        ctx.fillRect(win.x, win.y, win.w, win.h);
+        ctx.strokeRect(win.x, win.y, win.w, win.h);
+        if (win.state === "broken") {
+          ctx.strokeStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.moveTo(win.x + 3, win.y + 3);
+          ctx.lineTo(win.x + win.w - 3, win.y + win.h - 3);
+          ctx.moveTo(win.x + win.w - 3, win.y + 3);
+          ctx.lineTo(win.x + 3, win.y + win.h - 3);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+
+    // Draws stair connectors and target direction.
+    function drawStairs() {
+      for (const stair of runtime.state.level.stairs || []) {
+        ctx.save();
+        ctx.fillStyle = "#8ec6c0";
+        ctx.strokeStyle = "#1d3a3a";
+        ctx.lineWidth = 2;
+        ctx.fillRect(stair.x, stair.y, stair.w, stair.h);
+        ctx.strokeRect(stair.x, stair.y, stair.w, stair.h);
+        ctx.strokeStyle = "#102526";
+        for (let i = 6; i < stair.w; i += 10) {
+          ctx.beginPath();
+          ctx.moveTo(stair.x + i, stair.y + 4);
+          ctx.lineTo(stair.x + i, stair.y + stair.h - 4);
+          ctx.stroke();
+        }
+        ctx.fillStyle = "#102526";
+        ctx.font = "800 10px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText(stair.label || "STAIRS", stair.x + stair.w / 2, stair.y + stair.h / 2 + 4);
+        ctx.restore();
+      }
+    }
+
+    // Draws paper and other pickup items.
+    function drawItems() {
+      for (const item of runtime.state.level.items || []) {
+        if (item.picked) continue;
+        ctx.fillStyle = item.type === "paper" ? "#f5e6a6" : "#d9d9d9";
+        ctx.strokeStyle = "#6c6132";
+        ctx.lineWidth = 1.5;
+        ctx.fillRect(item.x, item.y, item.w || 20, item.h || 16);
+        ctx.strokeRect(item.x, item.y, item.w || 20, item.h || 16);
+        ctx.fillStyle = "#27240e";
+        ctx.font = "900 9px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText("P", item.x + (item.w || 20) / 2, item.y + (item.h || 16) / 2 + 3);
+      }
+    }
+
+    // Draws interactable equipment tables.
+    function drawEquipmentTables() {
+      for (const table of runtime.state.level.equipmentTables || []) {
+        ctx.fillStyle = "#6b6f75";
+        ctx.strokeStyle = "#25282c";
+        ctx.lineWidth = 2;
+        ctx.fillRect(table.x, table.y, table.w, table.h);
+        ctx.strokeRect(table.x, table.y, table.w, table.h);
+        ctx.fillStyle = "#eef3ef";
+        ctx.font = "800 9px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText("GEAR", table.x + table.w / 2, table.y + table.h / 2 + 3);
       }
     }
 
@@ -245,15 +351,46 @@
       }
     }
 
+    /*
+    // Draws a screen-space darkness mask outside selected-operator awareness.
+    function drawFog() {
+      const op = deps.selectedOperator();
+      if (!op || op.down) return;
+      const screen = worldToScreen(op);
+      const radius = deps.visibility.operatorSightRange(op) * deps.camera.getCamera().zoom;
+      ctx.save();
+      ctx.fillStyle = "rgba(0,0,0,0.34)";
+      ctx.fillRect(0, 0, deps.canvas.width, deps.canvas.height);
+      ctx.globalCompositeOperation = "destination-out";
+      const gradient = ctx.createRadialGradient(screen.x, screen.y, radius * 0.4, screen.x, screen.y, radius);
+      gradient.addColorStop(0, "rgba(0,0,0,1)");
+      gradient.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(screen.x, screen.y, radius, 0, twoPi);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Converts a world point into current screen space.
+    function worldToScreen(point) {
+      const camera = deps.camera.getCamera();
+      return {
+        x: (point.x - camera.x) * camera.zoom + deps.canvas.width / 2,
+        y: (point.y - camera.y) * camera.zoom + deps.canvas.height / 2
+      };
+    }
+    */
+
     // Draws the in-canvas selected-operator status and door hint.
     function drawHudOverlay() {
       const state = runtime.state;
       const selected = deps.selectedOperator();
-      const nearDoor = selected && !selected.down ? deps.geometry.nearestClosedDoorToOperator(selected) : null;
+      const hint = selected && !selected.down && deps.interaction ? deps.interaction.nearestHint(selected) : "";
       ctx.fillStyle = "rgba(16,18,20,0.78)";
-      ctx.fillRect(22, 22, 304, nearDoor ? 96 : 74);
+      ctx.fillRect(22, 22, 334, hint ? 96 : 74);
       ctx.strokeStyle = "rgba(255,255,255,0.12)";
-      ctx.strokeRect(22, 22, 304, nearDoor ? 96 : 74);
+      ctx.strokeRect(22, 22, 334, hint ? 96 : 74);
       ctx.fillStyle = colors.text;
       ctx.font = "800 18px system-ui";
       ctx.textAlign = "left";
@@ -262,12 +399,9 @@
       ctx.font = "600 13px system-ui";
       const pathCount = selected ? selected.path.length : 0;
       ctx.fillText(`Selected ${state.selectedId} | Waypoints ${pathCount}`, 38, 76);
-      if (nearDoor) {
+      if (hint) {
         ctx.fillStyle = colors.doorClosed;
         ctx.font = "800 12px system-ui";
-        const hint = deps.geometry.isLockedDigitalDoor(nearDoor)
-          ? "Door locked: press E or click to enter code"
-          : (deps.geometry.isDigitalLockDoor(nearDoor) ? "Door unlocked: press E or click to open" : "Door nearby: press E or click the door");
         ctx.fillText(hint, 38, 98);
       }
     }

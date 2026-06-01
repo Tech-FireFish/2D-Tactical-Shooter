@@ -65,8 +65,12 @@
       const target = enemy.searchTarget || enemy.lastKnownOperator;
       if (target) {
         enemy.angle = deps.angleTo(enemy, target);
-        moveEnemyToward(enemy, target, dt, 0.72);
-        if (deps.pointDistance(enemy, target) < 14) {
+        if (deps.enemyTraceMode && deps.enemyTraceMode() === "chase") {
+          moveEnemyByPath(enemy, target, dt);
+        } else {
+          moveEnemyToward(enemy, target, dt, 0.72);
+        }
+        if (deps.pointDistance(enemy, target) < 18) {
           enemy.searchTarget = null;
         }
       } else if (enemy.watch) {
@@ -116,6 +120,63 @@
         enemy.y = next.y;
         deps.audio.noteLoopActivity("enemy-walk");
       }
+    }
+
+    // Moves an enemy by a coarse path when chase mode is enabled.
+    function moveEnemyByPath(enemy, target, dt) {
+      const state = deps.getState();
+      enemy.pathTimer = Math.max(0, (enemy.pathTimer || 0) - dt);
+      if (!enemy.chasePath || enemy.pathTimer <= 0 || deps.pointDistance(enemy.chaseGoal || enemy, target) > 36) {
+        enemy.chasePath = findPath(state.level, enemy, target) || [target];
+        enemy.chaseGoal = { ...target };
+        enemy.pathTimer = 0.65;
+      }
+      const nextPoint = enemy.chasePath[0] || target;
+      if (deps.pointDistance(enemy, nextPoint) < 12) {
+        enemy.chasePath.shift();
+      }
+      moveEnemyToward(enemy, enemy.chasePath[0] || target, dt, 0.95);
+    }
+
+    // Finds a simple grid path across the current map.
+    function findPath(level, start, goal) {
+      const cell = 28;
+      const cols = Math.ceil((level.width || 960) / cell);
+      const rows = Math.ceil((level.height || 640) / cell);
+      const key = (c, r) => `${c},${r}`;
+      const toCell = (point) => ({
+        c: deps.clamp(Math.round(point.x / cell), 0, cols - 1),
+        r: deps.clamp(Math.round(point.y / cell), 0, rows - 1)
+      });
+      const toPoint = (c, r) => ({ x: c * cell, y: r * cell });
+      const pass = (c, r) => !deps.collidesWithMap(level, { ...toPoint(c, r), radius: 11 });
+      const startCell = toCell(start);
+      const goalCell = toCell(goal);
+      const queue = [startCell];
+      const came = new Map([[key(startCell.c, startCell.r), null]]);
+      const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+      while (queue.length) {
+        const cur = queue.shift();
+        if (cur.c === goalCell.c && cur.r === goalCell.r) {
+          const points = [];
+          let node = key(cur.c, cur.r);
+          while (node) {
+            const [c, r] = node.split(",").map(Number);
+            points.push(toPoint(c, r));
+            node = came.get(node);
+          }
+          return points.reverse().slice(1).concat([goal]);
+        }
+        for (const [dc, dr] of dirs) {
+          const nc = cur.c + dc;
+          const nr = cur.r + dr;
+          const nextKey = key(nc, nr);
+          if (nc < 0 || nr < 0 || nc >= cols || nr >= rows || came.has(nextKey) || !pass(nc, nr)) continue;
+          came.set(nextKey, key(cur.c, cur.r));
+          queue.push({ c: nc, r: nr });
+        }
+      }
+      return null;
     }
 
     // Alerts enemies near a newly opened or locked door interaction.
@@ -179,6 +240,8 @@
       updateCalmEnemy,
       updateEnemyPatrol,
       moveEnemyToward,
+      moveEnemyByPath,
+      findPath,
       noticeDoor,
       noticeShot,
       noticeDamage,
