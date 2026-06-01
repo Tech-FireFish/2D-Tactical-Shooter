@@ -8,6 +8,10 @@ Breachline 2D is a top-down tactical breach game. You choose one or two operator
 
 The mission succeeds when the VIP/objective is secured or all hostiles are neutralized. The mission fails if all operators are down or the objective is compromised.
 
+## Demo
+
+A self-contained demo copy is available in `demo/`. It runs by opening `demo/index.html` directly in a browser and does not require Node.js, npm, or a localhost server. The demo embeds the current level and equipment data in `demo/demo-data.js`, while keeping copied `level/` and `equipment/` folders as readable references.
+
 ## How To Run
 
 From this project folder, run:
