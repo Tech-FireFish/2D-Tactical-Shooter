@@ -17,6 +17,8 @@ const MIME_TYPES = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".svg": "image/svg+xml; charset=utf-8",
+  ".wav": "audio/wav",
+  ".pdf": "application/pdf",
   ".ico": "image/x-icon"
 };
 

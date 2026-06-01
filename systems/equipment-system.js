@@ -6,8 +6,10 @@
     const runtime = deps.runtime;
     const weapons = deps.weapons;
     const armors = deps.armors;
+    const backpacks = deps.backpacks;
     const operatorLoadouts = deps.operatorLoadouts;
     const operatorArmorLoadouts = deps.operatorArmorLoadouts;
+    const operatorBackpackLoadouts = deps.operatorBackpackLoadouts;
     const enemyLoadouts = deps.enemyLoadouts;
     const enemyArmorLoadouts = deps.enemyArmorLoadouts;
     const elements = deps.elements;
@@ -15,34 +17,34 @@
     let lastEnemyLoadoutHtml = "";
     const weaponPixelArt = {
       rifle: [
-        "................",
-        "............aa..",
-        "..bbbccccccccaa.",
-        ".bbccccddddddaaa",
-        "bbbccccccccccaa.",
-        "...cc..ee........",
-        "...cc...ee.......",
-        "....c....ee......"
+        "....................",
+        "...............aa...",
+        "...bbbccccccccccaa..",
+        "..bbccccddddddddaaa.",
+        ".bbbccccccccccccaa..",
+        ".....cc..ee.........",
+        ".....cc...ee........",
+        "......c....ee......."
       ],
       smg: [
-        "................",
-        ".......aaa......",
-        "..bbbccccccaaa..",
-        ".bbbccccddddaaa.",
-        "..bbccccccaaa...",
-        ".....cc.ee......",
-        ".....cc..ee.....",
-        "..........ee...."
+        "....................",
+        ".........aaa........",
+        "...bbbccccccaaa.....",
+        "..bbbccccddddaaa....",
+        "...bbccccccaaa......",
+        "......cc.ee.........",
+        "......cc..ee........",
+        "...........ee......."
       ],
       pistol: [
-        "................",
-        "................",
-        "....bbbccaaa....",
-        "...bbbccccaaa...",
-        ".....ccccaa.....",
-        "......cc........",
-        "......cee.......",
-        ".......ee......."
+        "....................",
+        "....................",
+        "......bbbccaaa......",
+        ".....bbbccccaaa.....",
+        ".......ccccaa.......",
+        "........cc..........",
+        "........cee.........",
+        ".........ee........."
       ]
     };
 
@@ -64,6 +66,16 @@
     // Normalizes unknown armor IDs to the default light armor.
     function validArmorId(id) {
       return armors.has(id) ? id : "light-armor";
+    }
+
+    // Resolves a backpack definition, falling back to medium backpack.
+    function backpackById(id) {
+      return backpacks.get(id) || backpacks.get("medium-backpack");
+    }
+
+    // Normalizes unknown backpack IDs to the default medium backpack.
+    function validBackpackId(id) {
+      return backpacks.has(id) ? id : "medium-backpack";
     }
 
     // Gets the saved enemy weapon choices for the active level.
@@ -100,10 +112,21 @@
       }).join("");
     }
 
+    // Produces backpack selector options for loadout controls.
+    function backpackOptionsHtml(selectedId) {
+      return deps.backpackOptions.map((meta) => {
+        const backpack = backpacks.get(meta.id);
+        if (!backpack) return "";
+        const selected = backpack.id === selectedId ? " selected" : "";
+        return `<option value="${backpack.id}"${selected}>${backpack.name}</option>`;
+      }).join("");
+    }
+
     // Loads all weapon and armor JSON definitions from the equipment folder.
     async function loadEquipment() {
       weapons.clear();
       armors.clear();
+      backpacks.clear();
       const loadedWeapons = await Promise.all(deps.weaponOptions.map(async (meta) => {
         const response = await fetch(meta.file, { cache: "no-store" });
         if (!response.ok) {
@@ -118,11 +141,21 @@
         }
         return response.json();
       }));
+      const loadedBackpacks = await Promise.all(deps.backpackOptions.map(async (meta) => {
+        const response = await fetch(meta.file, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Unable to load ${meta.file}: ${response.status}`);
+        }
+        return response.json();
+      }));
       for (const weapon of loadedWeapons) {
         weapons.set(weapon.id, weapon);
       }
       for (const armor of loadedArmors) {
         armors.set(armor.id, armor);
+      }
+      for (const backpack of loadedBackpacks) {
+        backpacks.set(backpack.id, backpack);
       }
       populateEquipmentSelects();
     }
@@ -146,6 +179,15 @@
         option.value = armor.id;
         option.textContent = armor.name;
         elements.armorSelect.append(option);
+      }
+      elements.backpackSelect.innerHTML = "";
+      for (const meta of deps.backpackOptions) {
+        const backpack = backpacks.get(meta.id);
+        if (!backpack) continue;
+        const option = document.createElement("option");
+        option.value = backpack.id;
+        option.textContent = backpack.name;
+        elements.backpackSelect.append(option);
       }
     }
 
@@ -224,9 +266,39 @@
       op.armorId = selectedArmorId;
       op.maxArmor = armor.armor;
       op.armor = armor.armor;
-      op.speed = (op.baseSpeed || 92) * armor.speedMultiplier;
+      const backpack = backpackById(op.backpackId);
+      op.speed = (op.baseSpeed || 92) * armor.speedMultiplier * (backpack.speedMultiplier || 1);
       operatorArmorLoadouts[op.id] = selectedArmorId;
       runtime.state.message = `${op.id} equipped ${armor.name}`;
+      deps.updateHud();
+    }
+
+    // Applies an operator weapon choice and refreshes ammunition.
+    function applyOperatorWeapon(op, weaponId) {
+      const selectedWeaponId = validWeaponId(weaponId);
+      op.weaponId = selectedWeaponId;
+      op.fireTimer = 0;
+      op.reaction = 0;
+      operatorLoadouts[op.id] = selectedWeaponId;
+      deps.shooting.resetAmmo(op);
+      runtime.state.message = `${op.id} equipped ${weaponById(op.weaponId).name}`;
+      deps.updateHud();
+    }
+
+    // Applies an operator backpack choice and refreshes ammo and storage.
+    function applyOperatorBackpack(op, backpackId) {
+      const selectedBackpackId = validBackpackId(backpackId);
+      const backpack = backpackById(selectedBackpackId);
+      const armor = armorById(op.armorId);
+      op.backpackId = selectedBackpackId;
+      op.speed = (op.baseSpeed || 92) * armor.speedMultiplier * (backpack.speedMultiplier || 1);
+      op.inventory.slots = backpack.slots;
+      if (op.inventory.items.length > op.inventory.slots) {
+        op.inventory.items = op.inventory.items.slice(0, op.inventory.slots);
+      }
+      operatorBackpackLoadouts[op.id] = selectedBackpackId;
+      deps.shooting.resetAmmo(op);
+      runtime.state.message = `${op.id} equipped ${backpack.name}`;
       deps.updateHud();
     }
 
@@ -236,40 +308,71 @@
       if (!state) {
         elements.weaponSelect.disabled = true;
         elements.armorSelect.disabled = true;
+        elements.backpackSelect.disabled = true;
         elements.selectedOperatorLabel.textContent = "Selected Operator";
+        if (elements.settingsSelectedOperatorLabel) elements.settingsSelectedOperatorLabel.textContent = "Selected Operator Weapon";
         elements.weaponStats.textContent = "Loading...";
         renderWeaponPixelPreview(null);
+        renderAmmoBoard(null);
         return;
       }
       const op = deps.selectedOperator();
       elements.weaponSelect.disabled = !op || op.down || state.gameOver;
       elements.armorSelect.disabled = !op || op.down || state.gameOver;
+      elements.backpackSelect.disabled = !op || op.down || state.gameOver;
       elements.selectedOperatorLabel.textContent = op ? `${op.id} Weapon` : "Selected Operator";
+      if (elements.settingsSelectedOperatorLabel) elements.settingsSelectedOperatorLabel.textContent = op ? `${op.id} Weapon` : "Selected Operator Weapon";
 
       if (!op) {
         elements.weaponStats.textContent = "No operator selected.";
         renderWeaponPixelPreview(null);
+        renderAmmoBoard(null);
         return;
       }
 
       elements.weaponSelect.value = validWeaponId(op.weaponId);
       elements.armorSelect.value = validArmorId(op.armorId);
+      elements.backpackSelect.value = validBackpackId(op.backpackId);
       const weapon = weaponById(op.weaponId);
       const armor = armorById(op.armorId);
-      if (!weapon || !armor) {
+      const backpack = backpackById(op.backpackId);
+      if (!weapon || !armor || !backpack) {
         elements.weaponStats.textContent = "Equipment data unavailable.";
         renderWeaponPixelPreview(null);
+        renderAmmoBoard(null);
         return;
       }
 
       renderWeaponPixelPreview(weapon.id);
+      renderAmmoBoard(op);
       elements.weaponStats.innerHTML = `
         <div>${weapon.role}</div>
         <div class="weapon-stat-row"><span>Range</span><strong>${weapon.range}</strong></div>
         <div class="weapon-stat-row"><span>Damage</span><strong>${weapon.damage}</strong></div>
         <div class="weapon-stat-row"><span>Fire Rate</span><strong>${(1 / weapon.fireInterval).toFixed(1)}/s</strong></div>
+        <div class="weapon-stat-row"><span>Magazine</span><strong>${weapon.magSize}</strong></div>
         <div class="weapon-stat-row"><span>Armor</span><strong>${armor.armor}</strong></div>
-        <div class="weapon-stat-row"><span>Mobility</span><strong>${Math.round(armor.speedMultiplier * 100)}%</strong></div>
+        <div class="weapon-stat-row"><span>Backpack</span><strong>${backpack.slots} slots</strong></div>
+        <div class="weapon-stat-row"><span>Mobility</span><strong>${Math.round(armor.speedMultiplier * (backpack.speedMultiplier || 1) * 100)}%</strong></div>
+      `;
+    }
+
+    // Renders magazine and carried bullet indicators for the selected operator.
+    function renderAmmoBoard(op) {
+      if (!elements.ammoBoard) return;
+      if (!op || !op.ammo) {
+        elements.ammoBoard.innerHTML = "<span>No ammo data</span>";
+        return;
+      }
+      const weapon = weaponById(op.weaponId);
+      const bullets = Array.from({ length: weapon.magSize || 20 }, (_, index) => {
+        const filled = index < op.ammo.magazine ? " filled" : "";
+        return `<span class="bullet${filled}" aria-hidden="true"></span>`;
+      }).join("");
+      elements.ammoBoard.innerHTML = `
+        <div class="bullet-grid">${bullets}</div>
+        <div class="ammo-count">${op.ammo.magazine}/${weapon.magSize} | Reserve ${op.ammo.reserve}</div>
+        ${op.ammo.reloading ? "<div class=\"reload-label\">Reloading</div>" : ""}
       `;
     }
 
@@ -305,7 +408,11 @@
         return;
       }
 
-      const html = state.level.operators.map((op) => {
+      const selected = deps.selectedOperator();
+      const visibleOperators = runtime.showAllHealth
+        ? state.level.operators
+        : state.level.operators.filter((op) => op.id === state.selectedId || op.movedBefore);
+      const html = visibleOperators.map((op) => {
         const weapon = weaponById(op.weaponId);
         const health = Math.max(0, Math.min(100, op.health));
         const armorPercent = op.maxArmor > 0 ? Math.max(0, Math.min(100, (op.armor / op.maxArmor) * 100)) : 0;
@@ -339,8 +446,11 @@
       }).join("");
 
       if (html !== lastHealthBoardHtml) {
-        elements.operatorHealthBoard.innerHTML = html;
+        elements.operatorHealthBoard.innerHTML = html || (selected ? "" : "<p class=\"empty-note\">No operator selected.</p>");
         lastHealthBoardHtml = html;
+      }
+      if (elements.showAllHealthButton) {
+        elements.showAllHealthButton.textContent = runtime.showAllHealth ? "Selected" : "Show All";
       }
     }
 
@@ -349,19 +459,25 @@
       validWeaponId,
       armorById,
       validArmorId,
+      backpackById,
+      validBackpackId,
       currentLevelWeaponLoadouts,
       currentLevelArmorLoadouts,
       weaponOptionsHtml,
       armorOptionsHtml,
+      backpackOptionsHtml,
       loadEquipment,
       populateEquipmentSelects,
       renderEnemyLoadouts,
       applyEnemyWeapon,
       applyEnemyArmor,
+      applyOperatorWeapon,
       applyOperatorArmor,
+      applyOperatorBackpack,
       renderLoadoutPanel,
       renderHealthBoard,
-      renderWeaponPixelPreview
+      renderWeaponPixelPreview,
+      renderAmmoBoard
     };
   }
 

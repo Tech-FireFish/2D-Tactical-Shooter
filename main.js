@@ -6,21 +6,32 @@ const elements = {
   levelSelect: document.getElementById("levelSelect"),
   operatorCountSelect: document.getElementById("operatorCountSelect"),
   modeLabel: document.getElementById("modeLabel"),
-  clockLabel: document.getElementById("clockLabel"),
   objectiveLabel: document.getElementById("objectiveLabel"),
+  selectedStatusLabel: document.getElementById("selectedStatusLabel"),
+  shootingStatusLabel: document.getElementById("shootingStatusLabel"),
+  selectedZoneLabel: document.getElementById("selectedZoneLabel"),
   runButton: document.getElementById("runButton"),
   restartButton: document.getElementById("restartButton"),
   debugButton: document.getElementById("debugButton"),
   settingsButton: document.getElementById("settingsButton"),
   weaponSelect: document.getElementById("weaponSelect"),
   armorSelect: document.getElementById("armorSelect"),
+  backpackSelect: document.getElementById("backpackSelect"),
   weaponPixelPreview: document.getElementById("weaponPixelPreview"),
   selectedOperatorLabel: document.getElementById("selectedOperatorLabel"),
+  settingsSelectedOperatorLabel: document.getElementById("settingsSelectedOperatorLabel"),
+  ammoBoard: document.getElementById("ammoBoard"),
   weaponStats: document.getElementById("weaponStats"),
+  inventorySummary: document.getElementById("inventorySummary"),
+  inventoryButton: document.getElementById("inventoryButton"),
   operatorHealthBoard: document.getElementById("operatorHealthBoard"),
+  showAllHealthButton: document.getElementById("showAllHealthButton"),
   settingsOverlay: document.getElementById("settingsOverlay"),
   closeSettingsButton: document.getElementById("closeSettingsButton"),
   difficultySelect: document.getElementById("difficultySelect"),
+  shootingModeSelect: document.getElementById("shootingModeSelect"),
+  enemyTraceSelect: document.getElementById("enemyTraceSelect"),
+  keyBindingList: document.getElementById("keyBindingList"),
   enemyLoadoutList: document.getElementById("enemyLoadoutList"),
   digitalLockOverlay: document.getElementById("digitalLockOverlay"),
   digitalLockTitle: document.getElementById("digitalLockTitle"),
@@ -29,6 +40,14 @@ const elements = {
   digitalLockError: document.getElementById("digitalLockError"),
   unlockDigitalDoorButton: document.getElementById("unlockDigitalDoorButton"),
   cancelDigitalLockButton: document.getElementById("cancelDigitalLockButton"),
+  inventoryOverlay: document.getElementById("inventoryOverlay"),
+  inventoryTitle: document.getElementById("inventoryTitle"),
+  inventoryDetails: document.getElementById("inventoryDetails"),
+  closeInventoryButton: document.getElementById("closeInventoryButton"),
+  equipmentTableOverlay: document.getElementById("equipmentTableOverlay"),
+  equipmentTableTitle: document.getElementById("equipmentTableTitle"),
+  equipmentTableOptions: document.getElementById("equipmentTableOptions"),
+  closeEquipmentTableButton: document.getElementById("closeEquipmentTableButton"),
   banner: document.getElementById("banner"),
   bannerTitle: document.getElementById("bannerTitle"),
   bannerText: document.getElementById("bannerText"),
@@ -42,7 +61,7 @@ const WORLD = { ...DEFAULT_WORLD };
 const TWO_PI = Math.PI * 2;
 const UNIT_RADIUS = 12;
 const DIFFICULT_OPERATOR_SIGHT = 115;
-const MANUAL_KEYS = new Set(["w", "a", "s", "d"]);
+const MANUAL_ACTIONS = new Set(["moveUp", "moveDown", "moveLeft", "moveRight"]);
 
 const colors = {
   floor: "#1a1f1f",
@@ -71,7 +90,8 @@ const LEVEL_OPTIONS = [
   { id: "ridge-house-entry", title: "Ridge House Entry", file: "level/ridge-house-entry.json" },
   { id: "warehouse-pinch", title: "Warehouse Pinch", file: "level/warehouse-pinch.json" },
   { id: "hardpoint-gallery", title: "Hardpoint Gallery", file: "level/hardpoint-gallery.json" },
-  { id: "terminal-breach", title: "Terminal Breach", file: "level/terminal-breach.json" }
+  { id: "terminal-breach", title: "Terminal Breach", file: "level/terminal-breach.json" },
+  { id: "house-blueprint", title: "House Blueprint", file: "level/house-blueprint.json" }
 ];
 
 const WEAPON_OPTIONS = [
@@ -86,6 +106,12 @@ const ARMOR_OPTIONS = [
   { id: "heavy-armor", file: "equipment/heavy-armor.json" }
 ];
 
+const BACKPACK_OPTIONS = [
+  { id: "small-backpack", file: "equipment/small-backpack.json" },
+  { id: "medium-backpack", file: "equipment/medium-backpack.json" },
+  { id: "large-backpack", file: "equipment/large-backpack.json" }
+];
+
 const SOUND_OPTIONS = [
   { id: "door-open", file: "sounds/door-open.wav" },
   { id: "door-locked", file: "sounds/door-locked.wav" },
@@ -95,6 +121,7 @@ const SOUND_OPTIONS = [
   { id: "operator-down", file: "sounds/operator-down.wav" },
   { id: "mission-success", file: "sounds/mission-success.wav" },
   { id: "mission-failed", file: "sounds/mission-failed.wav" },
+  { id: "window-break", file: "sounds/window-break.wav" },
   { id: "operator-walk", file: "sounds/armed-cement-walk.wav" },
   { id: "enemy-walk", file: "sounds/enemy-walk.wav" }
 ];
@@ -109,20 +136,36 @@ const runtime = {
   settingsResumeRunning: false,
   digitalLockOpen: false,
   digitalLockResumeRunning: false,
+  inventoryOpen: false,
+  inventoryResumeRunning: false,
+  equipmentTableOpen: false,
+  equipmentTableResumeRunning: false,
   activeDigitalDoorId: null,
+  enemyTraceMode: "current",
+  showAllHealth: false,
+  capturingKeyAction: null,
+  manualFireHeld: false,
+  manualFirePoint: null,
   lastTime: performance.now()
 };
 
 const keysDown = new Set();
 const weapons = new Map();
 const armors = new Map();
+const backpacks = new Map();
 const operatorLoadouts = {};
 const operatorArmorLoadouts = {};
+const operatorBackpackLoadouts = {};
 const enemyLoadouts = {};
 const enemyArmorLoadouts = {};
 
 let audio;
+let keybindings;
+let camera;
 let geometry;
+let shooting;
+let inventory;
+let interaction;
 let equipment;
 let level;
 let visibility;
@@ -153,7 +196,7 @@ function selectOperator(id) {
 
 // Checks whether any manual movement key is currently held.
 function hasManualInput() {
-  return [...MANUAL_KEYS].some((key) => keysDown.has(key));
+  return [...MANUAL_ACTIONS].some((action) => keysDown.has(action));
 }
 
 // Toggles between planning and execute mode when gameplay is not blocked.
@@ -184,6 +227,7 @@ function update(dt) {
   if (settings.gameplayPausedByOverlay()) return;
   const manualInput = hasManualInput();
   if (state.gameOver) return;
+  camera.update(dt);
 
   for (const op of state.level.operators) {
     const isManualOperator = op.id === state.selectedId && manualInput;
@@ -192,6 +236,9 @@ function update(dt) {
     }
   }
   for (const op of state.level.operators) actions.updateOperatorCombat(op, dt);
+  if (state.shootingMode === "manual" && runtime.manualFireHeld && runtime.manualFirePoint) {
+    shooting.manualFire(selectedOperator(), runtime.manualFirePoint);
+  }
   for (const enemy of state.level.enemies) actions.updateEnemy(enemy, dt);
 
   mission.updateObjective();
@@ -207,8 +254,10 @@ function updateHud() {
   const state = runtime.state;
   if (!state) {
     elements.modeLabel.textContent = "Loading";
-    elements.clockLabel.textContent = "Off";
     elements.objectiveLabel.textContent = "Loading";
+    elements.selectedStatusLabel.textContent = "None";
+    elements.shootingStatusLabel.textContent = "Automatic";
+    elements.selectedZoneLabel.textContent = "Loading";
     elements.runButton.textContent = "Execute";
     if (equipment) {
       equipment.renderLoadoutPanel();
@@ -218,7 +267,6 @@ function updateHud() {
     return;
   }
   elements.modeLabel.textContent = runtime.digitalLockOpen ? "Digital Lock" : (runtime.settingsOpen ? "Settings" : (state.gameOver ? titleCase(state.result) : (hasManualInput() ? "Manual" : (state.running ? "Execute" : "Planning"))));
-  elements.clockLabel.textContent = "Off";
   if (state.level.objective.secured) {
     elements.objectiveLabel.textContent = "Secured";
   } else if (state.level.objective.harmed) {
@@ -229,9 +277,17 @@ function updateHud() {
   }
   elements.runButton.textContent = state.running ? "Pause" : "Execute";
   elements.difficultySelect.value = runtime.currentDifficulty;
+  elements.shootingModeSelect.value = state.shootingMode;
+  elements.enemyTraceSelect.value = runtime.enemyTraceMode;
+  const selected = selectedOperator();
+  elements.selectedStatusLabel.textContent = selected ? selected.id : "None";
+  elements.shootingStatusLabel.textContent = titleCase(state.shootingMode || "automatic");
+  elements.selectedZoneLabel.textContent = selected ? (selected.zone || selected.floor || "Map") : "Map";
   equipment.renderLoadoutPanel();
   equipment.renderHealthBoard();
   equipment.renderEnemyLoadouts();
+  inventory.renderSummary();
+  if (runtime.inventoryOpen) inventory.renderInventory();
 }
 
 // Converts result labels into display-friendly title case.
@@ -263,6 +319,11 @@ function assertSystem(name, system) {
 // Creates each system and wires shared runtime dependencies between them.
 function initializeSystems() {
   assertSystem("Geometry system", window.GeometrySystem);
+  assertSystem("Keybinding system", window.KeybindingSystem);
+  assertSystem("Camera system", window.CameraSystem);
+  assertSystem("Shooting system", window.ShootingSystem);
+  assertSystem("Inventory system", window.InventorySystem);
+  assertSystem("Interaction system", window.InteractionSystem);
   assertSystem("Audio system", window.AudioSystem);
   assertSystem("Equipment system", window.EquipmentSystem);
   assertSystem("Level system", window.LevelSystem);
@@ -281,24 +342,70 @@ function initializeSystems() {
     loopVolume: 0.34
   });
 
+  keybindings = window.KeybindingSystem.create({
+    elements
+  });
+
+  camera = window.CameraSystem.create({
+    canvas: elements.canvas,
+    world: WORLD,
+    defaultWorld: DEFAULT_WORLD,
+    clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
+    selectedOperator
+  });
+
   geometry = window.GeometrySystem.create({
     runtime,
     canvas: elements.canvas,
-    twoPi: TWO_PI
+    twoPi: TWO_PI,
+    camera
   });
 
   equipment = window.EquipmentSystem.create({
     runtime,
     weapons,
     armors,
+    backpacks,
     operatorLoadouts,
     operatorArmorLoadouts,
+    operatorBackpackLoadouts,
     enemyLoadouts,
     enemyArmorLoadouts,
     elements,
     weaponOptions: WEAPON_OPTIONS,
     armorOptions: ARMOR_OPTIONS,
+    backpackOptions: BACKPACK_OPTIONS,
     selectedOperator,
+    shooting: {
+      resetAmmo: (unit) => shooting && shooting.resetAmmo(unit)
+    },
+    updateHud
+  });
+
+  shooting = window.ShootingSystem.create({
+    getState: () => runtime.state,
+    geometry,
+    equipment,
+    audio,
+    enemyBehavior: {
+      noticeShot: (...args) => enemyBehavior && enemyBehavior.noticeShot(...args)
+    },
+    actions: {
+      damageEnemy: (...args) => actions && actions.damageEnemy(...args)
+    },
+    updateHud
+  });
+
+  inventory = window.InventorySystem.create({
+    runtime,
+    elements,
+    keysDown,
+    equipment,
+    shooting,
+    selectedOperator,
+    weaponOptions: WEAPON_OPTIONS,
+    armorOptions: ARMOR_OPTIONS,
+    backpackOptions: BACKPACK_OPTIONS,
     updateHud
   });
 
@@ -333,9 +440,27 @@ function initializeSystems() {
     unitRadius: UNIT_RADIUS,
     levelOptions: LEVEL_OPTIONS,
     equipment,
+    shooting,
     operatorLoadouts,
     operatorArmorLoadouts,
+    operatorBackpackLoadouts,
     keysDown,
+    updateHud
+  });
+
+  interaction = window.InteractionSystem.create({
+    getState: () => runtime.state,
+    selectedOperator,
+    geometry,
+    inventory,
+    actions: {
+      damageOperator: (...args) => actions && actions.damageOperator(...args)
+    },
+    enemyBehavior: {
+      noticeDoor: (...args) => enemyBehavior && enemyBehavior.noticeDoor(...args)
+    },
+    audio,
+    openDigitalLock: digitalLock.openDigitalLock,
     updateHud
   });
 
@@ -348,6 +473,8 @@ function initializeSystems() {
     inFieldOfView: geometry.inFieldOfView,
     collidesWithMap: geometry.collidesWithMap,
     rectCenter: geometry.rectCenter,
+    clamp: geometry.clamp,
+    enemyTraceMode: () => runtime.enemyTraceMode,
     audio
   });
 
@@ -365,7 +492,7 @@ function initializeSystems() {
     getState: () => runtime.state,
     selectedOperator,
     hasManualInput,
-    isKeyDown: (key) => keysDown.has(key),
+    isActionDown: (action) => keysDown.has(action),
     pointDistance: geometry.pointDistance,
     angleTo: geometry.angleTo,
     collidesWithMap: geometry.collidesWithMap,
@@ -377,6 +504,8 @@ function initializeSystems() {
     weaponById: equipment.weaponById,
     operatorSightRange: visibility.operatorSightRange,
     openDigitalLock: digitalLock.openDigitalLock,
+    interaction,
+    shooting,
     enemyBehavior,
     audio,
     updateHud,
@@ -385,12 +514,15 @@ function initializeSystems() {
 
   renderer = window.RenderSystem.create({
     runtime,
+    canvas: elements.canvas,
     ctx,
     world: WORLD,
     colors,
     twoPi: TWO_PI,
+    camera,
     geometry,
     visibility,
+    interaction,
     selectedOperator,
     hasManualInput
   });
@@ -399,9 +531,12 @@ function initializeSystems() {
     runtime,
     elements,
     keysDown,
-    manualKeys: MANUAL_KEYS,
+    keybindings,
     geometry,
     actions,
+    interaction,
+    shooting,
+    inventory,
     equipment,
     level,
     settings,
@@ -412,7 +547,9 @@ function initializeSystems() {
     toggleRun,
     setDifficulty,
     updateHud,
-    operatorLoadouts
+    operatorLoadouts,
+    inventoryIsOpen: () => runtime.inventoryOpen,
+    equipmentTableIsOpen: () => runtime.equipmentTableOpen
   });
 
   input.bindEvents();

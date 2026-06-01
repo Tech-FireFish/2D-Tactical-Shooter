@@ -15,25 +15,43 @@
         </div>
       </header>
 
+      <section class="top-status-bar" aria-label="Mission status">
+        <div>
+          <span>Mode</span>
+          <strong id="modeLabel">Planning</strong>
+        </div>
+        <div>
+          <span>Objective</span>
+          <strong id="objectiveLabel">Secure</strong>
+        </div>
+        <div>
+          <span>Operator</span>
+          <strong id="selectedStatusLabel">ALPHA</strong>
+        </div>
+        <div>
+          <span>Shooting</span>
+          <strong id="shootingStatusLabel">Automatic</strong>
+        </div>
+        <div>
+          <span>Zone</span>
+          <strong id="selectedZoneLabel">Floor 1</strong>
+        </div>
+      </section>
+
       <section class="play-layout">
-        <aside class="side-panel left-panel" aria-label="Operator status and loadout">
+        <aside class="side-panel left-panel" aria-label="Operator equipment and inventory">
           <section class="control-card">
-            <p class="panel-label">Loadout</p>
-            <label class="field-stack" for="weaponSelect">
-              <span id="selectedOperatorLabel">Selected Operator</span>
-              <select id="weaponSelect"></select>
-            </label>
+            <p class="panel-label">Selected Loadout</p>
+            <span id="selectedOperatorLabel" class="selected-loadout-label">Selected Operator</span>
             <div id="weaponPixelPreview" class="weapon-pixel-preview" aria-label="Selected weapon pixel preview"></div>
-            <label class="field-stack" for="armorSelect">
-              <span>Armor</span>
-              <select id="armorSelect"></select>
-            </label>
+            <div id="ammoBoard" class="ammo-board" aria-live="polite"></div>
             <div id="weaponStats" class="weapon-stats"></div>
           </section>
 
           <section class="control-card">
-            <p class="panel-label">Operator Health</p>
-            <div id="operatorHealthBoard" class="health-board" aria-live="polite"></div>
+            <p class="panel-label">Inventory</p>
+            <div id="inventorySummary" class="inventory-summary" aria-live="polite"></div>
+            <button id="inventoryButton" type="button">Open Inventory</button>
           </section>
         </aside>
 
@@ -51,24 +69,6 @@
 
         <aside class="side-panel right-panel" aria-label="Mission controls">
           <section class="control-card">
-            <p class="panel-label">Mission Status</p>
-            <div class="status-grid">
-              <div>
-                <span>Mode</span>
-                <strong id="modeLabel">Planning</strong>
-              </div>
-              <div>
-                <span>Clock</span>
-                <strong id="clockLabel">Off</strong>
-              </div>
-              <div>
-                <span>Objective</span>
-                <strong id="objectiveLabel">Secure</strong>
-              </div>
-            </div>
-          </section>
-
-          <section class="control-card">
             <p class="panel-label">Actions</p>
             <div class="actions" aria-label="Game actions">
               <button id="runButton" type="button" title="Toggle pause and execute">Execute</button>
@@ -76,6 +76,14 @@
               <button id="debugButton" type="button" title="Toggle tactical debug overlay">Debug</button>
               <button id="settingsButton" type="button" title="Open settings">Settings</button>
             </div>
+          </section>
+
+          <section class="control-card">
+            <div class="panel-heading-row">
+              <p class="panel-label">Operator Health</p>
+              <button id="showAllHealthButton" type="button">Show All</button>
+            </div>
+            <div id="operatorHealthBoard" class="health-board" aria-live="polite"></div>
           </section>
         </aside>
       </section>
@@ -95,7 +103,10 @@
               <p class="panel-label">Keys</p>
               <dl class="key-list">
                 <div><dt>WASD</dt><dd>Move selected operator</dd></div>
+                <div><dt>Left Ctrl</dt><dd>Sneak while moving</dd></div>
+                <div><dt>Left Shift</dt><dd>Sprint while moving</dd></div>
                 <div><dt>E</dt><dd>Open nearby door</dd></div>
+                <div><dt>I</dt><dd>Open selected operator inventory</dd></div>
                 <div><dt>Space</dt><dd>Execute or pause plan</dd></div>
                 <div><dt>R</dt><dd>Restart current level</dd></div>
                 <div><dt>F3</dt><dd>Toggle debug overlay</dd></div>
@@ -103,6 +114,7 @@
                 <div><dt>Left Click</dt><dd>Select operator, add waypoint, or click nearby door</dd></div>
                 <div><dt>Right Click</dt><dd>Clear selected operator route</dd></div>
               </dl>
+              <div class="keybinding-list" id="keyBindingList"></div>
             </section>
 
             <section class="control-card">
@@ -125,8 +137,41 @@
                   <option value="difficult">Difficult</option>
                 </select>
               </label>
+              <label class="level-picker" for="shootingModeSelect">
+                <span>Shooting</span>
+                <select id="shootingModeSelect">
+                  <option value="automatic">Automatic</option>
+                  <option value="manual">Manual</option>
+                </select>
+              </label>
+              <label class="level-picker" for="enemyTraceSelect">
+                <span>Enemy Behavior</span>
+                <select id="enemyTraceSelect">
+                  <option value="current">Current</option>
+                  <option value="chase">Chase Last Known</option>
+                </select>
+              </label>
+            </section>
+
+            <section class="control-card">
+              <p class="panel-label">Operator Loadout</p>
+              <label class="field-stack" for="weaponSelect">
+                <span id="settingsSelectedOperatorLabel">Selected Operator Weapon</span>
+                <select id="weaponSelect"></select>
+              </label>
+              <label class="field-stack" for="armorSelect">
+                <span>Armor</span>
+                <select id="armorSelect"></select>
+              </label>
+              <label class="field-stack" for="backpackSelect">
+                <span>Backpack</span>
+                <select id="backpackSelect"></select>
+              </label>
+            </section>
+
+            <section class="control-card">
+              <p class="panel-label">Enemy Loadouts</p>
               <div class="enemy-loadouts">
-                <p class="panel-label">Enemy Loadouts</p>
                 <div id="enemyLoadoutList" class="enemy-loadout-list"></div>
               </div>
             </section>
@@ -165,9 +210,40 @@
           <button id="unlockDigitalDoorButton" type="button">Unlock</button>
         </div>
       </section>
+
+      <section id="inventoryOverlay" class="settings-overlay hidden" aria-label="Operator inventory" aria-modal="true" role="dialog">
+        <div class="inventory-panel">
+          <header class="settings-header">
+            <div>
+              <p class="eyebrow">Inventory</p>
+              <h2 id="inventoryTitle">Operator Inventory</h2>
+            </div>
+            <button id="closeInventoryButton" type="button" title="Close inventory">Close</button>
+          </header>
+          <div id="inventoryDetails" class="inventory-details"></div>
+        </div>
+      </section>
+
+      <section id="equipmentTableOverlay" class="settings-overlay hidden" aria-label="Equipment table" aria-modal="true" role="dialog">
+        <div class="inventory-panel">
+          <header class="settings-header">
+            <div>
+              <p class="eyebrow">Equipment Table</p>
+              <h2 id="equipmentTableTitle">Choose Equipment</h2>
+            </div>
+            <button id="closeEquipmentTableButton" type="button" title="Close equipment table">Close</button>
+          </header>
+          <div id="equipmentTableOptions" class="equipment-table-options"></div>
+        </div>
+      </section>
     </main>
     <script src="systems/audio-system.js?v=1"></script>
+    <script src="systems/keybinding-system.js?v=1"></script>
+    <script src="systems/camera-system.js?v=1"></script>
     <script src="systems/geometry-system.js?v=1"></script>
+    <script src="systems/shooting-system.js?v=1"></script>
+    <script src="systems/inventory-system.js?v=1"></script>
+    <script src="systems/interaction-system.js?v=1"></script>
     <script src="systems/equipment-system.js?v=1"></script>
     <script src="systems/level-system.js?v=1"></script>
     <script src="systems/visibility-system.js?v=1"></script>

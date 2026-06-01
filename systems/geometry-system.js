@@ -12,10 +12,11 @@
       const rect = canvas.getBoundingClientRect();
       const sx = canvas.width / rect.width;
       const sy = canvas.height / rect.height;
-      return {
+      const point = {
         x: (event.clientX - rect.left) * sx,
         y: (event.clientY - rect.top) * sy
       };
+      return deps.camera ? deps.camera.screenToWorld(point) : point;
     }
 
     // Measures straight-line distance between two world points.
@@ -71,7 +72,8 @@
     function blockingRects(level) {
       return [
         ...level.walls,
-        ...level.doors.filter(doorBlocks)
+        ...level.doors.filter(doorBlocks),
+        ...(level.windows || []).filter(windowBlocks)
       ];
     }
 
@@ -114,6 +116,11 @@
         ...level.doors.filter(doorBlocks)
       ];
       return !blockers.some((rect) => segmentIntersectsRect(a, b, rect));
+    }
+
+    // Treats closed windows as movement blockers that bullets can still cross.
+    function windowBlocks(win) {
+      return win.state === "closed";
     }
 
     // Checks target distance and angle against an observer vision cone.
@@ -161,6 +168,11 @@
       return runtime.state.level.doors.find((door) => doorBlocks(door) && pointInRect(point, inflateRect(door, 6)));
     }
 
+    // Finds a window under a click/touch point.
+    function windowAtPoint(point) {
+      return (runtime.state.level.windows || []).find((win) => pointInRect(point, inflateRect(win, 6)));
+    }
+
     // Expands a rectangle outward for forgiving interaction checks.
     function inflateRect(rect, amount) {
       return {
@@ -197,10 +209,12 @@
       segmentIntersectsRect,
       lineSegmentsIntersect,
       hasLineOfSight,
+      windowBlocks,
       inFieldOfView,
       nearestClosedDoorOnRoute,
       nearestClosedDoorToOperator,
       doorAtPoint,
+      windowAtPoint,
       inflateRect,
       isDigitalLockDoor,
       isLockedDigitalDoor

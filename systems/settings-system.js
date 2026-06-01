@@ -8,7 +8,7 @@
 
     // Opens settings, pauses execution, and remembers whether to resume.
     function openSettings() {
-      if (runtime.settingsOpen || runtime.digitalLockOpen) return;
+      if (runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen) return;
       runtime.settingsResumeRunning = Boolean(runtime.state && runtime.state.running);
       if (runtime.state) runtime.state.running = false;
       deps.keysDown.clear();
@@ -41,7 +41,7 @@
 
     // Reports whether any modal overlay should freeze gameplay updates.
     function gameplayPausedByOverlay() {
-      return runtime.settingsOpen || runtime.digitalLockOpen;
+      return runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen;
     }
 
     // Overrides the stored resume state for setup changes.
