@@ -68,6 +68,11 @@
         </section>
 
         <aside class="side-panel right-panel" aria-label="Mission controls">
+          <section class="control-card hint-card">
+            <p class="panel-label">Hint</p>
+            <div id="hintText" class="hint-text">Move near doors, windows, stairs, papers, laptops, or tables.</div>
+          </section>
+
           <section class="control-card">
             <p class="panel-label">Actions</p>
             <div class="actions" aria-label="Game actions">
@@ -99,25 +104,19 @@
           </header>
 
           <div class="settings-grid">
-            <section class="control-card">
+            <nav class="settings-tabs" aria-label="Settings sections">
+              <button type="button" class="active" data-settings-tab="keys">Keys</button>
+              <button type="button" data-settings-tab="mission">Mission Setup</button>
+              <button type="button" data-settings-tab="operator">Operator Loadout</button>
+              <button type="button" data-settings-tab="enemy">Enemy Loadout</button>
+            </nav>
+
+            <section class="control-card" data-settings-panel="keys">
               <p class="panel-label">Keys</p>
-              <dl class="key-list">
-                <div><dt>WASD</dt><dd>Move selected operator</dd></div>
-                <div><dt>Left Ctrl</dt><dd>Sneak while moving</dd></div>
-                <div><dt>Left Shift</dt><dd>Sprint while moving</dd></div>
-                <div><dt>E</dt><dd>Open nearby door</dd></div>
-                <div><dt>I</dt><dd>Open selected operator inventory</dd></div>
-                <div><dt>Space</dt><dd>Execute or pause plan</dd></div>
-                <div><dt>R</dt><dd>Restart current level</dd></div>
-                <div><dt>F3</dt><dd>Toggle debug overlay</dd></div>
-                <div><dt>Esc</dt><dd>Open or close settings</dd></div>
-                <div><dt>Left Click</dt><dd>Select operator, add waypoint, or click nearby door</dd></div>
-                <div><dt>Right Click</dt><dd>Clear selected operator route</dd></div>
-              </dl>
               <div class="keybinding-list" id="keyBindingList"></div>
             </section>
 
-            <section class="control-card">
+            <section class="control-card" data-settings-panel="mission">
               <p class="panel-label">Mission Setup</p>
               <label class="level-picker" for="levelSelect">
                 <span>Level</span>
@@ -153,7 +152,7 @@
               </label>
             </section>
 
-            <section class="control-card">
+            <section class="control-card" data-settings-panel="operator">
               <p class="panel-label">Operator Loadout</p>
               <label class="field-stack" for="weaponSelect">
                 <span id="settingsSelectedOperatorLabel">Selected Operator Weapon</span>
@@ -169,7 +168,7 @@
               </label>
             </section>
 
-            <section class="control-card">
+            <section class="control-card" data-settings-panel="enemy">
               <p class="panel-label">Enemy Loadouts</p>
               <div class="enemy-loadouts">
                 <div id="enemyLoadoutList" class="enemy-loadout-list"></div>
@@ -236,6 +235,22 @@
           <div id="equipmentTableOptions" class="equipment-table-options"></div>
         </div>
       </section>
+
+      <section id="laptopOverlay" class="settings-overlay hidden" aria-label="Camera laptop" aria-modal="true" role="dialog">
+        <div class="laptop-panel">
+          <header class="settings-header">
+            <div>
+              <p class="eyebrow">Camera Laptop</p>
+              <h2 id="laptopTitle">Camera Access</h2>
+            </div>
+            <button id="closeLaptopButton" type="button" title="Close laptop">Close</button>
+          </header>
+          <div class="laptop-screen">
+            <button id="startHackButton" type="button">Start Hacking</button>
+            <div id="cameraHackList" class="camera-hack-list"></div>
+          </div>
+        </div>
+      </section>
     </main>
     <script src="systems/audio-system.js?v=1"></script>
     <script src="systems/keybinding-system.js?v=1"></script>
@@ -244,6 +259,7 @@
     <script src="systems/shooting-system.js?v=1"></script>
     <script src="systems/inventory-system.js?v=1"></script>
     <script src="systems/interaction-system.js?v=1"></script>
+    <script src="systems/camera-hack-system.js?v=1"></script>
     <script src="systems/equipment-system.js?v=1"></script>
     <script src="systems/level-system.js?v=1"></script>
     <script src="systems/visibility-system.js?v=1"></script>
@@ -254,7 +270,7 @@
     <script src="systems/render-system.js?v=1"></script>
     <script src="systems/input-system.js?v=1"></script>
     <script src="systems/action-system.js?v=3"></script>
-    <script src="demo-data.js?v=2"></script>
-    <script src="main.js?v=17"></script>
+    <script src="demo-data.js"></script>
+    <script src="main.js?v=18"></script>
   </body>
 </html>

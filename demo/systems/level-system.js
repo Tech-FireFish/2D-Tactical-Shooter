@@ -19,6 +19,12 @@
         message: "Draw routes, then execute",
         shootingMode: runtime.state ? runtime.state.shootingMode || "automatic" : "automatic",
         shots: [],
+        cameraHack: {
+          started: false,
+          revealedCameras: new Set(),
+          revealedZones: new Set(),
+          discoveredZones: new Set()
+        },
         level: cloneLevel(level)
       };
     }
@@ -36,6 +42,8 @@
         floorZones: (level.floorZones || []).map((zone) => ({ ...zone })),
         rooms: (level.rooms || []).map((room) => ({ ...room })),
         labels: (level.labels || []).map((label) => ({ ...label })),
+        cameras: (level.cameras || []).map((camera) => ({ ...camera })),
+        laptops: (level.laptops || []).map((laptop) => ({ ...laptop })),
         walls: level.walls.map((wall) => ({ ...wall })),
         windows: (level.windows || []).map((win) => ({ ...win, state: win.state || "closed" })),
         stairs: (level.stairs || []).map((stair) => ({ ...stair, target: stair.target ? { ...stair.target } : null })),
@@ -202,7 +210,7 @@
       }
     }
 
-    // Loads an embedded demo level and starts it when loading succeeds.
+    // Fetches a level JSON file and starts it when loading succeeds.
     async function loadLevel(levelId) {
       const meta = deps.levelOptions.find((level) => level.id === levelId) || deps.levelOptions[0];
       runtime.currentLevelMeta = meta;
@@ -211,11 +219,11 @@
       elements.levelTitle.textContent = "Loading...";
 
       try {
-        const sourceLevel = window.DemoData && window.DemoData.levels && window.DemoData.levels[meta.id];
-        if (!sourceLevel) {
-          throw new Error(`Unable to load ${meta.id}`);
+        const response = await fetch(meta.file, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Unable to load ${meta.file}: ${response.status}`);
         }
-        runtime.currentLevel = JSON.parse(JSON.stringify(sourceLevel));
+        runtime.currentLevel = await response.json();
         runtime.currentLevel.id = runtime.currentLevel.id || meta.id;
         runtime.currentLevel.title = runtime.currentLevel.title || meta.title;
         restart();

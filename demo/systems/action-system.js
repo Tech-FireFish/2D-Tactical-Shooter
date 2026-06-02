@@ -183,6 +183,7 @@
       }
 
       if (!deps.shooting.consumeRound(shooter, weapon)) return;
+      deps.shooting.breakWindowsOnSegment(shooter, target);
       damageTarget(target, weapon.damage, shooter);
       deps.shooting.addShot(shooter, target, color, weapon.tracerTtl);
       deps.audio.playWeapon(weapon.id || shooter.weaponId);

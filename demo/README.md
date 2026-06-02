@@ -1,25 +1,17 @@
-# Breachline 2D Demo Guide
-
-This demo copy runs without Node.js, npm, or a localhost server. Open `index.html` directly in a browser to play.
-
-The copied `level/` and `equipment/` folders are included for reference, but the demo loads gameplay data from `demo-data.js` so browser `file://` JSON restrictions do not block startup.
-
-![Breachline 2D gameplay screenshot](docs/gameplay-screenshot.png)
+# Breachline 2D Standalone Demo
 
 ## Gameplay
 
-Breachline 2D is a top-down tactical breach game. You choose one or two operators, assign each operator a weapon, plan routes through the level, open doors manually with `E` or by clicking nearby doors, and let operators automatically engage enemies when they have clear line-of-sight. You can pause and replan at any time with `Space`.
-
-The mission succeeds when the VIP/objective is secured or all hostiles are neutralized. The mission fails if all operators are down or the objective is compromised.
+Breachline 2D is a top-down tactical breach game. Choose one or two operators, adjust loadouts, move through rooms, interact with doors, windows, laptops, papers, and equipment tables, and clear the mission with automatic or manual shooting.
 
 ## How To Run
 
-Open `index.html` directly from this `demo` folder.
+Open `demo/index.html` directly in a browser.
 
-## Why A Dev Server Is Needed
+No Node.js, npm command, install step, or localhost server is required for this demo copy.
 
-The root project uses a dev server because it loads JSON files with browser `fetch()` requests. This demo embeds those JSON files into `demo-data.js`, so it does not need a local HTTP server.
+## Why No Dev Server Is Needed
 
-## Do You Need To Install Node?
+The standalone demo embeds level and equipment data in `demo-data.js`, so the browser does not need to fetch JSON files from disk. The copied `level/` and `equipment/` folders are included for reference.
 
-No. This demo does not require Node.js, npm, or `npm start`. Use the root project only if you want the localhost development server.
+Audio still follows normal browser rules: click or press a key once before sounds can play.

@@ -14,6 +14,7 @@
       deps.keysDown.clear();
       runtime.settingsOpen = true;
       elements.settingsOverlay.classList.remove("hidden");
+      setActiveTab(runtime.activeSettingsTab || "keys");
       deps.renderEnemyLoadouts();
       deps.updateHud();
     }
@@ -41,7 +42,7 @@
 
     // Reports whether any modal overlay should freeze gameplay updates.
     function gameplayPausedByOverlay() {
-      return runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen;
+      return runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen || runtime.laptopOpen;
     }
 
     // Overrides the stored resume state for setup changes.
@@ -54,12 +55,24 @@
       return runtime.settingsOpen;
     }
 
+    // Shows one settings section and hides the other tab panels.
+    function setActiveTab(tabId) {
+      runtime.activeSettingsTab = tabId || "keys";
+      for (const tab of elements.settingsTabs || []) {
+        tab.classList.toggle("active", tab.dataset.settingsTab === runtime.activeSettingsTab);
+      }
+      for (const panel of elements.settingsPanels || []) {
+        panel.classList.toggle("hidden", panel.dataset.settingsPanel !== runtime.activeSettingsTab);
+      }
+    }
+
     return {
       openSettings,
       closeSettings,
       toggleSettings,
       gameplayPausedByOverlay,
       setResumeRunning,
+      setActiveTab,
       isOpen
     };
   }

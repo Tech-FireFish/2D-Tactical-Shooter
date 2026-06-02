@@ -115,7 +115,28 @@
         ...level.walls,
         ...level.doors.filter(doorBlocks)
       ];
-      return !blockers.some((rect) => segmentIntersectsRect(a, b, rect));
+      return !blockers.some((rect) => segmentBlockedByRectThroughWindows(a, b, rect, level));
+    }
+
+    // Verifies sight while allowing the target structure to reveal itself.
+    function hasLineOfSightIgnoring(a, b, level, ignoredRect) {
+      const blockers = [
+        ...level.walls,
+        ...level.doors.filter(doorBlocks)
+      ].filter((rect) => rect !== ignoredRect);
+      return !blockers.some((rect) => segmentBlockedByRectThroughWindows(a, b, rect, level));
+    }
+
+    // Lets sight and bullets pass through wall sections occupied by windows.
+    function segmentBlockedByRectThroughWindows(a, b, rect, level) {
+      if (!segmentIntersectsRect(a, b, rect)) return false;
+      const windowOpening = (level.windows || []).some((win) => segmentIntersectsRect(a, b, win) && rectsOverlap(rect, win));
+      return !windowOpening;
+    }
+
+    // Tests rough rectangle overlap for wall-window openings.
+    function rectsOverlap(a, b) {
+      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
     }
 
     // Treats closed windows as movement blockers that bullets can still cross.
@@ -209,6 +230,9 @@
       segmentIntersectsRect,
       lineSegmentsIntersect,
       hasLineOfSight,
+      hasLineOfSightIgnoring,
+      segmentBlockedByRectThroughWindows,
+      rectsOverlap,
       windowBlocks,
       inFieldOfView,
       nearestClosedDoorOnRoute,
