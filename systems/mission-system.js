@@ -23,7 +23,7 @@
       const state = runtime.state;
       if (state.gameOver) return;
       const liveOps = state.level.operators.some((op) => !op.down);
-      const allEnemiesDown = state.level.enemies.every((enemy) => enemy.down);
+      const allEnemiesDown = state.level.enemies.length > 0 && state.level.enemies.every((enemy) => enemy.down);
       if (state.level.objective.secured || allEnemiesDown) {
         finishMission("success", "Mission Complete", "Objective secured. The route held together.");
       } else if (!liveOps || state.level.objective.harmed) {

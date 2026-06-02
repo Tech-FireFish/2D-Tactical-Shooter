@@ -24,16 +24,19 @@
       drawStairs();
       drawItems();
       drawEquipmentTables();
+      drawLaptops();
       drawPaths();
       drawSight();
       drawDoors();
+      drawCameras();
       drawObjective();
       drawUnits();
       drawShots();
       deps.camera.reset(ctx);
       // Visibility fog disabled per user request.
       // drawFog();
-      drawHudOverlay();
+      // In-canvas hint/status card moved to the right panel.
+      // drawHudOverlay();
       if (runtime.state.debug) {
         deps.camera.apply(ctx);
         drawDebug();
@@ -73,7 +76,7 @@
       }
 
       ctx.fillStyle = colors.floorAlt;
-      const zones = state.level.floorZones.length ? state.level.floorZones : [
+      const zones = (state.level.floorZones.length ? state.level.floorZones : [
         { x: 140, y: 110, w: 155, h: 230 },
         { x: 315, y: 110, w: 185, h: 140 },
         { x: 520, y: 110, w: 270, h: 140 },
@@ -83,7 +86,7 @@
         { x: 140, y: 360, w: 155, h: 150 },
         { x: 315, y: 400, w: 185, h: 110 },
         { x: 520, y: 400, w: 270, h: 110 }
-      ];
+      ]).filter(shouldDrawObject);
       for (const zone of zones) {
         ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
       }
@@ -91,7 +94,7 @@
 
     // Draws wall rectangles and their outlines.
     function drawRooms() {
-      for (const wall of runtime.state.level.walls) {
+      for (const wall of runtime.state.level.walls.filter(shouldDrawObject)) {
         ctx.fillStyle = colors.wall;
         ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
         ctx.strokeStyle = colors.wallEdge;
@@ -104,9 +107,9 @@
     // Draws room and zone labels from level data.
     function drawLabels() {
       const labels = [
-        ...(runtime.state.level.rooms || []).map((room) => ({ x: room.x + room.w / 2, y: room.y + 18, text: room.label || room.id })),
-        ...(runtime.state.level.labels || [])
-      ];
+        ...(runtime.state.level.rooms || []).filter(shouldDrawObject).map((room) => ({ ...room, x: room.x + room.w / 2, y: room.y + 18, text: room.label || room.id })),
+        ...(runtime.state.level.labels || []).filter(shouldDrawObject)
+      ].filter(shouldDrawObject);
       ctx.fillStyle = "rgba(238,243,239,0.56)";
       ctx.font = "800 13px system-ui";
       ctx.textAlign = "center";
@@ -118,7 +121,7 @@
 
     // Draws windows with open, closed, and broken states.
     function drawWindows() {
-      for (const win of runtime.state.level.windows || []) {
+      for (const win of (runtime.state.level.windows || []).filter(shouldDrawObject)) {
         ctx.save();
         ctx.fillStyle = win.state === "broken" ? "#92d5e9" : (win.state === "open" ? "#72b7ce" : "#b9e8f3");
         ctx.strokeStyle = win.state === "broken" ? "#ffffff" : "#24434b";
@@ -140,7 +143,7 @@
 
     // Draws stair connectors and target direction.
     function drawStairs() {
-      for (const stair of runtime.state.level.stairs || []) {
+      for (const stair of (runtime.state.level.stairs || []).filter(shouldDrawObject)) {
         ctx.save();
         ctx.fillStyle = "#8ec6c0";
         ctx.strokeStyle = "#1d3a3a";
@@ -164,7 +167,7 @@
 
     // Draws paper and other pickup items.
     function drawItems() {
-      for (const item of runtime.state.level.items || []) {
+      for (const item of (runtime.state.level.items || []).filter(shouldDrawObject)) {
         if (item.picked) continue;
         ctx.fillStyle = item.type === "paper" ? "#f5e6a6" : "#d9d9d9";
         ctx.strokeStyle = "#6c6132";
@@ -180,7 +183,7 @@
 
     // Draws interactable equipment tables.
     function drawEquipmentTables() {
-      for (const table of runtime.state.level.equipmentTables || []) {
+      for (const table of (runtime.state.level.equipmentTables || []).filter(shouldDrawObject)) {
         ctx.fillStyle = "#6b6f75";
         ctx.strokeStyle = "#25282c";
         ctx.lineWidth = 2;
@@ -193,9 +196,24 @@
       }
     }
 
+    // Draws exterior laptop terminals used for camera hacking.
+    function drawLaptops() {
+      for (const laptop of runtime.state.level.laptops || []) {
+        ctx.fillStyle = "#202a31";
+        ctx.strokeStyle = "#72b7ce";
+        ctx.lineWidth = 2;
+        ctx.fillRect(laptop.x, laptop.y, laptop.w, laptop.h);
+        ctx.strokeRect(laptop.x, laptop.y, laptop.w, laptop.h);
+        ctx.fillStyle = "#72b7ce";
+        ctx.font = "900 9px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText("LAPTOP", laptop.x + laptop.w / 2, laptop.y + laptop.h / 2 + 3);
+      }
+    }
+
     // Draws each door in closed or open orientation.
     function drawDoors() {
-      for (const door of runtime.state.level.doors) {
+      for (const door of runtime.state.level.doors.filter(shouldDrawObject)) {
         const center = deps.geometry.rectCenter(door);
         ctx.save();
         ctx.translate(center.x, center.y);
@@ -209,6 +227,28 @@
         }
         ctx.restore();
         drawDoorIndicator(door, center);
+      }
+    }
+
+    // Draws camera labels only after a laptop hack has started.
+    function drawCameras() {
+      const hack = runtime.state.cameraHack;
+      if (!hack || !hack.started) return;
+      for (const camera of runtime.state.level.cameras || []) {
+        ctx.save();
+        ctx.fillStyle = hack.revealedCameras.has(camera.id) ? colors.success : colors.cyan;
+        ctx.strokeStyle = "#0f1518";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(camera.x, camera.y, 13, 0, twoPi);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "#071015";
+        ctx.font = "900 10px system-ui";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(camera.label || camera.id, camera.x, camera.y + 0.5);
+        ctx.restore();
       }
     }
 
@@ -264,6 +304,7 @@
       const state = runtime.state;
       for (const enemy of state.level.enemies) {
         if (enemy.down) continue;
+        if (!shouldDrawObject(enemy)) continue;
         if (runtime.currentDifficulty === "difficult" && !deps.visibility.visibleToOperators(enemy)) continue;
         drawCone(enemy, enemy.angle, enemy.sightRange, enemy.fov, colors.sight);
       }
@@ -286,8 +327,8 @@
 
     // Draws the VIP objective when it is visible.
     function drawObjective() {
-      if (!deps.visibility.objectiveVisible()) return;
       const obj = runtime.state.level.objective;
+      if (!shouldDrawObject(obj) || !deps.visibility.objectiveVisible()) return;
       ctx.fillStyle = obj.harmed ? colors.enemy : colors.hostage;
       ctx.strokeStyle = obj.secured ? colors.success : "#5d5330";
       ctx.lineWidth = 3;
@@ -306,10 +347,22 @@
     function drawUnits() {
       const state = runtime.state;
       for (const enemy of state.level.enemies) {
+        if (!shouldDrawObject(enemy)) continue;
         if (runtime.currentDifficulty === "difficult" && !deps.visibility.visibleToOperators(enemy)) continue;
         drawUnit(enemy, enemy.down ? "#573030" : colors.enemy, enemy.id, false);
       }
       for (const op of state.level.operators) drawUnit(op, op.down ? "#2d4035" : op.color, op.id, true);
+    }
+
+    // Applies camera-hack hidden-zone rules while still allowing direct operator sight.
+    function shouldDrawObject(obj) {
+      if (!obj || !obj.hiddenZone) return true;
+      if (deps.cameraHack && deps.cameraHack.isRevealed(obj)) return true;
+      if (deps.visibility.hiddenObjectVisible(obj)) {
+        if (deps.cameraHack && deps.cameraHack.discoverZone) deps.cameraHack.discoverZone(obj.hiddenZone);
+        return true;
+      }
+      return false;
     }
 
     // Draws one unit body, facing marker, and label.

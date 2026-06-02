@@ -94,6 +94,7 @@
     // Handles keyboard controls for overlays, movement, run state, doors, and debug.
     function handleKey(event) {
       deps.audio.unlock();
+      guardBrowserShortcut(event);
       if (runtime.capturingKeyAction) {
         event.preventDefault();
         deps.keybindings.capture(runtime.capturingKeyAction, event);
@@ -104,16 +105,30 @@
         handleDigitalLockKey(event);
         return;
       }
+      if (deps.laptopIsOpen()) {
+        if (deps.keybindings.matches(event, "settings")) {
+          event.preventDefault();
+          deps.cameraHack.closeLaptop();
+        }
+        return;
+      }
       const key = event.key.toLowerCase();
       if (deps.keybindings.matches(event, "settings")) {
         event.preventDefault();
         if (deps.inventoryIsOpen()) deps.inventory.closeInventory();
         else if (deps.equipmentTableIsOpen()) deps.inventory.closeEquipmentTable();
+        else if (deps.laptopIsOpen()) deps.cameraHack.closeLaptop();
         else deps.settings.toggleSettings();
         return;
       }
       const state = runtime.state;
       if (!state) return;
+      if (deps.keybindings.matches(event, "inventory")) {
+        event.preventDefault();
+        if (deps.inventoryIsOpen()) deps.inventory.closeInventory();
+        else deps.inventory.openInventory();
+        return;
+      }
       if (deps.settings.gameplayPausedByOverlay()) return;
       const holdAction = holdActionForEvent(event);
       if (holdAction) {
@@ -124,13 +139,14 @@
         event.preventDefault();
         deps.toggleRun();
       } else if (deps.keybindings.matches(event, "restart")) {
+        event.preventDefault();
         deps.level.restart();
+      } else if (deps.keybindings.matches(event, "reload")) {
+        event.preventDefault();
+        deps.shooting.activeReload(deps.selectedOperator());
       } else if (deps.keybindings.matches(event, "interact")) {
         event.preventDefault();
         deps.interaction.interactNearest();
-      } else if (deps.keybindings.matches(event, "inventory")) {
-        event.preventDefault();
-        deps.inventory.openInventory();
       } else if (deps.keybindings.matches(event, "debug")) {
         event.preventDefault();
         state.debug = !state.debug;
@@ -140,6 +156,7 @@
 
     // Releases manual movement keys when gameplay is not overlay-paused.
     function handleKeyUp(event) {
+      guardBrowserShortcut(event);
       const key = event.key.toLowerCase();
       if (deps.settings.gameplayPausedByOverlay()) return;
       const holdAction = holdActionForEvent(event);
@@ -154,6 +171,20 @@
     function holdActionForEvent(event) {
       const actions = ["moveUp", "moveDown", "moveLeft", "moveRight", "sneak", "sprint"];
       return actions.find((action) => deps.keybindings.matches(event, action)) || null;
+    }
+
+    // Prevents common browser shortcuts from interrupting play once the game page is active.
+    function guardBrowserShortcut(event) {
+      const code = event.code || "";
+      const ctrlLike = event.ctrlKey || event.metaKey;
+      if (
+        deps.keybindings.matches(event, "inventory")
+        || deps.keybindings.matches(event, "reload")
+        || (ctrlLike && ["KeyW", "KeyR", "KeyS", "KeyP"].includes(code))
+        || code === "F5"
+      ) {
+        event.preventDefault();
+      }
     }
 
     // Allows typed digits and submit/delete shortcuts inside the lock overlay.
@@ -236,6 +267,9 @@
       elements.settingsOverlay.addEventListener("click", (event) => {
         if (event.target === elements.settingsOverlay) deps.settings.closeSettings();
       });
+      for (const tab of elements.settingsTabs || []) {
+        tab.addEventListener("click", () => deps.settings.setActiveTab(tab.dataset.settingsTab));
+      }
       elements.debugButton.addEventListener("click", () => {
         const state = runtime.state;
         if (!state) return;
@@ -288,6 +322,16 @@
           deps.digitalLock.deleteDigit();
         }
       });
+      elements.closeLaptopButton.addEventListener("click", deps.cameraHack.closeLaptop);
+      elements.laptopOverlay.addEventListener("click", (event) => {
+        if (event.target === elements.laptopOverlay) deps.cameraHack.closeLaptop();
+      });
+      elements.startHackButton.addEventListener("click", deps.cameraHack.startHack);
+      elements.cameraHackList.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-camera-id]");
+        if (!button) return;
+        deps.cameraHack.toggleCamera(button.dataset.cameraId);
+      });
       elements.levelSelect.addEventListener("change", () => {
         deps.settings.setResumeRunning(false);
         deps.level.loadLevel(elements.levelSelect.value);
@@ -296,6 +340,11 @@
         deps.settings.setResumeRunning(false);
         runtime.activeOperatorCount = Number(elements.operatorCountSelect.value);
         deps.level.restart();
+      });
+      window.addEventListener("beforeunload", (event) => {
+        if (!runtime.state || runtime.state.gameOver) return;
+        event.preventDefault();
+        event.returnValue = "";
       });
     }
 

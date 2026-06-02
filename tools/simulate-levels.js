@@ -18,10 +18,13 @@ const ARMOR_FILES = [
   "heavy-armor.json"
 ];
 const LEVEL_FILES = [
+  "tutorial-digital-lock.json",
   "ridge-house-entry.json",
   "warehouse-pinch.json",
   "hardpoint-gallery.json",
-  "terminal-breach.json"
+  "terminal-breach.json",
+  "house-blueprint.json",
+  "camera-house.json"
 ];
 const weapons = new Map(WEAPON_FILES.map((file) => {
   const weapon = JSON.parse(fs.readFileSync(path.join("equipment", file), "utf8"));
@@ -41,17 +44,37 @@ function armorById(id) {
 }
 
 function cloneLevel(level) {
+  const generatedPasswords = {};
+  const doors = level.doors.map((door) => {
+    const password = door.lockType === "digital" ? randomPassword() : door.password;
+    if (door.lockType === "digital") generatedPasswords[door.id] = password;
+    return {
+      ...door,
+      password,
+      locked: door.lockType === "digital" ? door.locked !== false : Boolean(door.locked)
+    };
+  });
+  const items = (level.items || []).map((item) => ({ ...item, picked: false }));
+  for (const door of doors.filter((item) => item.lockType === "digital")) {
+    let paper = items.find((item) => item.type === "paper" && item.passwordFor === door.id);
+    if (!paper) {
+      paper = { id: `paper-${door.id}`, type: "paper", x: level.operators[0].x + 20, y: level.operators[0].y - 42, w: 22, h: 18, passwordFor: door.id, picked: false };
+      items.push(paper);
+    }
+    paper.text = `${door.id} code: ${door.password}`;
+  }
   return {
     id: level.id,
     title: level.title,
     width: level.width || 960,
     height: level.height || 640,
     walls: level.walls.map((wall) => ({ ...wall })),
-    doors: level.doors.map((door) => ({
-      ...door,
-      password: door.lockType === "digital" ? (door.password || "0000") : door.password,
-      locked: door.lockType === "digital" ? door.locked !== false : Boolean(door.locked)
-    })),
+    windows: (level.windows || []).map((win) => ({ ...win, state: win.state || "closed" })),
+    cameras: (level.cameras || []).map((camera) => ({ ...camera })),
+    laptops: (level.laptops || []).map((laptop) => ({ ...laptop })),
+    stairs: (level.stairs || []).map((stair) => ({ ...stair, target: stair.target ? { ...stair.target } : null })),
+    items,
+    doors,
     operators: level.operators.map((op) => {
       const armor = armorById(op.armorId || "light-armor");
       const baseSpeed = op.speed || 92;
@@ -71,7 +94,8 @@ function cloneLevel(level) {
         action: null,
         reaction: 0,
         targetId: null,
-        down: false
+        down: false,
+        inventory: { items: [] }
       };
     }),
     enemies: level.enemies.map((enemy) => {
@@ -97,8 +121,66 @@ function cloneLevel(level) {
         patrolIndex: 0
       };
     }),
-    objective: { ...level.objective }
+    objective: { ...level.objective },
+    generatedPasswords
   };
+}
+
+function validateTutorial(levelRaw) {
+  if (levelRaw.id !== "tutorial-digital-lock") return { valid: true };
+  const level = cloneLevel(levelRaw);
+  const door = level.doors.find((item) => item.lockType === "digital");
+  const paper = level.items.find((item) => item.type === "paper" && item.passwordFor === door.id);
+  const op = level.operators[0];
+  const paperReachable = Boolean(findPath(level, op, rectCenter(paper)));
+  const doorReachable = Boolean(findPath(level, op, rectCenter(door)));
+  const paperMatches = paper && door && paper.text.includes(door.password);
+  const route = buildMissionRoute(level, op);
+  return {
+    valid: Boolean(door && paper && paperReachable && doorReachable && paperMatches && route),
+    door: Boolean(door),
+    paper: Boolean(paper),
+    paperReachable,
+    doorReachable,
+    paperMatches,
+    route: Boolean(route)
+  };
+}
+
+function firstSolidBulletBlocker(level, a, b) {
+  return [
+    ...level.walls,
+    ...level.doors.filter(doorBlocks)
+  ].some((rect) => segmentBlockedByRectThroughWindows(level, a, b, rect));
+}
+
+function windowShotThroughTest(level) {
+  const windows = level.windows || [];
+  if (!windows.length || !level.enemies.length || !level.operators.length) return true;
+  const win = windows[0];
+  const center = rectCenter(win);
+  const a = win.orientation === "vertical"
+    ? { x: center.x - 40, y: center.y }
+    : { x: center.x, y: center.y - 40 };
+  const enemy = win.orientation === "vertical"
+    ? { ...level.enemies[0], x: center.x + 40, y: center.y, radius: 12 }
+    : { ...level.enemies[0], x: center.x, y: center.y + 40, radius: 12 };
+  const crossesWindow = segmentIntersectsRect(a, enemy, win);
+  const wallBlocked = firstSolidBulletBlocker(level, a, enemy);
+  return crossesWindow && !wallBlocked && Boolean(segmentCircleHit(a, enemy, enemy, enemy.radius + 2));
+}
+
+function segmentCircleHit(a, b, circle, radius) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const lengthSq = dx * dx + dy * dy || 1;
+  const t = clamp(((circle.x - a.x) * dx + (circle.y - a.y) * dy) / lengthSq, 0, 1);
+  const closest = { x: a.x + dx * t, y: a.y + dy * t };
+  return pointDistance(closest, circle) <= radius;
+}
+
+function randomPassword() {
+  return String(Math.floor(Math.random() * 10000)).padStart(4, "0");
 }
 
 function pointDistance(a, b) {
@@ -183,7 +265,8 @@ function doorBlocks(door) {
 function blockingRects(level) {
   return [
     ...level.walls,
-    ...level.doors.filter(doorBlocks)
+    ...level.doors.filter(doorBlocks),
+    ...(level.windows || []).filter((win) => win.state === "closed")
   ];
 }
 
@@ -196,7 +279,21 @@ function collidesWithWalls(level, circle) {
 }
 
 function hasLineOfSight(a, b, level) {
-  return !blockingRects(level).some((rect) => segmentIntersectsRect(a, b, rect));
+  const blockers = [
+    ...level.walls,
+    ...level.doors.filter(doorBlocks)
+  ];
+  return !blockers.some((rect) => segmentBlockedByRectThroughWindows(level, a, b, rect));
+}
+
+function rectsOverlap(a, b) {
+  return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+}
+
+function segmentBlockedByRectThroughWindows(level, a, b, rect) {
+  if (!segmentIntersectsRect(a, b, rect)) return false;
+  const windowOpening = (level.windows || []).some((win) => segmentIntersectsRect(a, b, win) && rectsOverlap(rect, win));
+  return !windowOpening;
 }
 
 function inFieldOfView(observer, target) {
@@ -230,9 +327,14 @@ function nearestClosedDoorOnRoute(level, op, next) {
   return best;
 }
 
-function tryOpenDoor(op, door) {
+function hasPaperFor(level, door) {
+  return level.operators.some((op) => op.inventory.items.some((item) => item.type === "paper" && item.passwordFor === door.id && item.text.includes(door.password)));
+}
+
+function tryOpenDoor(level, op, door) {
   if (!door || !doorBlocks(door)) return false;
   if (door.lockType === "digital" && door.locked !== false) {
+    if (!hasPaperFor(level, door)) return true;
     door.locked = false;
     return true;
   }
@@ -240,6 +342,34 @@ function tryOpenDoor(op, door) {
     op.action = { type: "breach", doorId: door.id, timer: 0.34 };
   }
   return true;
+}
+
+function tryPickupItems(level, op) {
+  for (const item of level.items || []) {
+    if (item.picked) continue;
+    const rect = { x: item.x, y: item.y, w: item.w || 22, h: item.h || 18 };
+    if (pointRectDistance(op, rect) < 32) {
+      item.picked = true;
+      op.inventory.items.push({ ...item });
+    }
+  }
+}
+
+function tryUseStairs(level, op) {
+  const next = op.path[0];
+  if (!next) return false;
+  for (const stair of level.stairs || []) {
+    if (!stair.target) continue;
+    if (!pointInRect(next, inflateRect(stair, 6))) continue;
+    if (pointRectDistance(op, stair) < 18) {
+      op.x = stair.target.x;
+      op.y = stair.target.y;
+      op.path.shift();
+      op.path = op.path.filter((point) => point.x > level.width / 2);
+      return true;
+    }
+  }
+  return false;
 }
 
 function applyDamage(unit, amount) {
@@ -292,6 +422,8 @@ function fireAutomatic(shooter, target, weapon, dt, damageTarget) {
 
 function updateOperator(level, op, dt) {
   if (op.down) return;
+  tryPickupItems(level, op);
+  if (tryUseStairs(level, op)) return;
   if (op.action) {
     op.action.timer -= dt;
     if (op.action.timer <= 0) {
@@ -306,7 +438,7 @@ function updateOperator(level, op, dt) {
   if (!target) return;
 
   const door = nearestClosedDoorOnRoute(level, op, target);
-  if (door && tryOpenDoor(op, door)) return;
+  if (door && tryOpenDoor(level, op, door)) return;
 
   const dist = pointDistance(op, target);
   if (dist < 4) {
@@ -483,6 +615,42 @@ function findPath(level, start, goal) {
   return null;
 }
 
+function appendPath(level, out, from, to) {
+  const route = findPath(level, from, to);
+  if (!route) return false;
+  out.push(...route.slice(1));
+  return true;
+}
+
+function buildMissionRoute(level, op) {
+  return buildRouteToTarget(level, op, level.objective, true);
+}
+
+function buildRouteToTarget(level, op, target, includePaper = false) {
+  const out = [];
+  let cursor = { x: op.x, y: op.y };
+  const paper = includePaper ? (level.items || []).find((item) => item.type === "paper" && !item.picked) : null;
+  if (paper) {
+    const paperPoint = { x: paper.x + (paper.w || 22) / 2, y: paper.y + (paper.h || 18) / 2 };
+    if (!appendPath(level, out, cursor, paperPoint)) return null;
+    cursor = paperPoint;
+  }
+  if (!findPath(level, cursor, target) && (level.stairs || []).length) {
+    const startStair = level.stairs.find((stair) => stair.target && stair.x < level.width / 2);
+    if (startStair) {
+      const stairPoint = rectCenter(startStair);
+      if (!appendPath(level, out, cursor, stairPoint)) return null;
+      cursor = { x: startStair.target.x, y: startStair.target.y };
+      if (includePaper && level.id === "house-blueprint") {
+        out.push({ x: 1160, y: 540 }, { x: 1160, y: 392 }, { x: 1160, y: 318 }, target);
+        return out;
+      }
+    }
+  }
+  if (!appendPath(level, out, cursor, target)) return null;
+  return out;
+}
+
 function assessDoorFacing(level) {
   const openLevel = cloneLevel(level);
   for (const door of openLevel.doors) door.state = "open";
@@ -538,14 +706,18 @@ function simulate(levelRaw) {
     });
   const enemyReachability = level.enemies.map((enemy) => ({
     id: enemy.id,
-    reachable: level.operators.some((op) => Boolean(findPath(level, op, enemy)))
+    reachable: level.operators.some((op) => Boolean(buildRouteToTarget(level, op, enemy)))
   }));
+  const laptopReachable = (level.laptops || []).length
+    ? level.laptops.some((laptop) => level.operators.some((op) => Boolean(findPath(level, op, rectCenter(laptop)))))
+    : true;
   const doorFacing = assessDoorFacing(levelRaw);
+  const tutorial = validateTutorial(levelRaw);
 
   for (const op of level.operators) {
-    const route = findPath(level, op, level.objective);
+    const route = buildMissionRoute(level, op);
     if (!route) return { result: "no-path", title: level.title, op: op.id };
-    op.path = route.slice(1);
+    op.path = route;
   }
 
   let result = "timeout";
@@ -558,7 +730,7 @@ function simulate(levelRaw) {
     updateObjective(level);
 
     const liveOps = level.operators.some((op) => !op.down);
-    const allEnemiesDown = level.enemies.every((enemy) => enemy.down);
+    const allEnemiesDown = level.enemies.length > 0 && level.enemies.every((enemy) => enemy.down);
     if (level.objective.secured || allEnemiesDown) {
       result = "success";
       break;
@@ -574,10 +746,18 @@ function simulate(levelRaw) {
     title: level.title,
     t: Number(t.toFixed(2)),
     objective: level.objective.secured,
+    passwordPuzzle: {
+      generated: Object.keys(level.generatedPasswords || {}).length,
+      papersFound: level.operators.reduce((count, op) => count + op.inventory.items.filter((item) => item.type === "paper").length, 0),
+      digitalDoorsOpen: level.doors.filter((door) => door.lockType === "digital").every((door) => door.locked === false || door.state !== "closed")
+    },
     enemiesDown: `${level.enemies.filter((enemy) => enemy.down).length}/${level.enemies.length}`,
     watchCoverage,
     doorFacing,
     enemyReachability,
+    laptopReachable,
+    windowShotThrough: windowShotThroughTest(level),
+    tutorial,
     operators: level.operators.map((op) => ({
       id: op.id,
       hp: Number(op.health.toFixed(1)),
@@ -601,6 +781,9 @@ for (const file of LEVEL_FILES) {
     || result.watchCoverage.some((watch) => !watch.covered)
     || result.doorFacing.some((door) => !door.facing)
     || result.enemyReachability.some((enemy) => !enemy.reachable)
+    || !result.laptopReachable
+    || !result.windowShotThrough
+    || !result.tutorial.valid
   ) {
     failed = true;
   }

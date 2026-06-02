@@ -17,6 +17,11 @@
         deps.inventory.openEquipmentTable(table);
         return true;
       }
+      const laptop = nearest(op, state.level.laptops || []);
+      if (laptop) {
+        deps.cameraHack.openLaptop(laptop);
+        return true;
+      }
       const win = nearest(op, state.level.windows || []);
       if (win) return interactWindow(op, win);
       const stair = nearest(op, state.level.stairs || []);
@@ -111,6 +116,8 @@
       if (item) return `Press E to pick up ${item.name || item.id}`;
       const table = nearest(op, state.level.equipmentTables || []);
       if (table) return "Press E to use equipment table";
+      const laptop = nearest(op, state.level.laptops || []);
+      if (laptop) return "Press E to use camera laptop";
       const win = nearest(op, state.level.windows || []);
       if (win) return win.state === "closed" ? "Press E to open window" : "Press E to climb through window";
       const stair = nearest(op, state.level.stairs || []);

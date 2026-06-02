@@ -19,6 +19,13 @@
         message: "Draw routes, then execute",
         shootingMode: runtime.state ? runtime.state.shootingMode || "automatic" : "automatic",
         shots: [],
+        tutorial: null,
+        cameraHack: {
+          started: false,
+          revealedCameras: new Set(),
+          revealedZones: new Set(),
+          discoveredZones: new Set()
+        },
         level: cloneLevel(level)
       };
     }
@@ -36,6 +43,9 @@
         floorZones: (level.floorZones || []).map((zone) => ({ ...zone })),
         rooms: (level.rooms || []).map((room) => ({ ...room })),
         labels: (level.labels || []).map((label) => ({ ...label })),
+        tutorialSteps: (level.tutorialSteps || []).map((step) => ({ ...step })),
+        cameras: (level.cameras || []).map((camera) => ({ ...camera })),
+        laptops: (level.laptops || []).map((laptop) => ({ ...laptop })),
         walls: level.walls.map((wall) => ({ ...wall })),
         windows: (level.windows || []).map((win) => ({ ...win, state: win.state || "closed" })),
         stairs: (level.stairs || []).map((stair) => ({ ...stair, target: stair.target ? { ...stair.target } : null })),

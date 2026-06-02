@@ -3,22 +3,38 @@
 (function () {
   // Builds persistent keyboard remapping and input matching helpers.
   function create(deps) {
-    const storageKey = "breachline-keybindings-v1";
+    const storageKey = "breachline-keybindings-v2";
     const defaults = {
       moveUp: { label: "Move Up", value: "KeyW", display: "W" },
       moveLeft: { label: "Move Left", value: "KeyA", display: "A" },
       moveDown: { label: "Move Down", value: "KeyS", display: "S" },
       moveRight: { label: "Move Right", value: "KeyD", display: "D" },
       interact: { label: "Interact", value: "KeyE", display: "E" },
-      inventory: { label: "Inventory", value: "KeyI", display: "I" },
+      inventory: { label: "Inventory", value: "Tab", display: "Tab" },
+      reload: { label: "Reload", value: "KeyR", display: "R" },
       pause: { label: "Execute / Pause", value: "Space", display: "Space" },
-      restart: { label: "Restart", value: "KeyR", display: "R" },
+      restart: { label: "Restart", value: "", display: "Unbound" },
       debug: { label: "Debug", value: "F3", display: "F3" },
       settings: { label: "Settings", value: "Escape", display: "Esc" },
       sneak: { label: "Sneak", value: "ControlLeft", display: "Left Ctrl" },
       sprint: { label: "Sprint", value: "ShiftLeft", display: "Left Shift" }
     };
     const bindings = loadBindings();
+    const descriptions = {
+      moveUp: "Move the selected operator upward.",
+      moveLeft: "Move the selected operator left.",
+      moveDown: "Move the selected operator downward.",
+      moveRight: "Move the selected operator right.",
+      interact: "Use nearby doors, windows, stairs, papers, laptops, and equipment tables.",
+      inventory: "Open or close the selected operator inventory.",
+      reload: "Actively reload the selected operator weapon from reserve ammo.",
+      pause: "Execute or pause the current plan.",
+      restart: "Restart shortcut is unbound by default; use the on-screen Restart button.",
+      debug: "Toggle tactical debug overlays.",
+      settings: "Open or close settings and modal overlays.",
+      sneak: "Hold to move slowly.",
+      sprint: "Hold to move quickly."
+    };
 
     // Loads saved bindings and merges them with defaults.
     function loadBindings() {
@@ -26,7 +42,7 @@
         const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
         return Object.fromEntries(Object.entries(defaults).map(([action, config]) => {
           const savedConfig = saved[action];
-          return [action, savedConfig && savedConfig.value ? { ...config, ...savedConfig } : { ...config }];
+          return [action, savedConfig ? { ...config, ...savedConfig } : { ...config }];
         }));
       } catch (error) {
         return Object.fromEntries(Object.entries(defaults).map(([action, config]) => [action, { ...config }]));
@@ -63,7 +79,7 @@
     // Tests whether an event matches a named action.
     function matches(event, action) {
       const binding = bindings[action];
-      return Boolean(binding && eventValue(event) === binding.value);
+      return Boolean(binding && binding.value && eventValue(event) === binding.value);
     }
 
     // Updates one action binding from a keyboard event.
@@ -79,7 +95,7 @@
     function render() {
       if (!deps.elements.keyBindingList) return;
       deps.elements.keyBindingList.innerHTML = Object.entries(bindings).map(([action, config]) => `
-        <label class="keybinding-row">
+        <label class="keybinding-row" title="${descriptions[action] || ""}">
           <span>${config.label}</span>
           <button type="button" data-keybinding-action="${action}">${config.display}</button>
         </label>

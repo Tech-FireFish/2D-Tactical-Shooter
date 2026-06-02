@@ -34,9 +34,24 @@
     // Starts a reload if spare ammunition exists.
     function beginReload(unit, weapon) {
       if (!unit.ammo || unit.ammo.reloading || unit.ammo.reserve <= 0) return false;
+      if (unit.ammo.magazine >= (weapon.magSize || 20)) return false;
       unit.ammo.reloading = true;
       unit.ammo.reloadTimer = weapon.reloadTime || 1.2;
       return true;
+    }
+
+    // Actively reloads a selected unit before the magazine is empty.
+    function activeReload(unit) {
+      if (!unit || unit.down) return false;
+      const weapon = deps.equipment.weaponById(unit.weaponId);
+      if (!unit.ammo || unit.ammo.weaponId !== weapon.id) resetAmmo(unit);
+      const started = beginReload(unit, weapon);
+      if (started) {
+        const state = deps.getState();
+        if (state) state.message = `${unit.id} reloading`;
+        deps.updateHud();
+      }
+      return started;
     }
 
     // Consumes one round when the shooter can fire.
@@ -128,6 +143,7 @@
         ...state.level.doors.filter((door) => deps.geometry.doorBlocks(door))
       ];
       for (const rect of blockers) {
+        if (deps.geometry.segmentBlockedByRectThroughWindows && !deps.geometry.segmentBlockedByRectThroughWindows(a, b, rect, state.level)) continue;
         const hit = segmentRectHit(a, b, rect);
         if (hit && (!best || hit.t < best.t)) best = hit;
       }
@@ -163,8 +179,10 @@
       resetAmmo,
       updateReload,
       beginReload,
+      activeReload,
       consumeRound,
       addShot,
+      breakWindowsOnSegment,
       manualFire
     };
   }

@@ -344,17 +344,29 @@
       }
 
       renderWeaponPixelPreview(weapon.id);
+      renderWeaponTooltip(op, weapon, armor, backpack);
       renderAmmoBoard(op);
       elements.weaponStats.innerHTML = `
         <div>${weapon.role}</div>
-        <div class="weapon-stat-row"><span>Range</span><strong>${weapon.range}</strong></div>
-        <div class="weapon-stat-row"><span>Damage</span><strong>${weapon.damage}</strong></div>
-        <div class="weapon-stat-row"><span>Fire Rate</span><strong>${(1 / weapon.fireInterval).toFixed(1)}/s</strong></div>
-        <div class="weapon-stat-row"><span>Magazine</span><strong>${weapon.magSize}</strong></div>
-        <div class="weapon-stat-row"><span>Armor</span><strong>${armor.armor}</strong></div>
-        <div class="weapon-stat-row"><span>Backpack</span><strong>${backpack.slots} slots</strong></div>
-        <div class="weapon-stat-row"><span>Mobility</span><strong>${Math.round(armor.speedMultiplier * (backpack.speedMultiplier || 1) * 100)}%</strong></div>
+        <div class="empty-note">Hover weapon art for equipment details.</div>
       `;
+    }
+
+    // Adds hidden hover details to the weapon pixel preview.
+    function renderWeaponTooltip(op, weapon, armor, backpack) {
+      if (!elements.weaponPixelPreview || !op || !weapon || !armor || !backpack) return;
+      const details = `
+        <div class="weapon-tooltip" role="tooltip">
+          <div class="weapon-stat-row"><span>Range</span><strong>${weapon.range}</strong></div>
+          <div class="weapon-stat-row"><span>Damage</span><strong>${weapon.damage}</strong></div>
+          <div class="weapon-stat-row"><span>Fire Rate</span><strong>${(1 / weapon.fireInterval).toFixed(1)}/s</strong></div>
+          <div class="weapon-stat-row"><span>Magazine</span><strong>${weapon.magSize}</strong></div>
+          <div class="weapon-stat-row"><span>Armor</span><strong>${armor.armor}</strong></div>
+          <div class="weapon-stat-row"><span>Backpack</span><strong>${backpack.slots} slots</strong></div>
+          <div class="weapon-stat-row"><span>Mobility</span><strong>${Math.round(armor.speedMultiplier * (backpack.speedMultiplier || 1) * 100)}%</strong></div>
+        </div>
+      `;
+      elements.weaponPixelPreview.innerHTML += details;
     }
 
     // Renders magazine and carried bullet indicators for the selected operator.
@@ -476,7 +488,8 @@
       applyOperatorBackpack,
       renderLoadoutPanel,
       renderHealthBoard,
-      renderWeaponPixelPreview,
+        renderWeaponPixelPreview,
+      renderWeaponTooltip,
       renderAmmoBoard
     };
   }

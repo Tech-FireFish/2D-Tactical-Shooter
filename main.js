@@ -26,8 +26,11 @@ const elements = {
   inventoryButton: document.getElementById("inventoryButton"),
   operatorHealthBoard: document.getElementById("operatorHealthBoard"),
   showAllHealthButton: document.getElementById("showAllHealthButton"),
+  hintText: document.getElementById("hintText"),
   settingsOverlay: document.getElementById("settingsOverlay"),
   closeSettingsButton: document.getElementById("closeSettingsButton"),
+  settingsTabs: document.querySelectorAll("[data-settings-tab]"),
+  settingsPanels: document.querySelectorAll("[data-settings-panel]"),
   difficultySelect: document.getElementById("difficultySelect"),
   shootingModeSelect: document.getElementById("shootingModeSelect"),
   enemyTraceSelect: document.getElementById("enemyTraceSelect"),
@@ -48,6 +51,15 @@ const elements = {
   equipmentTableTitle: document.getElementById("equipmentTableTitle"),
   equipmentTableOptions: document.getElementById("equipmentTableOptions"),
   closeEquipmentTableButton: document.getElementById("closeEquipmentTableButton"),
+  laptopOverlay: document.getElementById("laptopOverlay"),
+  laptopTitle: document.getElementById("laptopTitle"),
+  closeLaptopButton: document.getElementById("closeLaptopButton"),
+  startHackButton: document.getElementById("startHackButton"),
+  cameraHackList: document.getElementById("cameraHackList"),
+  tutorialCard: document.getElementById("tutorialCard"),
+  tutorialTitle: document.getElementById("tutorialTitle"),
+  tutorialText: document.getElementById("tutorialText"),
+  tutorialProgress: document.getElementById("tutorialProgress"),
   banner: document.getElementById("banner"),
   bannerTitle: document.getElementById("bannerTitle"),
   bannerText: document.getElementById("bannerText"),
@@ -79,6 +91,7 @@ const colors = {
   opDark: "#173f2a",
   enemy: "#df6262",
   hostage: "#ebd36b",
+  cyan: "#72b7ce",
   text: "#eef3ef",
   muted: "#9ca79f",
   sight: "rgba(226,95,95,0.13)",
@@ -87,11 +100,13 @@ const colors = {
 };
 
 const LEVEL_OPTIONS = [
+  { id: "tutorial-digital-lock", title: "Tutorial: Digital Lock", file: "level/tutorial-digital-lock.json" },
   { id: "ridge-house-entry", title: "Ridge House Entry", file: "level/ridge-house-entry.json" },
   { id: "warehouse-pinch", title: "Warehouse Pinch", file: "level/warehouse-pinch.json" },
   { id: "hardpoint-gallery", title: "Hardpoint Gallery", file: "level/hardpoint-gallery.json" },
   { id: "terminal-breach", title: "Terminal Breach", file: "level/terminal-breach.json" },
-  { id: "house-blueprint", title: "House Blueprint", file: "level/house-blueprint.json" }
+  { id: "house-blueprint", title: "House Blueprint", file: "level/house-blueprint.json" },
+  { id: "camera-house", title: "Camera House", file: "level/camera-house.json" }
 ];
 
 const WEAPON_OPTIONS = [
@@ -140,9 +155,12 @@ const runtime = {
   inventoryResumeRunning: false,
   equipmentTableOpen: false,
   equipmentTableResumeRunning: false,
+  laptopOpen: false,
+  laptopResumeRunning: false,
   activeDigitalDoorId: null,
   enemyTraceMode: "current",
   showAllHealth: false,
+  activeSettingsTab: "keys",
   capturingKeyAction: null,
   manualFireHeld: false,
   manualFirePoint: null,
@@ -166,6 +184,8 @@ let geometry;
 let shooting;
 let inventory;
 let interaction;
+let cameraHack;
+let tutorial;
 let equipment;
 let level;
 let visibility;
@@ -287,7 +307,13 @@ function updateHud() {
   equipment.renderHealthBoard();
   equipment.renderEnemyLoadouts();
   inventory.renderSummary();
+  if (elements.hintText) {
+    const hint = selected && interaction ? interaction.nearestHint(selected) : "";
+    elements.hintText.textContent = hint || "Move near doors, windows, stairs, papers, laptops, or tables.";
+  }
   if (runtime.inventoryOpen) inventory.renderInventory();
+  if (runtime.laptopOpen && cameraHack) cameraHack.render();
+  if (tutorial) tutorial.update();
 }
 
 // Converts result labels into display-friendly title case.
@@ -324,6 +350,8 @@ function initializeSystems() {
   assertSystem("Shooting system", window.ShootingSystem);
   assertSystem("Inventory system", window.InventorySystem);
   assertSystem("Interaction system", window.InteractionSystem);
+  assertSystem("Camera hack system", window.CameraHackSystem);
+  assertSystem("Tutorial system", window.TutorialSystem);
   assertSystem("Audio system", window.AudioSystem);
   assertSystem("Equipment system", window.EquipmentSystem);
   assertSystem("Level system", window.LevelSystem);
@@ -413,7 +441,10 @@ function initializeSystems() {
     runtime,
     difficultOperatorSight: DIFFICULT_OPERATOR_SIGHT,
     equipment,
-    geometry
+    geometry,
+    cameraHack: {
+      isRevealed: (obj) => cameraHack && cameraHack.isRevealed(obj)
+    }
   });
 
   settings = window.SettingsSystem.create({
@@ -430,6 +461,19 @@ function initializeSystems() {
     keysDown,
     audio,
     updateHud
+  });
+
+  cameraHack = window.CameraHackSystem.create({
+    runtime,
+    elements,
+    keysDown,
+    updateHud
+  });
+
+  tutorial = window.TutorialSystem.create({
+    runtime,
+    elements,
+    pointRectDistance: geometry.pointRectDistance
   });
 
   level = window.LevelSystem.create({
@@ -453,6 +497,7 @@ function initializeSystems() {
     selectedOperator,
     geometry,
     inventory,
+    cameraHack,
     actions: {
       damageOperator: (...args) => actions && actions.damageOperator(...args)
     },
@@ -523,6 +568,7 @@ function initializeSystems() {
     geometry,
     visibility,
     interaction,
+    cameraHack,
     selectedOperator,
     hasManualInput
   });
@@ -541,6 +587,7 @@ function initializeSystems() {
     level,
     settings,
     digitalLock,
+    cameraHack,
     audio,
     selectedOperator,
     selectOperator,
@@ -549,7 +596,8 @@ function initializeSystems() {
     updateHud,
     operatorLoadouts,
     inventoryIsOpen: () => runtime.inventoryOpen,
-    equipmentTableIsOpen: () => runtime.equipmentTableOpen
+    equipmentTableIsOpen: () => runtime.equipmentTableOpen,
+    laptopIsOpen: () => runtime.laptopOpen
   });
 
   input.bindEvents();

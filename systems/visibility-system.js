@@ -22,17 +22,39 @@
         && deps.geometry.hasLineOfSight(selected, target, state.level);
     }
 
+    // Checks whether any living operator can reveal a hidden map object by sight.
+    function hiddenObjectVisible(obj) {
+      const state = runtime.state;
+      if (!state || !obj) return false;
+      const isRect = obj.w !== undefined && obj.h !== undefined;
+      const target = isRect ? deps.geometry.rectCenter(obj) : obj;
+      return state.level.operators
+        .filter((op) => !op.down)
+        .some((op) => {
+          const inRange = isRect
+            ? deps.geometry.pointRectDistance(op, obj) <= operatorSightRange(op)
+            : deps.geometry.pointDistance(op, target) <= operatorSightRange(op);
+          if (!inRange) return false;
+          if (isRect && deps.geometry.hasLineOfSightIgnoring) {
+            return deps.geometry.hasLineOfSightIgnoring(op, target, state.level, obj);
+          }
+          return deps.geometry.hasLineOfSight(op, target, state.level);
+        });
+    }
+
     // Decides whether the VIP objective should be drawn in the current mode.
     function objectiveVisible() {
       const state = runtime.state;
       if (!state) return false;
       const obj = state.level.objective;
+      if (deps.cameraHack && deps.cameraHack.isRevealed(obj)) return true;
       return obj.secured || obj.harmed || visibleToOperators(obj);
     }
 
     return {
       operatorSightRange,
       visibleToOperators,
+      hiddenObjectVisible,
       objectiveVisible
     };
   }
