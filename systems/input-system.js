@@ -115,10 +115,12 @@
       const key = event.key.toLowerCase();
       if (deps.keybindings.matches(event, "settings")) {
         event.preventDefault();
-        if (deps.inventoryIsOpen()) deps.inventory.closeInventory();
+        if (deps.settings.isOpen()) deps.settings.closeSettings();
+        else if (deps.inventoryIsOpen()) deps.inventory.closeInventory();
         else if (deps.equipmentTableIsOpen()) deps.inventory.closeEquipmentTable();
         else if (deps.laptopIsOpen()) deps.cameraHack.closeLaptop();
-        else deps.settings.toggleSettings();
+        else if (runtime.pauseOpen) deps.menu.closePause();
+        else deps.menu.openPause();
         return;
       }
       const state = runtime.state;
@@ -144,6 +146,9 @@
       } else if (deps.keybindings.matches(event, "reload")) {
         event.preventDefault();
         deps.shooting.activeReload(deps.selectedOperator());
+      } else if (deps.keybindings.matches(event, "switchOperator")) {
+        event.preventDefault();
+        deps.cycleOperator();
       } else if (deps.keybindings.matches(event, "interact")) {
         event.preventDefault();
         deps.interaction.interactNearest();
@@ -254,6 +259,68 @@
         elements.exitTutorialButton.addEventListener("click", deps.level.loadFirstLevel);
       }
       elements.settingsButton.addEventListener("click", deps.settings.openSettings);
+      if (elements.playMenuButton) {
+        elements.playMenuButton.addEventListener("click", () => elements.onboardingQuestion.classList.remove("hidden"));
+      }
+      if (elements.playedNoButton) {
+        elements.playedNoButton.addEventListener("click", () => {
+          deps.menu.closePause();
+          deps.level.loadLevel("tutorial-basics-movement");
+          deps.menu.enterGame();
+        });
+      }
+      if (elements.playedYesButton) {
+        elements.playedYesButton.addEventListener("click", () => {
+          deps.menu.closePause();
+          deps.menu.showMain();
+        });
+      }
+      if (elements.mainMenuCloseButton) elements.mainMenuCloseButton.addEventListener("click", () => deps.menu.closePause() || deps.menu.enterGame());
+      if (elements.pauseResumeButton) elements.pauseResumeButton.addEventListener("click", deps.menu.closePause);
+      if (elements.pauseLevelButton) elements.pauseLevelButton.addEventListener("click", deps.menu.showLevelMenu);
+      if (elements.pauseTutorialButton) elements.pauseTutorialButton.addEventListener("click", deps.menu.showTutorialMenu);
+      if (elements.pauseSettingButton) elements.pauseSettingButton.addEventListener("click", deps.menu.openSettingsFromPause);
+      if (elements.expandGameButton) elements.expandGameButton.addEventListener("click", () => deps.menu.toggleExpanded());
+      if (elements.exitToMenuButton) elements.exitToMenuButton.addEventListener("click", deps.menu.showMain);
+      if (elements.resultLevelSelect) {
+        elements.resultLevelSelect.addEventListener("change", () => loadWithTutorialWarning(elements.resultLevelSelect.value));
+      }
+      if (elements.menuDifficultySelect) {
+        elements.menuDifficultySelect.addEventListener("change", () => deps.setDifficulty(elements.menuDifficultySelect.value));
+      }
+      if (elements.menuShootingModeSelect) {
+        elements.menuShootingModeSelect.addEventListener("change", () => {
+          if (!runtime.state) return;
+          runtime.state.shootingMode = elements.menuShootingModeSelect.value === "manual" ? "manual" : "automatic";
+          deps.updateHud();
+        });
+      }
+      if (elements.menuLevelBlocks) {
+        elements.menuLevelBlocks.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-menu-level]");
+          if (!button || button.disabled) return;
+          deps.level.loadLevel(button.dataset.menuLevel);
+          deps.menu.enterGame();
+        });
+      }
+      if (elements.menuTutorialBlocks) {
+        elements.menuTutorialBlocks.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-menu-tutorial]");
+          if (!button) return;
+          deps.level.loadLevel(button.dataset.menuTutorial);
+          deps.menu.enterGame();
+        });
+      }
+      if (elements.expandedNav) {
+        elements.expandedNav.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-expanded-action]");
+          if (!button) return;
+          const action = button.dataset.expandedAction;
+          if (action === "inventory") deps.inventory.openInventory();
+          else if (action === "settings" || action === "loadout") deps.settings.openSettings();
+          else deps.menu.openPause();
+        });
+      }
       elements.closeSettingsButton.addEventListener("click", deps.settings.closeSettings);
       if (elements.resetSettingsButton) {
         elements.resetSettingsButton.addEventListener("click", deps.settings.resetDefaults);

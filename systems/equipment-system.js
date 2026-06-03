@@ -55,6 +55,46 @@
         "........cc..........",
         "........cee.........",
         ".........ee........."
+      ],
+      "advanced-carbine": [
+        "....................",
+        "...............aa...",
+        "..eeebbbcccccccaaa..",
+        ".eeebbbccddddddaaa..",
+        "..eeebbbcccccccaaa..",
+        ".....cc..ee.........",
+        ".....cc...ee........",
+        "......c....ee......."
+      ],
+      "compact-pdw": [
+        "....................",
+        ".........aaa........",
+        "..eeebbbccccaaa.....",
+        ".eeebbbccddddaaa....",
+        "..eeebbbccccaaa.....",
+        "......cc.ee.........",
+        "......cc..ee........",
+        "...........ee......."
+      ],
+      "marksman-pistol": [
+        "....................",
+        "....................",
+        "....eeebbbccaaa.....",
+        "...eeebbbccccaaa....",
+        "......eeccccaa......",
+        "........cc..........",
+        "........cee.........",
+        ".........ee........."
+      ],
+      melee: [
+        "....................",
+        "..........aa........",
+        ".........aaa........",
+        "........aaa.........",
+        ".......aaa..........",
+        "......aaa...........",
+        ".....bbb.............",
+        "....bbb............."
       ]
     };
 
@@ -178,7 +218,9 @@
         if (!weapon) continue;
         const option = document.createElement("option");
         option.value = weapon.id;
-        option.textContent = weapon.name;
+        const locked = isLockedForOperator(weapon.id, weapon);
+        option.disabled = locked;
+        option.textContent = locked ? `${weapon.name} (Privilege ${weapon.unlockPrivilege || 2})` : weapon.name;
         elements.weaponSelect.append(option);
       }
       elements.armorSelect.innerHTML = "";
@@ -187,7 +229,9 @@
         if (!armor) continue;
         const option = document.createElement("option");
         option.value = armor.id;
-        option.textContent = armor.name;
+        const locked = isLockedForOperator(armor.id, armor);
+        option.disabled = locked;
+        option.textContent = locked ? `${armor.name} (Privilege 2)` : armor.name;
         elements.armorSelect.append(option);
       }
       elements.backpackSelect.innerHTML = "";
@@ -273,6 +317,12 @@
     function applyOperatorArmor(op, armorId) {
       const selectedArmorId = validArmorId(armorId);
       const armor = armorById(selectedArmorId);
+      if (isLockedForOperator(selectedArmorId, armor)) {
+        runtime.state.message = `${armor.name} requires privilege 2`;
+        elements.armorSelect.value = validArmorId(op.armorId);
+        deps.updateHud();
+        return;
+      }
       op.armorId = selectedArmorId;
       op.maxArmor = armor.armor;
       op.armor = armor.armor;
@@ -286,6 +336,13 @@
     // Applies an operator weapon choice and refreshes ammunition.
     function applyOperatorWeapon(op, weaponId) {
       const selectedWeaponId = validWeaponId(weaponId);
+      const weapon = weaponById(selectedWeaponId);
+      if (isLockedForOperator(selectedWeaponId, weapon)) {
+        runtime.state.message = `${weapon.name} requires privilege ${weapon.unlockPrivilege || 2}`;
+        elements.weaponSelect.value = validWeaponId(op.weaponId);
+        deps.updateHud();
+        return;
+      }
       op.weaponId = selectedWeaponId;
       op.fireTimer = 0;
       op.reaction = 0;
@@ -315,6 +372,12 @@
       deps.shooting.resetAmmo(op);
       runtime.state.message = `${op.id} equipped ${backpack.name}`;
       deps.updateHud();
+    }
+
+    // Reports whether an operator loadout choice is locked by privilege.
+    function isLockedForOperator(id, item) {
+      if (!deps.progression) return false;
+      return !deps.progression.isEquipmentUnlocked(id, item);
     }
 
     // Updates the selected operator loadout panel and equipment stats.
@@ -392,6 +455,12 @@
         return;
       }
       const weapon = weaponById(op.weaponId);
+      if (weapon.canFire === false || weapon.attackType === "melee") {
+        elements.ammoBoard.innerHTML = `
+          <div class="ammo-count">${weapon.attackType === "melee" ? "Melee weapon" : "Unarmed"}</div>
+        `;
+        return;
+      }
       const bullets = Array.from({ length: weapon.magSize || 20 }, (_, index) => {
         const filled = index < op.ammo.magazine ? " filled" : "";
         return `<span class="bullet${filled}" aria-hidden="true"></span>`;

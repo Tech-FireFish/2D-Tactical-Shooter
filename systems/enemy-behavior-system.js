@@ -6,6 +6,7 @@
     const calmStatus = "calm";
     const suspiciousStatus = "suspicious";
     const alertStatus = "alert";
+    const returnStatus = "return";
     const downStatus = "down";
 
     // Updates one enemy through calm, suspicious, alert, or down behavior.
@@ -34,6 +35,10 @@
       }
       if (enemy.status === suspiciousStatus) {
         updateSuspiciousEnemy(enemy, dt);
+        return;
+      }
+      if (enemy.status === returnStatus) {
+        updateReturningEnemy(enemy, dt);
         return;
       }
       updateCalmEnemy(enemy, dt);
@@ -77,10 +82,28 @@
         enemy.angle = deps.angleTo(enemy, enemy.watch);
       }
       if (enemy.suspicionTimer <= 0) {
-        enemy.status = calmStatus;
+        enemy.status = deps.enemyTraceMode && deps.enemyTraceMode() === "chase" ? returnStatus : calmStatus;
         enemy.lastKnownOperator = null;
         enemy.searchTarget = null;
+        enemy.returnTarget = enemy.spawn ? { x: enemy.spawn.x, y: enemy.spawn.y } : (enemy.watch ? { ...enemy.watch } : null);
       }
+    }
+
+    // Sends a search enemy back toward its authored spawn or watch point.
+    function updateReturningEnemy(enemy, dt) {
+      const target = enemy.returnTarget || (enemy.spawn ? { x: enemy.spawn.x, y: enemy.spawn.y } : enemy.watch);
+      if (!target) {
+        enemy.status = calmStatus;
+        return;
+      }
+      enemy.angle = deps.angleTo(enemy, target);
+      if (deps.pointDistance(enemy, target) > 14) {
+        moveEnemyByPath(enemy, target, dt);
+        return;
+      }
+      enemy.status = calmStatus;
+      enemy.returnTarget = null;
+      if (enemy.watch) enemy.angle = deps.angleTo(enemy, enemy.watch);
     }
 
     // Keeps calm enemies watching assigned points or following their patrol.
@@ -237,6 +260,7 @@
       findVisibleOperator,
       setStatus,
       updateSuspiciousEnemy,
+      updateReturningEnemy,
       updateCalmEnemy,
       updateEnemyPatrol,
       moveEnemyToward,

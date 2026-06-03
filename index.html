@@ -7,6 +7,69 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <section id="startMenuOverlay" class="menu-overlay" aria-label="Start menu" aria-modal="true" role="dialog">
+      <div class="credits-card">
+        <p class="panel-label">Credits</p>
+        <strong>Original tactical prototype</strong>
+        <span>Built with HTML, CSS, and JavaScript Canvas.</span>
+      </div>
+      <div class="menu-panel start-panel">
+        <p class="eyebrow">Breachline Training</p>
+        <h2>2D tactical shooter</h2>
+        <button id="playMenuButton" type="button">Play</button>
+        <div id="onboardingQuestion" class="onboarding-question hidden">
+          <p>Have you played this game before?</p>
+          <div class="menu-actions">
+            <button id="playedYesButton" type="button">Yes</button>
+            <button id="playedNoButton" type="button">No</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="mainMenuOverlay" class="menu-overlay hidden" aria-label="Main menu" aria-modal="true" role="dialog">
+      <div class="menu-panel main-menu-panel">
+        <header class="settings-header">
+          <div>
+            <p class="eyebrow">Command Access</p>
+            <h2>Main Page</h2>
+          </div>
+          <button id="mainMenuCloseButton" type="button">Enter Game</button>
+        </header>
+        <div class="main-menu-grid">
+          <section class="control-card">
+            <p class="panel-label">Privilege And Access</p>
+            <div id="privilegeBoard" class="privilege-board"></div>
+          </section>
+          <section class="control-card">
+            <p class="panel-label">Quick Setup</p>
+            <label class="level-picker" for="menuDifficultySelect">
+              <span>Difficulty</span>
+              <select id="menuDifficultySelect">
+                <option value="normal">Normal</option>
+                <option value="difficult">Difficult</option>
+              </select>
+            </label>
+            <label class="level-picker" for="menuShootingModeSelect">
+              <span>Shooting</span>
+              <select id="menuShootingModeSelect">
+                <option value="automatic">Automatic</option>
+                <option value="manual">Manual</option>
+              </select>
+            </label>
+          </section>
+          <section class="control-card">
+            <p class="panel-label">Story Levels</p>
+            <div id="menuLevelBlocks" class="number-block-grid"></div>
+          </section>
+          <section class="control-card">
+            <p class="panel-label">Tutorials</p>
+            <div id="menuTutorialBlocks" class="number-block-grid"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
     <main class="shell">
       <header class="brandbar" aria-label="Game title">
         <div>
@@ -60,13 +123,27 @@
 
         <section class="game-panel">
           <canvas id="game" width="960" height="640" aria-label="Breachline 2D tactical map"></canvas>
+          <button id="expandGameButton" class="expand-game-button" type="button">Expand</button>
+          <div id="expandedNav" class="expanded-nav hidden" aria-label="Expanded gameplay navigation">
+            <button type="button" data-expanded-action="inventory">Inventory</button>
+            <button type="button" data-expanded-action="status">Status</button>
+            <button type="button" data-expanded-action="actions">Actions</button>
+            <button type="button" data-expanded-action="loadout">Loadout</button>
+            <button type="button" data-expanded-action="settings">Settings</button>
+          </div>
           <div id="banner" class="banner hidden" role="status" aria-live="polite">
             <strong id="bannerTitle">Mission Complete</strong>
             <span id="bannerText">Restart to run the plan again.</span>
+            <div id="missionReport" class="mission-report"></div>
+            <label class="level-picker result-level-picker" for="resultLevelSelect">
+              <span>Level</span>
+              <select id="resultLevelSelect"></select>
+            </label>
             <div class="banner-actions" aria-label="Mission result actions">
-              <button id="nextLevelButton" type="button">Next Level</button>
+              <button id="nextLevelButton" type="button">Next</button>
               <button id="exitTutorialButton" class="hidden" type="button">Exit To First Level</button>
               <button id="bannerRestartButton" type="button">Restart</button>
+              <button id="exitToMenuButton" type="button">Exit</button>
             </div>
           </div>
         </section>
@@ -102,6 +179,19 @@
             <div id="operatorHealthBoard" class="health-board" aria-live="polite"></div>
           </section>
         </aside>
+      </section>
+
+      <section id="pauseOverlay" class="settings-overlay hidden" aria-label="Pause menu" aria-modal="true" role="dialog">
+        <div class="pause-panel">
+          <p class="eyebrow">Paused</p>
+          <h2>Navigation</h2>
+          <div class="pause-actions">
+            <button id="pauseResumeButton" type="button">Resume</button>
+            <button id="pauseLevelButton" type="button">Level</button>
+            <button id="pauseTutorialButton" type="button">Tutorial</button>
+            <button id="pauseSettingButton" type="button">Setting</button>
+          </div>
+        </div>
       </section>
 
       <section id="settingsOverlay" class="settings-overlay hidden" aria-label="Settings menu" aria-modal="true" role="dialog">
@@ -270,6 +360,21 @@
         </div>
       </section>
     </main>
+    <div id="mobileControls" class="mobile-controls hidden" aria-label="Mobile controls">
+      <button id="mobilePauseButton" class="mobile-pause-button" type="button">Pause</button>
+      <div class="mobile-pad mobile-move-pad" aria-label="Movement controller">
+        <button type="button" data-mobile-action="moveUp">W</button>
+        <button type="button" data-mobile-action="moveLeft">A</button>
+        <button type="button" data-mobile-action="moveDown">S</button>
+        <button type="button" data-mobile-action="moveRight">D</button>
+      </div>
+      <div class="mobile-pad mobile-shoot-pad" aria-label="Shooting controller">
+        <button type="button" data-mobile-shoot="up">Aim</button>
+        <button type="button" data-mobile-shoot="left">Left</button>
+        <button type="button" data-mobile-shoot="down">Fire</button>
+        <button type="button" data-mobile-shoot="right">Right</button>
+      </div>
+    </div>
     <script src="systems/audio-system.js?v=1"></script>
     <script src="systems/keybinding-system.js?v=1"></script>
     <script src="systems/camera-system.js?v=1"></script>
@@ -279,6 +384,9 @@
     <script src="systems/interaction-system.js?v=1"></script>
     <script src="systems/camera-hack-system.js?v=1"></script>
     <script src="systems/tutorial-system.js?v=1"></script>
+    <script src="systems/progression-system.js?v=1"></script>
+    <script src="systems/menu-system.js?v=1"></script>
+    <script src="systems/mobile-control-system.js?v=1"></script>
     <script src="systems/equipment-system.js?v=1"></script>
     <script src="systems/level-system.js?v=1"></script>
     <script src="systems/visibility-system.js?v=1"></script>

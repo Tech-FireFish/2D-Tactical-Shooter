@@ -94,8 +94,13 @@
         }),
         enemies: level.enemies.map((enemy) => {
           const useSavedLoadout = !level.forceLoadouts;
-          const weaponId = deps.equipment.validWeaponId((useSavedLoadout && levelWeaponLoadouts[enemy.id]) || enemy.weaponId || "rifle");
-          const armorId = deps.equipment.validArmorId((useSavedLoadout && levelArmorLoadouts[enemy.id]) || enemy.armorId || "light-armor");
+          const difficultRandom = runtime.currentDifficulty === "difficult" && useSavedLoadout;
+          const weaponId = deps.equipment.validWeaponId(difficultRandom
+            ? randomEnemyWeaponId()
+            : ((useSavedLoadout && levelWeaponLoadouts[enemy.id]) || enemy.weaponId || "rifle"));
+          const armorId = deps.equipment.validArmorId(difficultRandom
+            ? randomEnemyArmorId()
+            : ((useSavedLoadout && levelArmorLoadouts[enemy.id]) || enemy.armorId || "light-armor"));
           const armor = deps.equipment.armorById(armorId);
           const baseSpeed = enemy.speed || 34;
           return {
@@ -179,6 +184,19 @@
     // Generates a random four-digit digital lock password.
     function randomPassword() {
       return String(Math.floor(Math.random() * 10000)).padStart(4, "0");
+    }
+
+    // Picks a difficult-mode enemy weapon excluding no-weapon.
+    function randomEnemyWeaponId() {
+      const ids = ["rifle", "smg", "pistol", "advanced-carbine", "compact-pdw", "marksman-pistol", "melee"]
+        .filter((id) => deps.equipment.weaponById(id));
+      return ids[Math.floor(Math.random() * ids.length)] || "rifle";
+    }
+
+    // Picks a difficult-mode enemy armor tier.
+    function randomEnemyArmorId() {
+      const ids = ["light-armor", "medium-armor", "heavy-armor"];
+      return ids[Math.floor(Math.random() * ids.length)] || "light-armor";
     }
 
     // Rebuilds the active level state and resets transient gameplay state.

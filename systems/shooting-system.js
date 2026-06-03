@@ -7,7 +7,7 @@
     function resetAmmo(unit) {
       const weapon = deps.equipment.weaponById(unit.weaponId);
       const backpack = deps.equipment.backpackById(unit.backpackId || "medium-backpack");
-      if (weapon.canFire === false) {
+      if (weapon.canFire === false || weapon.attackType === "melee") {
         unit.ammo = {
           weaponId: weapon.id,
           magazine: 0,
@@ -35,6 +35,10 @@
       unit.ammo.reloadTimer = Math.max(0, unit.ammo.reloadTimer - dt);
       if (unit.ammo.reloadTimer > 0) return;
       const weapon = deps.equipment.weaponById(unit.weaponId);
+      if (weapon.attackType === "melee") {
+        unit.ammo.reloading = false;
+        return;
+      }
       const needed = (weapon.magSize || 20) - unit.ammo.magazine;
       const loaded = Math.min(needed, unit.ammo.reserve);
       unit.ammo.magazine += loaded;
@@ -45,6 +49,7 @@
     // Starts a reload if spare ammunition exists.
     function beginReload(unit, weapon) {
       if (!unit.ammo || unit.ammo.reloading || unit.ammo.reserve <= 0) return false;
+      if (weapon.attackType === "melee") return false;
       if (unit.ammo.magazine >= (weapon.magSize || 20)) return false;
       unit.ammo.reloading = true;
       unit.ammo.reloadTimer = weapon.reloadTime || 1.2;
@@ -55,7 +60,7 @@
     function activeReload(unit) {
       if (!unit || unit.down) return false;
       const weapon = deps.equipment.weaponById(unit.weaponId);
-      if (weapon.canFire === false) return false;
+      if (weapon.canFire === false || weapon.attackType === "melee") return false;
       if (!unit.ammo || unit.ammo.weaponId !== weapon.id) resetAmmo(unit);
       const started = beginReload(unit, weapon);
       if (started) {
@@ -70,6 +75,7 @@
     function consumeRound(shooter, weapon) {
       if (!shooter.ammo || shooter.ammo.weaponId !== weapon.id) resetAmmo(shooter);
       if (weapon.canFire === false) return false;
+      if (weapon.attackType === "melee") return true;
       if (shooter.ammo.reloading) return false;
       if (shooter.ammo.magazine <= 0) {
         beginReload(shooter, weapon);
@@ -99,10 +105,21 @@
       const weapon = deps.equipment.weaponById(op.weaponId);
       if (weapon.canFire === false) return false;
       op.fireTimer = Math.max(0, op.fireTimer || 0);
-      if (op.fireTimer > 0 || !consumeRound(op, weapon)) return false;
+      if (op.fireTimer > 0) return false;
 
       const angle = deps.geometry.angleTo(op, point);
       op.aim = angle;
+      if (weapon.attackType === "melee") {
+        const target = firstMeleeEnemy(op, weapon);
+        if (!target) return false;
+        deps.actions.damageEnemy(target, weapon.damage, op);
+        if (state.tutorial) state.tutorial.manualShotFired = true;
+        deps.enemyBehavior.noticeShot(op, target);
+        op.fireTimer = weapon.fireInterval;
+        deps.updateHud();
+        return true;
+      }
+      if (!consumeRound(op, weapon)) return false;
       const end = {
         x: op.x + Math.cos(angle) * weapon.range,
         y: op.y + Math.sin(angle) * weapon.range
@@ -122,6 +139,20 @@
       op.fireTimer = weapon.fireInterval;
       deps.updateHud();
       return true;
+    }
+
+    // Finds a nearby enemy valid for a melee strike.
+    function firstMeleeEnemy(op, weapon) {
+      const state = deps.getState();
+      let best = null;
+      for (const enemy of state.level.enemies) {
+        if (enemy.down) continue;
+        const distance = deps.geometry.pointDistance(op, enemy);
+        if (distance > weapon.range) continue;
+        if (!deps.geometry.hasLineOfSight(op, enemy, state.level)) continue;
+        if (!best || distance < best.distance) best = { enemy, distance };
+      }
+      return best ? best.enemy : null;
     }
 
     // Breaks every closed window crossed by a bullet segment.

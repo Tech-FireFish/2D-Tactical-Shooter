@@ -160,6 +160,8 @@
       enemy.reaction = 0;
       enemy.suspicionTimer = 0;
       enemy.searchTarget = null;
+      enemy.returnTarget = null;
+      enemy.chasePath = null;
       deps.shooting.resetAmmo(enemy);
     }
 
@@ -208,6 +210,15 @@
       deps.shooting.updateReload(shooter, dt);
       shooter.fireTimer = Math.max(0, shooter.fireTimer - dt);
       if (shooter.reaction < weapon.reactionDelay || shooter.fireTimer > 0) {
+        return;
+      }
+
+      if (weapon.attackType === "melee") {
+        if (deps.pointDistance(shooter, target) > weapon.range) return;
+        if (!deps.hasLineOfSight(shooter, target, getState().level)) return;
+        damageTarget(target, weapon.damage, shooter);
+        deps.enemyBehavior.noticeShot(shooter, target);
+        shooter.fireTimer = weapon.fireInterval;
         return;
       }
 

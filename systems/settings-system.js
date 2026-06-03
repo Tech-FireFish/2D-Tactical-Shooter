@@ -42,7 +42,7 @@
 
     // Reports whether any modal overlay should freeze gameplay updates.
     function gameplayPausedByOverlay() {
-      return runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen || runtime.laptopOpen;
+      return runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen || runtime.laptopOpen || runtime.pauseOpen;
     }
 
     // Overrides the stored resume state for setup changes.

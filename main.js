@@ -2,6 +2,18 @@
 
 const elements = {
   canvas: document.getElementById("game"),
+  startMenuOverlay: document.getElementById("startMenuOverlay"),
+  playMenuButton: document.getElementById("playMenuButton"),
+  onboardingQuestion: document.getElementById("onboardingQuestion"),
+  playedYesButton: document.getElementById("playedYesButton"),
+  playedNoButton: document.getElementById("playedNoButton"),
+  mainMenuOverlay: document.getElementById("mainMenuOverlay"),
+  mainMenuCloseButton: document.getElementById("mainMenuCloseButton"),
+  privilegeBoard: document.getElementById("privilegeBoard"),
+  menuDifficultySelect: document.getElementById("menuDifficultySelect"),
+  menuShootingModeSelect: document.getElementById("menuShootingModeSelect"),
+  menuLevelBlocks: document.getElementById("menuLevelBlocks"),
+  menuTutorialBlocks: document.getElementById("menuTutorialBlocks"),
   levelTitle: document.getElementById("levelTitle"),
   levelSelect: document.getElementById("levelSelect"),
   tutorialSelect: document.getElementById("tutorialSelect"),
@@ -63,11 +75,23 @@ const elements = {
   tutorialTitle: document.getElementById("tutorialTitle"),
   tutorialText: document.getElementById("tutorialText"),
   tutorialProgress: document.getElementById("tutorialProgress"),
+  pauseOverlay: document.getElementById("pauseOverlay"),
+  pauseResumeButton: document.getElementById("pauseResumeButton"),
+  pauseLevelButton: document.getElementById("pauseLevelButton"),
+  pauseTutorialButton: document.getElementById("pauseTutorialButton"),
+  pauseSettingButton: document.getElementById("pauseSettingButton"),
+  expandGameButton: document.getElementById("expandGameButton"),
+  expandedNav: document.getElementById("expandedNav"),
+  mobileControls: document.getElementById("mobileControls"),
+  mobilePauseButton: document.getElementById("mobilePauseButton"),
   banner: document.getElementById("banner"),
   bannerTitle: document.getElementById("bannerTitle"),
   bannerText: document.getElementById("bannerText"),
+  missionReport: document.getElementById("missionReport"),
+  resultLevelSelect: document.getElementById("resultLevelSelect"),
   nextLevelButton: document.getElementById("nextLevelButton"),
   exitTutorialButton: document.getElementById("exitTutorialButton"),
+  exitToMenuButton: document.getElementById("exitToMenuButton"),
   bannerRestartButton: document.getElementById("bannerRestartButton")
 };
 
@@ -125,7 +149,11 @@ const WEAPON_OPTIONS = [
   { id: "no-weapon", file: "equipment/no-weapon.json" },
   { id: "rifle", file: "equipment/rifle.json" },
   { id: "smg", file: "equipment/smg.json" },
-  { id: "pistol", file: "equipment/pistol.json" }
+  { id: "pistol", file: "equipment/pistol.json" },
+  { id: "melee", file: "equipment/melee.json" },
+  { id: "advanced-carbine", file: "equipment/advanced-carbine.json" },
+  { id: "compact-pdw", file: "equipment/compact-pdw.json" },
+  { id: "marksman-pistol", file: "equipment/marksman-pistol.json" }
 ];
 
 const ARMOR_OPTIONS = [
@@ -173,6 +201,10 @@ const runtime = {
   laptopResumeRunning: false,
   activeDigitalDoorId: null,
   enemyTraceMode: "current",
+  pauseOpen: false,
+  pauseResumeRunning: false,
+  expandedGame: false,
+  mobileMode: false,
   showAllHealth: false,
   activeSettingsTab: "keys",
   capturingKeyAction: null,
@@ -201,6 +233,9 @@ let inventory;
 let interaction;
 let cameraHack;
 let tutorial;
+let progression;
+let menu;
+let mobileControls;
 let equipment;
 let level;
 let visibility;
@@ -229,6 +264,17 @@ function selectOperator(id) {
   updateHud();
 }
 
+// Cycles control to the next living operator.
+function cycleOperator() {
+  const state = runtime.state;
+  if (!state) return;
+  const live = state.level.operators.filter((op) => !op.down);
+  if (!live.length) return;
+  const index = Math.max(0, live.findIndex((op) => op.id === state.selectedId));
+  state.selectedId = live[(index + 1) % live.length].id;
+  updateHud();
+}
+
 // Checks whether any manual movement key is currently held.
 function hasManualInput() {
   return [...MANUAL_ACTIONS].some((action) => keysDown.has(action));
@@ -248,8 +294,9 @@ function toggleRun() {
 // Applies the selected difficulty and updates the player-facing status.
 function setDifficulty(value) {
   runtime.currentDifficulty = value === "difficult" ? "difficult" : "normal";
+  if (runtime.currentDifficulty === "difficult") runtime.enemyTraceMode = "chase";
   if (runtime.state) {
-    runtime.state.message = runtime.currentDifficulty === "difficult" ? "Difficult visibility enabled" : "Normal visibility enabled";
+    runtime.state.message = runtime.currentDifficulty === "difficult" ? "Difficult mode: short sight, chase/search enemies, random enemy gear" : "Normal visibility enabled";
   }
   updateHud();
 }
@@ -367,6 +414,9 @@ function initializeSystems() {
   assertSystem("Interaction system", window.InteractionSystem);
   assertSystem("Camera hack system", window.CameraHackSystem);
   assertSystem("Tutorial system", window.TutorialSystem);
+  assertSystem("Progression system", window.ProgressionSystem);
+  assertSystem("Menu system", window.MenuSystem);
+  assertSystem("Mobile control system", window.MobileControlSystem);
   assertSystem("Audio system", window.AudioSystem);
   assertSystem("Equipment system", window.EquipmentSystem);
   assertSystem("Level system", window.LevelSystem);
@@ -404,6 +454,11 @@ function initializeSystems() {
     camera
   });
 
+  progression = window.ProgressionSystem.create({
+    runtime,
+    elements
+  });
+
   equipment = window.EquipmentSystem.create({
     runtime,
     weapons,
@@ -419,6 +474,7 @@ function initializeSystems() {
     armorOptions: ARMOR_OPTIONS,
     backpackOptions: BACKPACK_OPTIONS,
     selectedOperator,
+    progression,
     shooting: {
       resetAmmo: (unit) => shooting && shooting.resetAmmo(unit)
     },
@@ -514,6 +570,7 @@ function initializeSystems() {
     operatorLoadouts,
     operatorArmorLoadouts,
     operatorBackpackLoadouts,
+    progression,
     keysDown,
     updateHud
   });
@@ -559,6 +616,10 @@ function initializeSystems() {
     currentLevelIndex: () => level.currentLevelIndex(),
     currentTutorialIndex: () => level.currentTutorialIndex(),
     tutorial,
+    progression,
+    menu: {
+      showMain: () => menu && menu.showMain()
+    },
     updateHud
   });
 
@@ -621,16 +682,53 @@ function initializeSystems() {
     audio,
     selectedOperator,
     selectOperator,
+    cycleOperator,
     toggleRun,
     setDifficulty,
     updateHud,
     operatorLoadouts,
     inventoryIsOpen: () => runtime.inventoryOpen,
     equipmentTableIsOpen: () => runtime.equipmentTableOpen,
-    laptopIsOpen: () => runtime.laptopOpen
+    laptopIsOpen: () => runtime.laptopOpen,
+    menu: {
+      openPause: () => menu && menu.openPause(),
+      closePause: () => menu && menu.closePause(),
+      showMain: () => menu && menu.showMain(),
+      showLevelMenu: () => menu && menu.showLevelMenu(),
+      showTutorialMenu: () => menu && menu.showTutorialMenu(),
+      openSettingsFromPause: () => menu && menu.openSettingsFromPause(),
+      enterGame: () => menu && menu.enterGame(),
+      toggleExpanded: (...args) => menu && menu.toggleExpanded(...args)
+    }
   });
 
   input.bindEvents();
+
+  menu = window.MenuSystem.create({
+    runtime,
+    elements,
+    keysDown,
+    levelOptions: LEVEL_OPTIONS,
+    tutorialOptions: TUTORIAL_OPTIONS,
+    level,
+    settings,
+    inventory,
+    progression,
+    setDifficulty,
+    updateHud
+  });
+  menu.render();
+
+  mobileControls = window.MobileControlSystem.create({
+    runtime,
+    elements,
+    keysDown,
+    menu,
+    shooting,
+    selectedOperator,
+    updateHud
+  });
+  mobileControls.bindEvents();
 }
 
 window.__breachline = {
@@ -643,6 +741,8 @@ window.__breachline = {
   loadNextLevel: () => level.loadNextLevel(),
   loadNextTutorial: () => level.loadNextTutorial(),
   loadFirstLevel: () => level.loadFirstLevel(),
+  showMain: () => menu.showMain(),
+  cycleOperator,
   toggleRun
 };
 

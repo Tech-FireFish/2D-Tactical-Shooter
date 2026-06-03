@@ -1000,6 +1000,337 @@ canvas {
   min-width: 120px;
 }
 
+.menu-overlay,
+.pause-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 7, 8, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.credits-card {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  display: grid;
+  gap: 4px;
+  width: min(270px, calc(100vw - 40px));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(23, 27, 30, 0.92);
+}
+
+.credits-card strong,
+.credits-card span {
+  display: block;
+  font-size: 12px;
+}
+
+.credits-card span {
+  color: var(--muted);
+}
+
+.menu-panel,
+.pause-panel {
+  width: min(960px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  overflow: auto;
+  background: #121619;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.58);
+}
+
+.start-panel {
+  width: min(560px, calc(100vw - 48px));
+  text-align: center;
+}
+
+.start-panel h1 {
+  font-size: clamp(34px, 7vw, 70px);
+}
+
+.onboarding-question {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+}
+
+.menu-actions,
+.pause-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.main-menu-panel {
+  width: min(1180px, calc(100vw - 48px));
+}
+
+.main-menu-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(220px, 0.8fr) minmax(260px, 1fr) minmax(260px, 1fr);
+  gap: 12px;
+}
+
+.privilege-board {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.reward-list {
+  display: grid;
+  gap: 6px;
+}
+
+.reward-list span {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.reward-list span.unlocked {
+  border-color: rgba(96, 198, 137, 0.42);
+  color: var(--green);
+}
+
+.number-block-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.number-block-grid button {
+  aspect-ratio: 1;
+  min-height: 0;
+  padding: 0;
+  font-size: 16px;
+}
+
+.number-block-grid button.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pause-panel {
+  width: min(520px, calc(100vw - 48px));
+  text-align: center;
+}
+
+.expand-game-button {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 4;
+  min-height: 32px;
+  padding: 0 10px;
+  background: rgba(23, 27, 30, 0.88);
+}
+
+.expanded-nav {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: min(620px, calc(100% - 140px));
+  transform: translateX(-50%);
+}
+
+.expanded-nav button {
+  min-height: 32px;
+  padding: 0 10px;
+  background: rgba(23, 27, 30, 0.88);
+}
+
+body.game-expanded {
+  overflow: hidden;
+}
+
+body.game-expanded .shell {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+}
+
+body.game-expanded .brandbar,
+body.game-expanded .left-panel,
+body.game-expanded .right-panel {
+  display: none;
+}
+
+body.game-expanded .play-layout {
+  display: block;
+}
+
+body.game-expanded .game-panel {
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  border-radius: 0;
+}
+
+body.game-expanded canvas {
+  width: 100vw;
+  height: 100vh;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.mission-report {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.mission-report div {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.mission-report span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mission-report strong {
+  display: block;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.banner {
+  width: min(560px, calc(100% - 36px));
+}
+
+.mobile-controls {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.mobile-pause-button {
+  position: fixed;
+  left: 50%;
+  top: 12px;
+  z-index: 13;
+  pointer-events: auto;
+  transform: translateX(-50%);
+}
+
+.mobile-pad {
+  position: fixed;
+  bottom: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, 54px);
+  grid-template-rows: repeat(3, 54px);
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.mobile-move-pad {
+  left: 18px;
+}
+
+.mobile-shoot-pad {
+  right: 18px;
+}
+
+.mobile-pad button {
+  min-height: 54px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(23, 27, 30, 0.76);
+  backdrop-filter: blur(4px);
+}
+
+.mobile-pad button:first-child {
+  grid-column: 2;
+}
+
+.mobile-pad button:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.mobile-pad button:nth-child(3) {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.mobile-pad button:nth-child(4) {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.weapon-pixel-advanced-carbine .tone-a,
+.weapon-pixel-advanced-carbine .tone-c {
+  background: #e8c35c;
+}
+
+.weapon-pixel-advanced-carbine .tone-b,
+.weapon-pixel-advanced-carbine .tone-d {
+  background: #30414b;
+}
+
+.weapon-pixel-compact-pdw .tone-a,
+.weapon-pixel-compact-pdw .tone-c {
+  background: #38d0b2;
+}
+
+.weapon-pixel-compact-pdw .tone-b,
+.weapon-pixel-compact-pdw .tone-d {
+  background: #263b48;
+}
+
+.weapon-pixel-marksman-pistol .tone-a,
+.weapon-pixel-marksman-pistol .tone-c {
+  background: #d473d8;
+}
+
+.weapon-pixel-marksman-pistol .tone-b,
+.weapon-pixel-marksman-pistol .tone-d {
+  background: #30313f;
+}
+
+.weapon-pixel-melee .tone-a,
+.weapon-pixel-melee .tone-c {
+  background: #f3f7fb;
+}
+
+.weapon-pixel-melee .tone-b,
+.weapon-pixel-melee .tone-d {
+  background: #7c8790;
+}
+
 .hidden {
   display: none;
 }
@@ -1025,6 +1356,10 @@ canvas {
 
   .actions {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .main-menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   canvas {
@@ -1064,5 +1399,27 @@ canvas {
 
   .banner-actions {
     flex-direction: column;
+  }
+
+  .menu-overlay,
+  .pause-overlay {
+    padding: 10px;
+  }
+
+  .credits-card {
+    position: static;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .main-menu-grid,
+  .mission-report {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 860px) {
+  .mobile-controls:not(.hidden) {
+    display: block;
   }
 }
