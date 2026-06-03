@@ -7,6 +7,17 @@
     function resetAmmo(unit) {
       const weapon = deps.equipment.weaponById(unit.weaponId);
       const backpack = deps.equipment.backpackById(unit.backpackId || "medium-backpack");
+      if (weapon.canFire === false) {
+        unit.ammo = {
+          weaponId: weapon.id,
+          magazine: 0,
+          reserve: 0,
+          maxReserve: 0,
+          reloading: false,
+          reloadTimer: 0
+        };
+        return;
+      }
       const reserve = Math.round((weapon.reserveBullets || 90) * (backpack.ammoMultiplier || 1));
       unit.ammo = {
         weaponId: weapon.id,
@@ -44,6 +55,7 @@
     function activeReload(unit) {
       if (!unit || unit.down) return false;
       const weapon = deps.equipment.weaponById(unit.weaponId);
+      if (weapon.canFire === false) return false;
       if (!unit.ammo || unit.ammo.weaponId !== weapon.id) resetAmmo(unit);
       const started = beginReload(unit, weapon);
       if (started) {
@@ -57,6 +69,7 @@
     // Consumes one round when the shooter can fire.
     function consumeRound(shooter, weapon) {
       if (!shooter.ammo || shooter.ammo.weaponId !== weapon.id) resetAmmo(shooter);
+      if (weapon.canFire === false) return false;
       if (shooter.ammo.reloading) return false;
       if (shooter.ammo.magazine <= 0) {
         beginReload(shooter, weapon);
@@ -84,6 +97,7 @@
       const state = deps.getState();
       if (!state || !op || op.down || state.gameOver) return false;
       const weapon = deps.equipment.weaponById(op.weaponId);
+      if (weapon.canFire === false) return false;
       op.fireTimer = Math.max(0, op.fireTimer || 0);
       if (op.fireTimer > 0 || !consumeRound(op, weapon)) return false;
 
@@ -102,6 +116,7 @@
         deps.actions.damageEnemy(hit.enemy, weapon.damage, op);
       }
       addShot(op, shotEnd, op.color, weapon.tracerTtl);
+      if (state.tutorial) state.tutorial.manualShotFired = true;
       deps.audio.playWeapon(weapon.id);
       deps.enemyBehavior.noticeShot(op, hit ? hit.enemy : shotEnd);
       op.fireTimer = weapon.fireInterval;

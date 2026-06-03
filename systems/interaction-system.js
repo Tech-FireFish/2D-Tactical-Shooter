@@ -69,6 +69,7 @@
       const state = deps.getState();
       if (win.state === "closed") {
         win.state = "open";
+        if (state.tutorial) state.tutorial.windowOpened = true;
         state.message = `${op.id} opened ${win.id}`;
         deps.updateHud();
         return true;
@@ -90,6 +91,7 @@
         op.y = op.y < center.y ? center.y + 34 : center.y - 34;
       }
       op.movedBefore = true;
+      win.vaulted = true;
       if (damaged) deps.actions.damageOperator(op, win.damage || 8);
     }
 
@@ -103,6 +105,7 @@
       op.zone = stair.target.label || stair.label || op.zone;
       op.path = [];
       op.movedBefore = true;
+      stair.used = true;
       state.message = `${op.id} moved to ${op.zone || "stairs"}`;
       deps.updateHud();
       return true;

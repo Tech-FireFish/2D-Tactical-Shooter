@@ -15,29 +15,6 @@
         </div>
       </header>
 
-      <section class="top-status-bar" aria-label="Mission status">
-        <div>
-          <span>Mode</span>
-          <strong id="modeLabel">Planning</strong>
-        </div>
-        <div>
-          <span>Objective</span>
-          <strong id="objectiveLabel">Secure</strong>
-        </div>
-        <div>
-          <span>Operator</span>
-          <strong id="selectedStatusLabel">ALPHA</strong>
-        </div>
-        <div>
-          <span>Shooting</span>
-          <strong id="shootingStatusLabel">Automatic</strong>
-        </div>
-        <div>
-          <span>Zone</span>
-          <strong id="selectedZoneLabel">Floor 1</strong>
-        </div>
-      </section>
-
       <section class="play-layout">
         <aside class="side-panel left-panel" aria-label="Operator equipment and inventory">
           <section class="control-card">
@@ -53,6 +30,32 @@
             <div id="inventorySummary" class="inventory-summary" aria-live="polite"></div>
             <button id="inventoryButton" type="button">Open Inventory</button>
           </section>
+
+          <section class="control-card mission-status-card" aria-label="Mission status">
+            <p class="panel-label">Mission Status</p>
+            <div class="mission-status-grid">
+              <div>
+                <span>Mode</span>
+                <strong id="modeLabel">Planning</strong>
+              </div>
+              <div>
+                <span>Objective</span>
+                <strong id="objectiveLabel">Secure</strong>
+              </div>
+              <div>
+                <span>Operator</span>
+                <strong id="selectedStatusLabel">ALPHA</strong>
+              </div>
+              <div>
+                <span>Shooting</span>
+                <strong id="shootingStatusLabel">Automatic</strong>
+              </div>
+              <div>
+                <span>Zone</span>
+                <strong id="selectedZoneLabel">Floor 1</strong>
+              </div>
+            </div>
+          </section>
         </aside>
 
         <section class="game-panel">
@@ -62,6 +65,7 @@
             <span id="bannerText">Restart to run the plan again.</span>
             <div class="banner-actions" aria-label="Mission result actions">
               <button id="nextLevelButton" type="button">Next Level</button>
+              <button id="exitTutorialButton" class="hidden" type="button">Exit To First Level</button>
               <button id="bannerRestartButton" type="button">Restart</button>
             </div>
           </div>
@@ -75,7 +79,7 @@
             <div id="tutorialProgress" class="tutorial-progress">Step 1 / 8</div>
           </section>
 
-          <section class="control-card hint-card">
+          <section id="hintCard" class="control-card hint-card">
             <p class="panel-label">Hint</p>
             <div id="hintText" class="hint-text">Move near doors, windows, stairs, papers, laptops, or tables.</div>
           </section>
@@ -107,7 +111,10 @@
               <p class="eyebrow">Settings</p>
               <h2>Controls And Mission Setup</h2>
             </div>
-            <button id="closeSettingsButton" type="button" title="Close settings">Close</button>
+            <div class="settings-actions">
+              <button id="resetSettingsButton" type="button" title="Reset settings to defaults">Reset</button>
+              <button id="closeSettingsButton" type="button" title="Close settings">Close</button>
+            </div>
           </header>
 
           <div class="settings-grid">
@@ -128,6 +135,10 @@
               <label class="level-picker" for="levelSelect">
                 <span>Level</span>
                 <select id="levelSelect"></select>
+              </label>
+              <label class="level-picker" for="tutorialSelect">
+                <span>Tutorial</span>
+                <select id="tutorialSelect"></select>
               </label>
               <label class="level-picker" for="operatorCountSelect">
                 <span>Operators</span>
@@ -278,6 +289,6 @@
     <script src="systems/render-system.js?v=1"></script>
     <script src="systems/input-system.js?v=1"></script>
     <script src="systems/action-system.js?v=3"></script>
-    <script src="main.js?v=19"></script>
+    <script src="main.js?v=21"></script>
   </body>
 </html>

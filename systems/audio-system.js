@@ -44,6 +44,7 @@
 
     // Maps weapon IDs to their matching weapon-fire sound.
     function playWeapon(weaponId) {
+      if (weaponId === "no-weapon") return;
       if (weaponId === "smg") {
         play("smg-shot");
       } else if (weaponId === "pistol") {

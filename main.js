@@ -4,6 +4,7 @@ const elements = {
   canvas: document.getElementById("game"),
   levelTitle: document.getElementById("levelTitle"),
   levelSelect: document.getElementById("levelSelect"),
+  tutorialSelect: document.getElementById("tutorialSelect"),
   operatorCountSelect: document.getElementById("operatorCountSelect"),
   modeLabel: document.getElementById("modeLabel"),
   objectiveLabel: document.getElementById("objectiveLabel"),
@@ -29,6 +30,7 @@ const elements = {
   hintText: document.getElementById("hintText"),
   settingsOverlay: document.getElementById("settingsOverlay"),
   closeSettingsButton: document.getElementById("closeSettingsButton"),
+  resetSettingsButton: document.getElementById("resetSettingsButton"),
   settingsTabs: document.querySelectorAll("[data-settings-tab]"),
   settingsPanels: document.querySelectorAll("[data-settings-panel]"),
   difficultySelect: document.getElementById("difficultySelect"),
@@ -57,6 +59,7 @@ const elements = {
   startHackButton: document.getElementById("startHackButton"),
   cameraHackList: document.getElementById("cameraHackList"),
   tutorialCard: document.getElementById("tutorialCard"),
+  hintCard: document.getElementById("hintCard"),
   tutorialTitle: document.getElementById("tutorialTitle"),
   tutorialText: document.getElementById("tutorialText"),
   tutorialProgress: document.getElementById("tutorialProgress"),
@@ -64,6 +67,7 @@ const elements = {
   bannerTitle: document.getElementById("bannerTitle"),
   bannerText: document.getElementById("bannerText"),
   nextLevelButton: document.getElementById("nextLevelButton"),
+  exitTutorialButton: document.getElementById("exitTutorialButton"),
   bannerRestartButton: document.getElementById("bannerRestartButton")
 };
 
@@ -100,7 +104,6 @@ const colors = {
 };
 
 const LEVEL_OPTIONS = [
-  { id: "tutorial-digital-lock", title: "Tutorial: Digital Lock", file: "level/tutorial-digital-lock.json" },
   { id: "ridge-house-entry", title: "Ridge House Entry", file: "level/ridge-house-entry.json" },
   { id: "warehouse-pinch", title: "Warehouse Pinch", file: "level/warehouse-pinch.json" },
   { id: "hardpoint-gallery", title: "Hardpoint Gallery", file: "level/hardpoint-gallery.json" },
@@ -109,13 +112,24 @@ const LEVEL_OPTIONS = [
   { id: "camera-house", title: "Camera House", file: "level/camera-house.json" }
 ];
 
+const TUTORIAL_OPTIONS = [
+  { id: "tutorial-basics-movement", title: "Tutorial: Basics Movement", file: "tutorials/basics-movement.json" },
+  { id: "tutorial-shooting-modes", title: "Tutorial: Shooting Modes", file: "tutorials/shooting-modes.json" },
+  { id: "tutorial-operators-stairs", title: "Tutorial: Operators And Stairs", file: "tutorials/operators-stairs.json" },
+  { id: "tutorial-equipment-table", title: "Tutorial: Equipment Table", file: "tutorials/equipment-table.json" },
+  { id: "tutorial-windows", title: "Tutorial: Windows", file: "tutorials/windows.json" },
+  { id: "tutorial-digital-lock", title: "Tutorial: Digital Lock", file: "tutorials/digital-lock.json" }
+];
+
 const WEAPON_OPTIONS = [
+  { id: "no-weapon", file: "equipment/no-weapon.json" },
   { id: "rifle", file: "equipment/rifle.json" },
   { id: "smg", file: "equipment/smg.json" },
   { id: "pistol", file: "equipment/pistol.json" }
 ];
 
 const ARMOR_OPTIONS = [
+  { id: "no-armor", file: "equipment/no-armor.json" },
   { id: "light-armor", file: "equipment/light-armor.json" },
   { id: "medium-armor", file: "equipment/medium-armor.json" },
   { id: "heavy-armor", file: "equipment/heavy-armor.json" }
@@ -164,6 +178,7 @@ const runtime = {
   capturingKeyAction: null,
   manualFireHeld: false,
   manualFirePoint: null,
+  activeMode: "level",
   lastTime: performance.now()
 };
 
@@ -451,6 +466,15 @@ function initializeSystems() {
     runtime,
     elements,
     keysDown,
+    keybindings,
+    level: {
+      restart: () => level && level.restart()
+    },
+    operatorLoadouts,
+    operatorArmorLoadouts,
+    operatorBackpackLoadouts,
+    enemyLoadouts,
+    enemyArmorLoadouts,
     renderEnemyLoadouts: () => equipment.renderEnemyLoadouts(),
     updateHud
   });
@@ -473,6 +497,7 @@ function initializeSystems() {
   tutorial = window.TutorialSystem.create({
     runtime,
     elements,
+    pointDistance: geometry.pointDistance,
     pointRectDistance: geometry.pointRectDistance
   });
 
@@ -483,6 +508,7 @@ function initializeSystems() {
     defaultWorld: DEFAULT_WORLD,
     unitRadius: UNIT_RADIUS,
     levelOptions: LEVEL_OPTIONS,
+    tutorialOptions: TUTORIAL_OPTIONS,
     equipment,
     shooting,
     operatorLoadouts,
@@ -529,7 +555,10 @@ function initializeSystems() {
     geometry,
     audio,
     levelOptions: LEVEL_OPTIONS,
+    tutorialOptions: TUTORIAL_OPTIONS,
     currentLevelIndex: () => level.currentLevelIndex(),
+    currentTutorialIndex: () => level.currentTutorialIndex(),
+    tutorial,
     updateHud
   });
 
@@ -588,6 +617,7 @@ function initializeSystems() {
     settings,
     digitalLock,
     cameraHack,
+    tutorial,
     audio,
     selectedOperator,
     selectOperator,
@@ -609,7 +639,10 @@ window.__breachline = {
   getArmors: () => [...armors.values()],
   restart: () => level.restart(),
   loadLevel: (levelId) => level.loadLevel(levelId),
+  loadTutorial: (tutorialId) => level.loadLevel(tutorialId),
   loadNextLevel: () => level.loadNextLevel(),
+  loadNextTutorial: () => level.loadNextTutorial(),
+  loadFirstLevel: () => level.loadFirstLevel(),
   toggleRun
 };
 

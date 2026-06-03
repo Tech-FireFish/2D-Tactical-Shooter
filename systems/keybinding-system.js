@@ -107,6 +107,15 @@
       return bindings[action] ? bindings[action].display : "";
     }
 
+    // Restores every remappable key to its default binding.
+    function reset() {
+      for (const [action, config] of Object.entries(defaults)) {
+        bindings[action] = { ...config };
+      }
+      saveBindings();
+      render();
+    }
+
     render();
 
     return {
@@ -115,7 +124,8 @@
       matches,
       capture,
       render,
-      display
+      display,
+      reset
     };
   }
 

@@ -243,9 +243,21 @@
       elements.runButton.addEventListener("click", deps.toggleRun);
       elements.restartButton.addEventListener("click", deps.level.restart);
       elements.bannerRestartButton.addEventListener("click", deps.level.restart);
-      elements.nextLevelButton.addEventListener("click", deps.level.loadNextLevel);
+      elements.nextLevelButton.addEventListener("click", () => {
+        if (runtime.activeMode === "tutorial" && runtime.state && runtime.state.result === "success") {
+          deps.level.loadNextTutorial();
+        } else {
+          deps.level.loadNextLevel();
+        }
+      });
+      if (elements.exitTutorialButton) {
+        elements.exitTutorialButton.addEventListener("click", deps.level.loadFirstLevel);
+      }
       elements.settingsButton.addEventListener("click", deps.settings.openSettings);
       elements.closeSettingsButton.addEventListener("click", deps.settings.closeSettings);
+      if (elements.resetSettingsButton) {
+        elements.resetSettingsButton.addEventListener("click", deps.settings.resetDefaults);
+      }
       elements.inventoryButton.addEventListener("click", deps.inventory.openInventory);
       elements.closeInventoryButton.addEventListener("click", deps.inventory.closeInventory);
       elements.inventoryOverlay.addEventListener("click", (event) => {
@@ -334,8 +346,15 @@
       });
       elements.levelSelect.addEventListener("change", () => {
         deps.settings.setResumeRunning(false);
-        deps.level.loadLevel(elements.levelSelect.value);
+        loadWithTutorialWarning(elements.levelSelect.value);
       });
+      if (elements.tutorialSelect) {
+        elements.tutorialSelect.addEventListener("change", () => {
+          if (!elements.tutorialSelect.value) return;
+          deps.settings.setResumeRunning(false);
+          loadWithTutorialWarning(elements.tutorialSelect.value);
+        });
+      }
       elements.operatorCountSelect.addEventListener("change", () => {
         deps.settings.setResumeRunning(false);
         runtime.activeOperatorCount = Number(elements.operatorCountSelect.value);
@@ -346,6 +365,19 @@
         event.preventDefault();
         event.returnValue = "";
       });
+    }
+
+    // Gives unfinished tutorials a visible warning before loading a selected destination.
+    function loadWithTutorialWarning(levelId) {
+      if (!levelId) return;
+      const warned = deps.tutorial && deps.tutorial.warnExit && deps.tutorial.warnExit();
+      if (warned) {
+        deps.settings.setResumeRunning(false);
+        deps.settings.closeSettings();
+        window.setTimeout(() => deps.level.loadLevel(levelId), 850);
+        return;
+      }
+      deps.level.loadLevel(levelId);
     }
 
     return {

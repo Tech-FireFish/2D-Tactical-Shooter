@@ -62,6 +62,9 @@
     { "id": "south-hall-a", "x": 330, "y": 560, "w": 100, "h": 20, "orientation": "horizontal", "state": "closed" },
     { "id": "south-hall-b", "x": 830, "y": 560, "w": 100, "h": 20, "orientation": "horizontal", "state": "closed" }
   ],
+  "equipmentTables": [
+    { "id": "terminal-entry-table", "name": "Terminal Entry Gear Table", "x": 52, "y": 352, "w": 42, "h": 56 }
+  ],
   "operators": [
     { "id": "ALPHA", "x": 72, "y": 300, "color": "#67c98f" },
     { "id": "BRAVO", "x": 72, "y": 420, "color": "#72b7ce" }

@@ -19,6 +19,7 @@
         message: "Draw routes, then execute",
         shootingMode: runtime.state ? runtime.state.shootingMode || "automatic" : "automatic",
         shots: [],
+        enemyDownCount: 0,
         tutorial: null,
         cameraHack: {
           started: false,
@@ -38,6 +39,7 @@
       return {
         id: level.id,
         title: level.title,
+        requireObjective: Boolean(level.requireObjective),
         width: level.width || deps.defaultWorld.w,
         height: level.height || deps.defaultWorld.h,
         floorZones: (level.floorZones || []).map((zone) => ({ ...zone })),
@@ -53,8 +55,9 @@
         equipmentTables: (level.equipmentTables || []).map((table) => ({ ...table })),
         doors: buildDoors(level),
         operators: level.operators.slice(0, maxOperators).map((op) => {
-          const armorId = deps.equipment.validArmorId(deps.operatorArmorLoadouts[op.id] || op.armorId || "light-armor");
-          const backpackId = deps.equipment.validBackpackId(deps.operatorBackpackLoadouts[op.id] || op.backpackId || "medium-backpack");
+          const useSavedLoadout = !level.forceLoadouts;
+          const armorId = deps.equipment.validArmorId((useSavedLoadout && deps.operatorArmorLoadouts[op.id]) || op.armorId || "light-armor");
+          const backpackId = deps.equipment.validBackpackId((useSavedLoadout && deps.operatorBackpackLoadouts[op.id]) || op.backpackId || "medium-backpack");
           const armor = deps.equipment.armorById(armorId);
           const backpack = deps.equipment.backpackById(backpackId);
           const baseSpeed = op.speed || 92;
@@ -69,7 +72,7 @@
             backpackId,
             baseSpeed,
             speed: baseSpeed * armor.speedMultiplier * (backpack.speedMultiplier || 1),
-            weaponId: deps.equipment.validWeaponId(deps.operatorLoadouts[op.id] || op.weaponId || "rifle"),
+            weaponId: deps.equipment.validWeaponId((useSavedLoadout && deps.operatorLoadouts[op.id]) || op.weaponId || "rifle"),
             fireTimer: 0,
             path: [],
             aim: 0,
@@ -90,8 +93,9 @@
           return unit;
         }),
         enemies: level.enemies.map((enemy) => {
-          const weaponId = deps.equipment.validWeaponId(levelWeaponLoadouts[enemy.id] || enemy.weaponId || "rifle");
-          const armorId = deps.equipment.validArmorId(levelArmorLoadouts[enemy.id] || enemy.armorId || "light-armor");
+          const useSavedLoadout = !level.forceLoadouts;
+          const weaponId = deps.equipment.validWeaponId((useSavedLoadout && levelWeaponLoadouts[enemy.id]) || enemy.weaponId || "rifle");
+          const armorId = deps.equipment.validArmorId((useSavedLoadout && levelArmorLoadouts[enemy.id]) || enemy.armorId || "light-armor");
           const armor = deps.equipment.armorById(armorId);
           const baseSpeed = enemy.speed || 34;
           return {
@@ -105,12 +109,15 @@
             baseSpeed,
             speed: baseSpeed * armor.speedMultiplier,
             weaponId,
+            spawn: { x: enemy.x, y: enemy.y, angle: enemy.angle || 0 },
             fireTimer: 0,
             sightRange: enemy.sightRange || Math.max(190, deps.equipment.weaponById(weaponId).range),
             fov: Math.PI * 0.78,
             reaction: 0,
             targetId: null,
             down: false,
+            respawnDelay: enemy.respawnDelay || 0,
+            respawnTimer: 0,
             patrolIndex: 0,
             status: "calm",
             lastKnownOperator: null,
@@ -183,6 +190,7 @@
       resizeWorld(runtime.state.level.width, runtime.state.level.height);
       runtime.lastTime = performance.now();
       elements.banner.classList.add("hidden");
+      if (elements.exitTutorialButton) elements.exitTutorialButton.classList.add("hidden");
       elements.levelTitle.textContent = runtime.currentLevel.title || runtime.currentLevelMeta.title;
       deps.updateHud();
     }
@@ -201,6 +209,12 @@
       return Math.max(0, deps.levelOptions.findIndex((level) => level.id === runtime.currentLevelMeta.id));
     }
 
+    // Finds the active tutorial index in the tutorial option list.
+    function currentTutorialIndex() {
+      const options = deps.tutorialOptions || [];
+      return Math.max(0, options.findIndex((level) => level.id === runtime.currentLevelMeta.id));
+    }
+
     // Fills the level selector from the configured level list.
     function populateLevelSelect() {
       elements.levelSelect.innerHTML = "";
@@ -210,14 +224,27 @@
         option.textContent = level.title;
         elements.levelSelect.append(option);
       }
+      if (!elements.tutorialSelect) return;
+      elements.tutorialSelect.innerHTML = "<option value=\"\">Choose Tutorial</option>";
+      for (const tutorial of deps.tutorialOptions || []) {
+        const option = document.createElement("option");
+        option.value = tutorial.id;
+        option.textContent = tutorial.title;
+        elements.tutorialSelect.append(option);
+      }
     }
 
     // Fetches a level JSON file and starts it when loading succeeds.
     async function loadLevel(levelId) {
-      const meta = deps.levelOptions.find((level) => level.id === levelId) || deps.levelOptions[0];
+      const storyMeta = deps.levelOptions.find((level) => level.id === levelId);
+      const tutorialMeta = (deps.tutorialOptions || []).find((level) => level.id === levelId);
+      const meta = storyMeta || tutorialMeta || deps.levelOptions[0];
       runtime.currentLevelMeta = meta;
-      elements.levelSelect.value = meta.id;
+      runtime.activeMode = tutorialMeta ? "tutorial" : "level";
+      elements.levelSelect.value = storyMeta ? meta.id : "";
+      if (elements.tutorialSelect) elements.tutorialSelect.value = tutorialMeta ? meta.id : "";
       elements.levelSelect.disabled = true;
+      if (elements.tutorialSelect) elements.tutorialSelect.disabled = true;
       elements.levelTitle.textContent = "Loading...";
 
       try {
@@ -238,6 +265,7 @@
         elements.banner.classList.remove("hidden");
       } finally {
         elements.levelSelect.disabled = false;
+        if (elements.tutorialSelect) elements.tutorialSelect.disabled = false;
       }
     }
 
@@ -248,15 +276,35 @@
       loadLevel(deps.levelOptions[nextIndex].id);
     }
 
+    // Advances to the next tutorial, returning to the first story level when none exist.
+    function loadNextTutorial() {
+      const options = deps.tutorialOptions || [];
+      if (!options.length) {
+        loadFirstLevel();
+        return;
+      }
+      const nextIndex = (currentTutorialIndex() + 1) % options.length;
+      loadLevel(options[nextIndex].id);
+    }
+
+    // Loads the first configured story level.
+    function loadFirstLevel() {
+      if (!deps.levelOptions.length) return;
+      loadLevel(deps.levelOptions[0].id);
+    }
+
     return {
       createGameState,
       cloneLevel,
       restart,
       resizeWorld,
       currentLevelIndex,
+      currentTutorialIndex,
       populateLevelSelect,
       loadLevel,
-      loadNextLevel
+      loadNextLevel,
+      loadNextTutorial,
+      loadFirstLevel
     };
   }
 

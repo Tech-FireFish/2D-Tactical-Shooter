@@ -16,6 +16,16 @@
     let lastHealthBoardHtml = "";
     let lastEnemyLoadoutHtml = "";
     const weaponPixelArt = {
+      "no-weapon": [
+        "....................",
+        "....................",
+        "......aaaaaaaa......",
+        ".....a........a.....",
+        "....a..........a....",
+        ".....a........a.....",
+        "......aaaaaaaa......",
+        "...................."
+      ],
       rifle: [
         "....................",
         "...............aa...",
@@ -268,7 +278,7 @@
       op.armor = armor.armor;
       const backpack = backpackById(op.backpackId);
       op.speed = (op.baseSpeed || 92) * armor.speedMultiplier * (backpack.speedMultiplier || 1);
-      operatorArmorLoadouts[op.id] = selectedArmorId;
+      if (!runtime.state.level.forceLoadouts) operatorArmorLoadouts[op.id] = selectedArmorId;
       runtime.state.message = `${op.id} equipped ${armor.name}`;
       deps.updateHud();
     }
@@ -279,7 +289,7 @@
       op.weaponId = selectedWeaponId;
       op.fireTimer = 0;
       op.reaction = 0;
-      operatorLoadouts[op.id] = selectedWeaponId;
+      if (!runtime.state.level.forceLoadouts) operatorLoadouts[op.id] = selectedWeaponId;
       deps.shooting.resetAmmo(op);
       runtime.state.message = `${op.id} equipped ${weaponById(op.weaponId).name}`;
       deps.updateHud();
@@ -290,13 +300,18 @@
       const selectedBackpackId = validBackpackId(backpackId);
       const backpack = backpackById(selectedBackpackId);
       const armor = armorById(op.armorId);
+      const carried = (op.inventory.items || []).filter(Boolean);
+      if (carried.length > backpack.slots) {
+        runtime.state.message = "Backpack too full";
+        elements.backpackSelect.value = validBackpackId(op.backpackId);
+        deps.updateHud();
+        return;
+      }
       op.backpackId = selectedBackpackId;
       op.speed = (op.baseSpeed || 92) * armor.speedMultiplier * (backpack.speedMultiplier || 1);
       op.inventory.slots = backpack.slots;
-      if (op.inventory.items.length > op.inventory.slots) {
-        op.inventory.items = op.inventory.items.slice(0, op.inventory.slots);
-      }
-      operatorBackpackLoadouts[op.id] = selectedBackpackId;
+      op.inventory.items = Array.from({ length: backpack.slots }, (_, index) => carried[index] || null);
+      if (!runtime.state.level.forceLoadouts) operatorBackpackLoadouts[op.id] = selectedBackpackId;
       deps.shooting.resetAmmo(op);
       runtime.state.message = `${op.id} equipped ${backpack.name}`;
       deps.updateHud();
@@ -359,7 +374,7 @@
         <div class="weapon-tooltip" role="tooltip">
           <div class="weapon-stat-row"><span>Range</span><strong>${weapon.range}</strong></div>
           <div class="weapon-stat-row"><span>Damage</span><strong>${weapon.damage}</strong></div>
-          <div class="weapon-stat-row"><span>Fire Rate</span><strong>${(1 / weapon.fireInterval).toFixed(1)}/s</strong></div>
+          <div class="weapon-stat-row"><span>Fire Rate</span><strong>${weapon.canFire === false ? "None" : `${(1 / weapon.fireInterval).toFixed(1)}/s`}</strong></div>
           <div class="weapon-stat-row"><span>Magazine</span><strong>${weapon.magSize}</strong></div>
           <div class="weapon-stat-row"><span>Armor</span><strong>${armor.armor}</strong></div>
           <div class="weapon-stat-row"><span>Backpack</span><strong>${backpack.slots} slots</strong></div>
@@ -383,7 +398,7 @@
       }).join("");
       elements.ammoBoard.innerHTML = `
         <div class="bullet-grid">${bullets}</div>
-        <div class="ammo-count">${op.ammo.magazine}/${weapon.magSize} | Reserve ${op.ammo.reserve}</div>
+        <div class="ammo-count">${weapon.canFire === false ? "Unarmed" : `${op.ammo.magazine}/${weapon.magSize} | Reserve ${op.ammo.reserve}`}</div>
         ${op.ammo.reloading ? "<div class=\"reload-label\">Reloading</div>" : ""}
       `;
     }

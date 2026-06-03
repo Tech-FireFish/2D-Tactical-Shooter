@@ -122,18 +122,45 @@
         op.x = next.x;
         op.y = next.y;
         op.movedBefore = true;
+        if (state.tutorial) {
+          if (deps.isActionDown("sneak")) state.tutorial.sneaked = true;
+          if (deps.isActionDown("sprint")) state.tutorial.sprinted = true;
+        }
         deps.audio.noteLoopActivity("operator-walk");
       }
     }
 
     // Updates enemy targeting, watch direction, patrol, and firing.
     function updateEnemy(enemy, dt) {
+      if (enemy.down && enemy.respawnDelay) {
+        updateEnemyRespawn(enemy, dt);
+        return;
+      }
       deps.shooting.updateReload(enemy, dt);
       deps.enemyBehavior.updateEnemy(enemy, dt, {
         fireAtOperator: (shooter, target, weapon, frameDt) => {
           fireAutomatic(shooter, target, weapon, frameDt, damageOperator, deps.colors.enemy);
         }
       });
+    }
+
+    // Restores tutorial enemies after their authored respawn delay.
+    function updateEnemyRespawn(enemy, dt) {
+      enemy.respawnTimer = Math.max(0, (enemy.respawnTimer || enemy.respawnDelay) - dt);
+      if (enemy.respawnTimer > 0) return;
+      enemy.x = enemy.spawn ? enemy.spawn.x : enemy.x;
+      enemy.y = enemy.spawn ? enemy.spawn.y : enemy.y;
+      enemy.angle = enemy.spawn ? enemy.spawn.angle : enemy.angle;
+      enemy.health = 100;
+      enemy.armor = enemy.maxArmor;
+      enemy.down = false;
+      enemy.status = "calm";
+      enemy.targetId = null;
+      enemy.fireTimer = 0;
+      enemy.reaction = 0;
+      enemy.suspicionTimer = 0;
+      enemy.searchTarget = null;
+      deps.shooting.resetAmmo(enemy);
     }
 
     // Moves an enemy through its patrol route when no target is visible.
@@ -149,6 +176,7 @@
       op.fireTimer = Math.max(0, (op.fireTimer || 0) - dt);
       if (state.shootingMode === "manual") return;
       const weapon = deps.weaponById(op.weaponId);
+      if (weapon.canFire === false) return;
       const visible = state.level.enemies
         .filter((enemy) => !enemy.down)
         .filter((enemy) => deps.pointDistance(op, enemy) <= Math.min(weapon.range, deps.operatorSightRange(op)))
@@ -169,6 +197,7 @@
 
     // Runs reaction timing, fire rate timing, damage, and tracer creation.
     function fireAutomatic(shooter, target, weapon, dt, damageTarget, color) {
+      if (weapon.canFire === false) return;
       if (shooter.targetId !== target.id) {
         shooter.targetId = target.id;
         shooter.reaction = 0;
@@ -186,6 +215,10 @@
       deps.shooting.breakWindowsOnSegment(shooter, target);
       damageTarget(target, weapon.damage, shooter);
       deps.shooting.addShot(shooter, target, color, weapon.tracerTtl);
+      const state = getState();
+      if (state && state.tutorial && shooter.kind === "operator" && state.shootingMode === "automatic") {
+        state.tutorial.automaticShotFired = true;
+      }
       deps.audio.playWeapon(weapon.id || shooter.weaponId);
       deps.enemyBehavior.noticeShot(shooter, target);
       shooter.fireTimer = weapon.fireInterval;
@@ -199,10 +232,19 @@
       if (enemy.health <= 0) {
         enemy.health = 0;
         enemy.down = true;
+        enemy.respawnTimer = enemy.respawnDelay || 0;
         enemy.status = "down";
         enemy.targetId = null;
         enemy.fireTimer = 0;
         if (!wasDown) {
+          const state = getState();
+          if (state) {
+            state.enemyDownCount = (state.enemyDownCount || 0) + 1;
+            if (state.tutorial) {
+              if (!state.tutorial.completedEnemies) state.tutorial.completedEnemies = new Set();
+              state.tutorial.completedEnemies.add(enemy.id);
+            }
+          }
           deps.enemyBehavior.noticeEnemyDown(enemy, source);
         }
       }
@@ -243,6 +285,7 @@
       updateOperator,
       updateManualOperator,
       updateEnemy,
+      updateEnemyRespawn,
       updateEnemyPatrol,
       updateOperatorCombat,
       damageEnemy,
