@@ -9,6 +9,31 @@
       zoom: 1.38,
       targetZoom: 1.38
     };
+    const viewport = {
+      w: deps.defaultWorld.w,
+      h: deps.defaultWorld.h,
+      pixelRatio: 1
+    };
+    const padding = {
+      x: 180,
+      y: 140
+    };
+
+    // Matches the canvas backing buffer to its CSS size and device pixel ratio.
+    function resizeCanvas() {
+      const rect = deps.canvas.getBoundingClientRect();
+      const cssW = Math.max(1, rect.width || deps.defaultWorld.w);
+      const cssH = Math.max(1, rect.height || deps.defaultWorld.h);
+      const ratio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+      const nextW = Math.round(cssW * ratio);
+      const nextH = Math.round(cssH * ratio);
+      viewport.w = cssW;
+      viewport.h = cssH;
+      viewport.pixelRatio = ratio;
+      if (deps.canvas.width !== nextW) deps.canvas.width = nextW;
+      if (deps.canvas.height !== nextH) deps.canvas.height = nextH;
+      clampToWorld();
+    }
 
     // Moves the camera toward the selected operator and clamps to world bounds.
     function update(dt) {
@@ -23,27 +48,28 @@
 
     // Keeps the camera inside the current world rectangle.
     function clampToWorld() {
-      const viewW = deps.canvas.width / camera.zoom;
-      const viewH = deps.canvas.height / camera.zoom;
-      camera.x = deps.clamp(camera.x, viewW / 2, Math.max(viewW / 2, deps.world.w - viewW / 2));
-      camera.y = deps.clamp(camera.y, viewH / 2, Math.max(viewH / 2, deps.world.h - viewH / 2));
+      const viewW = viewport.w / camera.zoom;
+      const viewH = viewport.h / camera.zoom;
+      camera.x = deps.clamp(camera.x, -padding.x + viewW / 2, Math.max(-padding.x + viewW / 2, deps.world.w + padding.x - viewW / 2));
+      camera.y = deps.clamp(camera.y, -padding.y + viewH / 2, Math.max(-padding.y + viewH / 2, deps.world.h + padding.y - viewH / 2));
     }
 
     // Applies the world transform before map rendering.
     function apply(ctx) {
-      ctx.setTransform(camera.zoom, 0, 0, camera.zoom, -camera.x * camera.zoom + deps.canvas.width / 2, -camera.y * camera.zoom + deps.canvas.height / 2);
+      const scale = camera.zoom * viewport.pixelRatio;
+      ctx.setTransform(scale, 0, 0, scale, (-camera.x * camera.zoom + viewport.w / 2) * viewport.pixelRatio, (-camera.y * camera.zoom + viewport.h / 2) * viewport.pixelRatio);
     }
 
     // Restores identity transform for screen-space clearing or overlays.
     function reset(ctx) {
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.setTransform(viewport.pixelRatio, 0, 0, viewport.pixelRatio, 0, 0);
     }
 
     // Converts a screen/canvas coordinate into world space.
     function screenToWorld(point) {
       return {
-        x: (point.x - deps.canvas.width / 2) / camera.zoom + camera.x,
-        y: (point.y - deps.canvas.height / 2) / camera.zoom + camera.y
+        x: (point.x - viewport.w / 2) / camera.zoom + camera.x,
+        y: (point.y - viewport.h / 2) / camera.zoom + camera.y
       };
     }
 
@@ -52,12 +78,25 @@
       return camera;
     }
 
+    // Returns logical CSS-pixel viewport dimensions for rendering helpers.
+    function getViewport() {
+      return viewport;
+    }
+
+    // Returns the non-playable camera padding around authored maps.
+    function getPadding() {
+      return padding;
+    }
+
     return {
+      resizeCanvas,
       update,
       apply,
       reset,
       screenToWorld,
-      getCamera
+      getCamera,
+      getViewport,
+      getPadding
     };
   }
 

@@ -48,6 +48,7 @@ const elements = {
   difficultySelect: document.getElementById("difficultySelect"),
   shootingModeSelect: document.getElementById("shootingModeSelect"),
   enemyTraceSelect: document.getElementById("enemyTraceSelect"),
+  hintOpacityRange: document.getElementById("hintOpacityRange"),
   keyBindingList: document.getElementById("keyBindingList"),
   enemyLoadoutList: document.getElementById("enemyLoadoutList"),
   digitalLockOverlay: document.getElementById("digitalLockOverlay"),
@@ -81,9 +82,13 @@ const elements = {
   pauseTutorialButton: document.getElementById("pauseTutorialButton"),
   pauseSettingButton: document.getElementById("pauseSettingButton"),
   expandGameButton: document.getElementById("expandGameButton"),
+  expandedPauseButton: document.getElementById("expandedPauseButton"),
   expandedNav: document.getElementById("expandedNav"),
   mobileControls: document.getElementById("mobileControls"),
   mobilePauseButton: document.getElementById("mobilePauseButton"),
+  mobileMoveJoystick: document.getElementById("mobileMoveJoystick"),
+  mobileJoystickThumb: document.getElementById("mobileJoystickThumb"),
+  mobileInteractButton: document.getElementById("mobileInteractButton"),
   banner: document.getElementById("banner"),
   bannerTitle: document.getElementById("bannerTitle"),
   bannerText: document.getElementById("bannerText"),
@@ -204,7 +209,9 @@ const runtime = {
   pauseOpen: false,
   pauseResumeRunning: false,
   expandedGame: false,
+  expandedPaused: false,
   mobileMode: false,
+  hintOpacity: 0.42,
   showAllHealth: false,
   activeSettingsTab: "keys",
   capturingKeyAction: null,
@@ -372,6 +379,12 @@ function updateHud() {
   if (elements.hintText) {
     const hint = selected && interaction ? interaction.nearestHint(selected) : "";
     elements.hintText.textContent = hint || "Move near doors, windows, stairs, papers, laptops, or tables.";
+  }
+  if (elements.hintCard) {
+    elements.hintCard.style.setProperty("--hint-card-alpha", String(runtime.hintOpacity));
+  }
+  if (elements.hintOpacityRange && Number(elements.hintOpacityRange.value) !== runtime.hintOpacity) {
+    elements.hintOpacityRange.value = String(runtime.hintOpacity);
   }
   if (runtime.inventoryOpen) inventory.renderInventory();
   if (runtime.laptopOpen && cameraHack) cameraHack.render();
@@ -565,6 +578,7 @@ function initializeSystems() {
     unitRadius: UNIT_RADIUS,
     levelOptions: LEVEL_OPTIONS,
     tutorialOptions: TUTORIAL_OPTIONS,
+    resizeCanvas: () => camera && camera.resizeCanvas(),
     equipment,
     shooting,
     operatorLoadouts,
@@ -714,6 +728,7 @@ function initializeSystems() {
     settings,
     inventory,
     progression,
+    resizeCanvas: () => camera && camera.resizeCanvas(),
     setDifficulty,
     updateHud
   });
@@ -725,10 +740,13 @@ function initializeSystems() {
     keysDown,
     menu,
     shooting,
+    interaction,
     selectedOperator,
     updateHud
   });
   mobileControls.bindEvents();
+  camera.resizeCanvas();
+  window.addEventListener("resize", () => camera.resizeCanvas());
 }
 
 window.__breachline = {

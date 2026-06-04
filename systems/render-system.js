@@ -12,7 +12,8 @@
     // Draws one full frame of the current game state.
     function draw() {
       deps.camera.reset(ctx);
-      ctx.clearRect(0, 0, deps.canvas.width, deps.canvas.height);
+      const viewport = deps.camera.getViewport ? deps.camera.getViewport() : { w: deps.canvas.width, h: deps.canvas.height };
+      ctx.clearRect(0, 0, viewport.w, viewport.h);
       if (!runtime.state) {
         drawLoading();
         return;
@@ -46,18 +47,22 @@
 
     // Draws the loading screen when no level state is available.
     function drawLoading() {
+      const viewport = deps.camera.getViewport ? deps.camera.getViewport() : { w: deps.canvas.width, h: deps.canvas.height };
       ctx.fillStyle = colors.floor;
-      ctx.fillRect(0, 0, deps.canvas.width, deps.canvas.height);
+      ctx.fillRect(0, 0, viewport.w, viewport.h);
       ctx.fillStyle = colors.text;
       ctx.font = "800 24px system-ui";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("Loading level...", world.w / 2, world.h / 2);
+      ctx.fillText("Loading level...", viewport.w / 2, viewport.h / 2);
     }
 
     // Draws the map floor, grid, and floor zone fills.
     function drawFloor() {
       const state = runtime.state;
+      const padding = deps.camera.getPadding ? deps.camera.getPadding() : { x: 0, y: 0 };
+      ctx.fillStyle = "#101315";
+      ctx.fillRect(-padding.x, -padding.y, world.w + padding.x * 2, world.h + padding.y * 2);
       ctx.fillStyle = colors.floor;
       ctx.fillRect(0, 0, world.w, world.h);
       ctx.strokeStyle = colors.grid;

@@ -182,10 +182,13 @@
     function guardBrowserShortcut(event) {
       const code = event.code || "";
       const ctrlLike = event.ctrlKey || event.metaKey;
+      const isolateAllCtrlLike = ctrlLike && (runtime.expandedGame || runtime.mobileMode);
       if (
         deps.keybindings.matches(event, "inventory")
         || deps.keybindings.matches(event, "reload")
+        || isolateAllCtrlLike
         || (ctrlLike && ["KeyW", "KeyR", "KeyS", "KeyP"].includes(code))
+        || event.altKey
         || code === "F5"
       ) {
         event.preventDefault();
@@ -281,6 +284,7 @@
       if (elements.pauseTutorialButton) elements.pauseTutorialButton.addEventListener("click", deps.menu.showTutorialMenu);
       if (elements.pauseSettingButton) elements.pauseSettingButton.addEventListener("click", deps.menu.openSettingsFromPause);
       if (elements.expandGameButton) elements.expandGameButton.addEventListener("click", () => deps.menu.toggleExpanded());
+      if (elements.expandedPauseButton) elements.expandedPauseButton.addEventListener("click", deps.menu.openPause);
       if (elements.exitToMenuButton) elements.exitToMenuButton.addEventListener("click", deps.menu.showMain);
       if (elements.resultLevelSelect) {
         elements.resultLevelSelect.addEventListener("change", () => loadWithTutorialWarning(elements.resultLevelSelect.value));
@@ -311,6 +315,7 @@
           deps.menu.enterGame();
         });
       }
+      /*
       if (elements.expandedNav) {
         elements.expandedNav.addEventListener("click", (event) => {
           const button = event.target.closest("[data-expanded-action]");
@@ -321,6 +326,7 @@
           else deps.menu.openPause();
         });
       }
+      */
       elements.closeSettingsButton.addEventListener("click", deps.settings.closeSettings);
       if (elements.resetSettingsButton) {
         elements.resetSettingsButton.addEventListener("click", deps.settings.resetDefaults);
@@ -370,6 +376,12 @@
         if (runtime.state) runtime.state.message = runtime.enemyTraceMode === "chase" ? "Enemies chase last known contacts" : "Enemies use current behavior";
         deps.updateHud();
       });
+      if (elements.hintOpacityRange) {
+        elements.hintOpacityRange.addEventListener("input", () => {
+          runtime.hintOpacity = Number(elements.hintOpacityRange.value) || 0.42;
+          deps.updateHud();
+        });
+      }
       elements.keyBindingList.addEventListener("click", (event) => {
         const button = event.target.closest("[data-keybinding-action]");
         if (!button) return;

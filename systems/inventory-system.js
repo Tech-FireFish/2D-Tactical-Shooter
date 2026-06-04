@@ -269,13 +269,31 @@
         return `<div class="inventory-slot empty" data-inventory-slot="${index}" aria-label="Empty slot ${index + 1}"></div>`;
       }
       const count = item.quantity > 1 ? `<span class="inventory-item-count">${item.quantity}</span>` : "";
+      const preview = escapeAttr(firstTwoSentences(item.text || item.name));
       return `
-        <div class="inventory-slot" draggable="true" data-inventory-slot="${index}" title="${item.text || item.name}">
+        <div class="inventory-slot" draggable="true" data-inventory-slot="${index}" title="${preview}" data-slot-tip="${preview}">
           <span class="inventory-item-icon">${itemIcon(item)}</span>
           <span class="inventory-item-name">${item.name}</span>
           ${count}
         </div>
       `;
+    }
+
+    // Keeps inventory hover details short enough for compact slots.
+    function firstTwoSentences(text) {
+      const raw = String(text || "").trim();
+      if (!raw) return "";
+      const sentences = raw.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [raw];
+      return sentences.slice(0, 2).join(" ").replace(/\s+/g, " ").trim();
+    }
+
+    // Escapes text for safe use inside HTML attributes.
+    function escapeAttr(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
 
     // Picks a short cell marker for an item type.

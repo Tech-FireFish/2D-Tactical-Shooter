@@ -124,6 +124,8 @@
         <section class="game-panel">
           <canvas id="game" width="960" height="640" aria-label="Breachline 2D tactical map"></canvas>
           <button id="expandGameButton" class="expand-game-button" type="button">Expand</button>
+          <button id="expandedPauseButton" class="expanded-pause-button" type="button">PAUSE</button>
+          <!--
           <div id="expandedNav" class="expanded-nav hidden" aria-label="Expanded gameplay navigation">
             <button type="button" data-expanded-action="inventory">Inventory</button>
             <button type="button" data-expanded-action="status">Status</button>
@@ -131,6 +133,7 @@
             <button type="button" data-expanded-action="loadout">Loadout</button>
             <button type="button" data-expanded-action="settings">Settings</button>
           </div>
+          -->
           <div id="banner" class="banner hidden" role="status" aria-live="polite">
             <strong id="bannerTitle">Mission Complete</strong>
             <span id="bannerText">Restart to run the plan again.</span>
@@ -181,10 +184,10 @@
         </aside>
       </section>
 
-      <section id="pauseOverlay" class="settings-overlay hidden" aria-label="Pause menu" aria-modal="true" role="dialog">
+      <section id="pauseOverlay" class="settings-overlay pause-overlay hidden" aria-label="Pause menu" aria-modal="true" role="dialog">
         <div class="pause-panel">
           <p class="eyebrow">Paused</p>
-          <h2>Navigation</h2>
+          <h2>Paused Game</h2>
           <div class="pause-actions">
             <button id="pauseResumeButton" type="button">Resume</button>
             <button id="pauseLevelButton" type="button">Level</button>
@@ -257,6 +260,10 @@
                   <option value="current">Current</option>
                   <option value="chase">Chase Last Known</option>
                 </select>
+              </label>
+              <label class="level-picker" for="hintOpacityRange">
+                <span>Hint Transparency</span>
+                <input id="hintOpacityRange" type="range" min="0.18" max="0.78" step="0.04" value="0.42">
               </label>
             </section>
 
@@ -362,18 +369,28 @@
     </main>
     <div id="mobileControls" class="mobile-controls hidden" aria-label="Mobile controls">
       <button id="mobilePauseButton" class="mobile-pause-button" type="button">Pause</button>
+      <div id="mobileMoveJoystick" class="mobile-joystick" aria-label="Movement joystick">
+        <span class="joystick-ring">
+          <span id="mobileJoystickThumb" class="joystick-thumb"></span>
+        </span>
+      </div>
+      <button id="mobileInteractButton" class="mobile-interact-button" type="button">E</button>
+      <!--
       <div class="mobile-pad mobile-move-pad" aria-label="Movement controller">
         <button type="button" data-mobile-action="moveUp">W</button>
         <button type="button" data-mobile-action="moveLeft">A</button>
         <button type="button" data-mobile-action="moveDown">S</button>
         <button type="button" data-mobile-action="moveRight">D</button>
       </div>
+      -->
+      <!--
       <div class="mobile-pad mobile-shoot-pad" aria-label="Shooting controller">
         <button type="button" data-mobile-shoot="up">Aim</button>
         <button type="button" data-mobile-shoot="left">Left</button>
         <button type="button" data-mobile-shoot="down">Fire</button>
         <button type="button" data-mobile-shoot="right">Right</button>
       </div>
+      -->
     </div>
     <script src="systems/audio-system.js?v=1"></script>
     <script src="systems/keybinding-system.js?v=1"></script>

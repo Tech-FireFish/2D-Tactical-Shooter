@@ -74,6 +74,7 @@
       runtime.enemyTraceMode = "current";
       runtime.activeOperatorCount = 2;
       runtime.showAllHealth = false;
+      runtime.hintOpacity = 0.42;
       if (runtime.state) {
         runtime.state.shootingMode = "automatic";
         runtime.state.message = "Settings reset to defaults";
@@ -88,6 +89,7 @@
       if (elements.difficultySelect) elements.difficultySelect.value = "normal";
       if (elements.shootingModeSelect) elements.shootingModeSelect.value = "automatic";
       if (elements.enemyTraceSelect) elements.enemyTraceSelect.value = "current";
+      if (elements.hintOpacityRange) elements.hintOpacityRange.value = "0.42";
       if (deps.level && deps.level.restart) deps.level.restart();
       deps.renderEnemyLoadouts();
       deps.updateHud();

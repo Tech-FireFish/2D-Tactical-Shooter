@@ -37,6 +37,8 @@
       runtime.pauseResumeRunning = Boolean(runtime.state && runtime.state.running);
       if (runtime.state) runtime.state.running = false;
       runtime.pauseOpen = true;
+      runtime.expandedPaused = Boolean(runtime.expandedGame);
+      document.body.classList.toggle("expanded-paused", runtime.expandedPaused);
       deps.keysDown.clear();
       elements.pauseOverlay.classList.remove("hidden");
       deps.updateHud();
@@ -46,6 +48,8 @@
     function closePause() {
       if (!runtime.pauseOpen) return;
       runtime.pauseOpen = false;
+      runtime.expandedPaused = false;
+      document.body.classList.remove("expanded-paused");
       elements.pauseOverlay.classList.add("hidden");
       if (runtime.state && !runtime.state.gameOver && runtime.pauseResumeRunning) runtime.state.running = true;
       runtime.pauseResumeRunning = false;
@@ -74,9 +78,14 @@
     function toggleExpanded(force) {
       const next = typeof force === "boolean" ? force : !runtime.expandedGame;
       runtime.expandedGame = next;
+      if (!next) {
+        runtime.expandedPaused = false;
+        document.body.classList.remove("expanded-paused");
+      }
       document.body.classList.toggle("game-expanded", next);
       if (elements.expandedNav) elements.expandedNav.classList.toggle("hidden", !next);
       if (elements.expandGameButton) elements.expandGameButton.textContent = next ? "Collapse" : "Expand";
+      if (deps.resizeCanvas) requestAnimationFrame(deps.resizeCanvas);
       deps.updateHud();
     }
 

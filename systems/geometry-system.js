@@ -10,11 +10,9 @@
     // Converts a browser mouse event into canvas world coordinates.
     function getMouseWorld(event) {
       const rect = canvas.getBoundingClientRect();
-      const sx = canvas.width / rect.width;
-      const sy = canvas.height / rect.height;
       const point = {
-        x: (event.clientX - rect.left) * sx,
-        y: (event.clientY - rect.top) * sy
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
       };
       return deps.camera ? deps.camera.screenToWorld(point) : point;
     }

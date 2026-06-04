@@ -217,9 +217,8 @@
     function resizeWorld(width, height) {
       world.w = width || deps.defaultWorld.w;
       world.h = height || deps.defaultWorld.h;
-      elements.canvas.width = deps.defaultWorld.w;
-      elements.canvas.height = deps.defaultWorld.h;
       elements.canvas.style.aspectRatio = `${deps.defaultWorld.w} / ${deps.defaultWorld.h}`;
+      if (deps.resizeCanvas) deps.resizeCanvas();
     }
 
     // Finds the active level index in the level option list.
