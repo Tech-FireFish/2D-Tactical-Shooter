@@ -12,7 +12,12 @@
       const obj = state.level.objective;
       if (obj.secured || obj.harmed) return;
 
-      const opNear = state.level.operators.some((op) => !op.down && deps.geometry.pointDistance(op, obj) < 34);
+      const objectiveRadius = deps.objectScale ? deps.objectScale.scaledRadius(obj) : obj.radius;
+      const opNear = state.level.operators.some((op) => {
+        if (op.down) return false;
+        const opRadius = deps.objectScale ? deps.objectScale.scaledRadius(op) : op.radius;
+        return deps.geometry.pointDistance(op, obj) < opRadius + objectiveRadius + 6;
+      });
       if (opNear) {
         if (deps.tutorial && deps.tutorial.shouldGateObjective(state)) {
           deps.tutorial.recordPrematureObjectiveTouch(state);

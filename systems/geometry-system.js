@@ -6,6 +6,7 @@
     const runtime = deps.runtime;
     const canvas = deps.canvas;
     const twoPi = deps.twoPi;
+    const objectScale = deps.objectScale;
 
     // Converts a browser mouse event into canvas world coordinates.
     function getMouseWorld(event) {
@@ -42,11 +43,12 @@
 
     // Tests a circular unit body against a rectangular blocker.
     function circleRectCollides(circle, rect, padding = 0) {
-      const closestX = clamp(circle.x, rect.x - padding, rect.x + rect.w + padding);
-      const closestY = clamp(circle.y, rect.y - padding, rect.y + rect.h + padding);
-      const dx = circle.x - closestX;
-      const dy = circle.y - closestY;
-      return dx * dx + dy * dy <= circle.radius * circle.radius;
+      const scaledCircle = objectScale ? objectScale.scaledCircle(circle) : circle;
+      const closestX = clamp(scaledCircle.x, rect.x - padding, rect.x + rect.w + padding);
+      const closestY = clamp(scaledCircle.y, rect.y - padding, rect.y + rect.h + padding);
+      const dx = scaledCircle.x - closestX;
+      const dy = scaledCircle.y - closestY;
+      return dx * dx + dy * dy <= scaledCircle.radius * scaledCircle.radius;
     }
 
     // Finds the shortest distance from a point to a rectangle.
@@ -61,6 +63,21 @@
       return { x: rect.x + rect.w / 2, y: rect.y + rect.h / 2 };
     }
 
+    // Scales non-wall object rectangles around their center.
+    function scaledRect(rect) {
+      return objectScale ? objectScale.scaledRect(rect) : rect;
+    }
+
+    // Scales non-wall object radii around their center.
+    function scaledRadius(obj) {
+      return objectScale ? objectScale.scaledRadius(obj) : obj.radius;
+    }
+
+    // Measures from a point to a scaled non-wall rectangle.
+    function scaledPointRectDistance(point, rect) {
+      return pointRectDistance(point, scaledRect(rect));
+    }
+
     // Treats closed doors as blocking movement and sight.
     function doorBlocks(door) {
       return door.state === "closed";
@@ -70,8 +87,8 @@
     function blockingRects(level) {
       return [
         ...level.walls,
-        ...level.doors.filter(doorBlocks),
-        ...(level.windows || []).filter(windowBlocks)
+        ...level.doors.filter(doorBlocks).map(scaledRect),
+        ...(level.windows || []).filter(windowBlocks).map(scaledRect)
       ];
     }
 
@@ -111,7 +128,7 @@
     function hasLineOfSight(a, b, level) {
       const blockers = [
         ...level.walls,
-        ...level.doors.filter(doorBlocks)
+        ...level.doors.filter(doorBlocks).map(scaledRect)
       ];
       return !blockers.some((rect) => segmentBlockedByRectThroughWindows(a, b, rect, level));
     }
@@ -121,14 +138,17 @@
       const blockers = [
         ...level.walls,
         ...level.doors.filter(doorBlocks)
-      ].filter((rect) => rect !== ignoredRect);
+      ].filter((rect) => rect !== ignoredRect).map((rect) => level.walls.includes(rect) ? rect : scaledRect(rect));
       return !blockers.some((rect) => segmentBlockedByRectThroughWindows(a, b, rect, level));
     }
 
     // Lets sight and bullets pass through wall sections occupied by windows.
     function segmentBlockedByRectThroughWindows(a, b, rect, level) {
       if (!segmentIntersectsRect(a, b, rect)) return false;
-      const windowOpening = (level.windows || []).some((win) => segmentIntersectsRect(a, b, win) && rectsOverlap(rect, win));
+      const windowOpening = (level.windows || []).some((win) => {
+        const scaledWindow = scaledRect(win);
+        return segmentIntersectsRect(a, b, scaledWindow) && rectsOverlap(rect, scaledWindow);
+      });
       return !windowOpening;
     }
 
@@ -156,8 +176,9 @@
       let bestDist = Infinity;
       for (const door of runtime.state.level.doors) {
         if (!doorBlocks(door)) continue;
-        const crossing = segmentIntersectsRect({ x: op.x, y: op.y }, next, inflateRect(door, 8));
-        const distance = pointRectDistance(op, door);
+        const scaledDoor = scaledRect(door);
+        const crossing = segmentIntersectsRect({ x: op.x, y: op.y }, next, inflateRect(scaledDoor, 8));
+        const distance = pointRectDistance(op, scaledDoor);
         const close = distance < 38;
         if ((crossing || close) && close && distance < bestDist) {
           best = door;
@@ -173,7 +194,7 @@
       let bestDist = Infinity;
       for (const door of runtime.state.level.doors) {
         if (!doorBlocks(door)) continue;
-        const distance = pointRectDistance(op, door);
+        const distance = scaledPointRectDistance(op, door);
         if (distance < maxDistance && distance < bestDist) {
           best = door;
           bestDist = distance;
@@ -184,12 +205,12 @@
 
     // Finds a closed door under a click/touch point.
     function doorAtPoint(point) {
-      return runtime.state.level.doors.find((door) => doorBlocks(door) && pointInRect(point, inflateRect(door, 6)));
+      return runtime.state.level.doors.find((door) => doorBlocks(door) && pointInRect(point, inflateRect(scaledRect(door), 6)));
     }
 
     // Finds a window under a click/touch point.
     function windowAtPoint(point) {
-      return (runtime.state.level.windows || []).find((win) => pointInRect(point, inflateRect(win, 6)));
+      return (runtime.state.level.windows || []).find((win) => pointInRect(point, inflateRect(scaledRect(win), 6)));
     }
 
     // Expands a rectangle outward for forgiving interaction checks.
@@ -220,6 +241,9 @@
       angleTo,
       circleRectCollides,
       pointRectDistance,
+      scaledRect,
+      scaledRadius,
+      scaledPointRectDistance,
       rectCenter,
       doorBlocks,
       blockingRects,

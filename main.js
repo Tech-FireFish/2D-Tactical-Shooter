@@ -188,6 +188,13 @@ const SOUND_OPTIONS = [
   { id: "enemy-walk", file: "sounds/enemy-walk.wav" }
 ];
 
+const MOBILE_OBJECT_SCALE_CONFIG = {
+  baseWidth: 1920,
+  baseHeight: 1080,
+  minObjectScale: 0.65,
+  scaleHitboxes: true
+};
+
 const runtime = {
   state: null,
   currentLevel: null,
@@ -242,6 +249,7 @@ let cameraHack;
 let tutorial;
 let progression;
 let menu;
+let objectScale;
 let mobileControls;
 let equipment;
 let level;
@@ -429,6 +437,7 @@ function initializeSystems() {
   assertSystem("Tutorial system", window.TutorialSystem);
   assertSystem("Progression system", window.ProgressionSystem);
   assertSystem("Menu system", window.MenuSystem);
+  assertSystem("Object scale system", window.ObjectScaleSystem);
   assertSystem("Mobile control system", window.MobileControlSystem);
   assertSystem("Audio system", window.AudioSystem);
   assertSystem("Equipment system", window.EquipmentSystem);
@@ -460,11 +469,22 @@ function initializeSystems() {
     selectedOperator
   });
 
+  objectScale = window.ObjectScaleSystem.create({
+    config: MOBILE_OBJECT_SCALE_CONFIG,
+    camera,
+    pointRectDistance: (point, rect) => {
+      const closestX = Math.max(rect.x, Math.min(rect.x + rect.w, point.x));
+      const closestY = Math.max(rect.y, Math.min(rect.y + rect.h, point.y));
+      return Math.hypot(point.x - closestX, point.y - closestY);
+    }
+  });
+
   geometry = window.GeometrySystem.create({
     runtime,
     canvas: elements.canvas,
     twoPi: TWO_PI,
-    camera
+    camera,
+    objectScale
   });
 
   progression = window.ProgressionSystem.create({
@@ -567,7 +587,7 @@ function initializeSystems() {
     runtime,
     elements,
     pointDistance: geometry.pointDistance,
-    pointRectDistance: geometry.pointRectDistance
+    pointRectDistance: geometry.scaledPointRectDistance
   });
 
   level = window.LevelSystem.create({
@@ -578,7 +598,10 @@ function initializeSystems() {
     unitRadius: UNIT_RADIUS,
     levelOptions: LEVEL_OPTIONS,
     tutorialOptions: TUTORIAL_OPTIONS,
-    resizeCanvas: () => camera && camera.resizeCanvas(),
+    resizeCanvas: () => {
+      if (camera) camera.resizeCanvas();
+      if (objectScale) objectScale.update();
+    },
     equipment,
     shooting,
     operatorLoadouts,
@@ -624,6 +647,7 @@ function initializeSystems() {
     runtime,
     elements,
     geometry,
+    objectScale,
     audio,
     levelOptions: LEVEL_OPTIONS,
     tutorialOptions: TUTORIAL_OPTIONS,
@@ -647,7 +671,8 @@ function initializeSystems() {
     collidesWithMap: geometry.collidesWithMap,
     hasLineOfSight: geometry.hasLineOfSight,
     inFieldOfView: geometry.inFieldOfView,
-    pointRectDistance: geometry.pointRectDistance,
+    pointRectDistance: geometry.scaledPointRectDistance,
+    scaledRadius: geometry.scaledRadius,
     nearestClosedDoorToOperator: geometry.nearestClosedDoorToOperator,
     isLockedDigitalDoor: geometry.isLockedDigitalDoor,
     weaponById: equipment.weaponById,
@@ -707,6 +732,7 @@ function initializeSystems() {
     menu: {
       openPause: () => menu && menu.openPause(),
       closePause: () => menu && menu.closePause(),
+      togglePause: () => menu && menu.togglePause(),
       showMain: () => menu && menu.showMain(),
       showLevelMenu: () => menu && menu.showLevelMenu(),
       showTutorialMenu: () => menu && menu.showTutorialMenu(),
@@ -728,7 +754,10 @@ function initializeSystems() {
     settings,
     inventory,
     progression,
-    resizeCanvas: () => camera && camera.resizeCanvas(),
+    resizeCanvas: () => {
+      if (camera) camera.resizeCanvas();
+      if (objectScale) objectScale.update();
+    },
     setDifficulty,
     updateHud
   });
@@ -741,18 +770,24 @@ function initializeSystems() {
     menu,
     shooting,
     interaction,
+    objectScale,
     selectedOperator,
     updateHud
   });
   mobileControls.bindEvents();
   camera.resizeCanvas();
-  window.addEventListener("resize", () => camera.resizeCanvas());
+  objectScale.update();
+  window.addEventListener("resize", () => {
+    camera.resizeCanvas();
+    objectScale.update();
+  });
 }
 
 window.__breachline = {
   getState: () => runtime.state,
   getWeapons: () => [...weapons.values()],
   getArmors: () => [...armors.values()],
+  getObjectScale: () => objectScale ? objectScale.objectScale() : 1,
   restart: () => level.restart(),
   loadLevel: (levelId) => level.loadLevel(levelId),
   loadTutorial: (tutorialId) => level.loadLevel(tutorialId),

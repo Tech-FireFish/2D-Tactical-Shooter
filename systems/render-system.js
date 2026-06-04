@@ -127,19 +127,20 @@
     // Draws windows with open, closed, and broken states.
     function drawWindows() {
       for (const win of (runtime.state.level.windows || []).filter(shouldDrawObject)) {
+        const box = deps.geometry.scaledRect(win);
         ctx.save();
         ctx.fillStyle = win.state === "broken" ? "#92d5e9" : (win.state === "open" ? "#72b7ce" : "#b9e8f3");
         ctx.strokeStyle = win.state === "broken" ? "#ffffff" : "#24434b";
         ctx.lineWidth = 2;
-        ctx.fillRect(win.x, win.y, win.w, win.h);
-        ctx.strokeRect(win.x, win.y, win.w, win.h);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         if (win.state === "broken") {
           ctx.strokeStyle = "#ffffff";
           ctx.beginPath();
-          ctx.moveTo(win.x + 3, win.y + 3);
-          ctx.lineTo(win.x + win.w - 3, win.y + win.h - 3);
-          ctx.moveTo(win.x + win.w - 3, win.y + 3);
-          ctx.lineTo(win.x + 3, win.y + win.h - 3);
+          ctx.moveTo(box.x + 3, box.y + 3);
+          ctx.lineTo(box.x + box.w - 3, box.y + box.h - 3);
+          ctx.moveTo(box.x + box.w - 3, box.y + 3);
+          ctx.lineTo(box.x + 3, box.y + box.h - 3);
           ctx.stroke();
         }
         ctx.restore();
@@ -149,23 +150,24 @@
     // Draws stair connectors and target direction.
     function drawStairs() {
       for (const stair of (runtime.state.level.stairs || []).filter(shouldDrawObject)) {
+        const box = deps.geometry.scaledRect(stair);
         ctx.save();
         ctx.fillStyle = "#8ec6c0";
         ctx.strokeStyle = "#1d3a3a";
         ctx.lineWidth = 2;
-        ctx.fillRect(stair.x, stair.y, stair.w, stair.h);
-        ctx.strokeRect(stair.x, stair.y, stair.w, stair.h);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         ctx.strokeStyle = "#102526";
-        for (let i = 6; i < stair.w; i += 10) {
+        for (let i = 6; i < box.w; i += 10) {
           ctx.beginPath();
-          ctx.moveTo(stair.x + i, stair.y + 4);
-          ctx.lineTo(stair.x + i, stair.y + stair.h - 4);
+          ctx.moveTo(box.x + i, box.y + 4);
+          ctx.lineTo(box.x + i, box.y + box.h - 4);
           ctx.stroke();
         }
         ctx.fillStyle = "#102526";
         ctx.font = "800 10px system-ui";
         ctx.textAlign = "center";
-        ctx.fillText(stair.label || "STAIRS", stair.x + stair.w / 2, stair.y + stair.h / 2 + 4);
+        ctx.fillText(stair.label || "STAIRS", box.x + box.w / 2, box.y + box.h / 2 + 4);
         ctx.restore();
       }
     }
@@ -174,61 +176,65 @@
     function drawItems() {
       for (const item of (runtime.state.level.items || []).filter(shouldDrawObject)) {
         if (item.picked) continue;
+        const box = deps.geometry.scaledRect({ ...item, w: item.w || 20, h: item.h || 16 });
         ctx.fillStyle = item.type === "paper" ? "#f5e6a6" : "#d9d9d9";
         ctx.strokeStyle = "#6c6132";
         ctx.lineWidth = 1.5;
-        ctx.fillRect(item.x, item.y, item.w || 20, item.h || 16);
-        ctx.strokeRect(item.x, item.y, item.w || 20, item.h || 16);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         ctx.fillStyle = "#27240e";
         ctx.font = "900 9px system-ui";
         ctx.textAlign = "center";
-        ctx.fillText("P", item.x + (item.w || 20) / 2, item.y + (item.h || 16) / 2 + 3);
+        ctx.fillText("P", box.x + box.w / 2, box.y + box.h / 2 + 3);
       }
     }
 
     // Draws interactable equipment tables.
     function drawEquipmentTables() {
       for (const table of (runtime.state.level.equipmentTables || []).filter(shouldDrawObject)) {
+        const box = deps.geometry.scaledRect(table);
         ctx.fillStyle = "#6b6f75";
         ctx.strokeStyle = "#25282c";
         ctx.lineWidth = 2;
-        ctx.fillRect(table.x, table.y, table.w, table.h);
-        ctx.strokeRect(table.x, table.y, table.w, table.h);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         ctx.fillStyle = "#eef3ef";
         ctx.font = "800 9px system-ui";
         ctx.textAlign = "center";
-        ctx.fillText("GEAR", table.x + table.w / 2, table.y + table.h / 2 + 3);
+        ctx.fillText("GEAR", box.x + box.w / 2, box.y + box.h / 2 + 3);
       }
     }
 
     // Draws exterior laptop terminals used for camera hacking.
     function drawLaptops() {
       for (const laptop of runtime.state.level.laptops || []) {
+        const box = deps.geometry.scaledRect(laptop);
         ctx.fillStyle = "#202a31";
         ctx.strokeStyle = "#72b7ce";
         ctx.lineWidth = 2;
-        ctx.fillRect(laptop.x, laptop.y, laptop.w, laptop.h);
-        ctx.strokeRect(laptop.x, laptop.y, laptop.w, laptop.h);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         ctx.fillStyle = "#72b7ce";
         ctx.font = "900 9px system-ui";
         ctx.textAlign = "center";
-        ctx.fillText("LAPTOP", laptop.x + laptop.w / 2, laptop.y + laptop.h / 2 + 3);
+        ctx.fillText("LAPTOP", box.x + box.w / 2, box.y + box.h / 2 + 3);
       }
     }
 
     // Draws each door in closed or open orientation.
     function drawDoors() {
       for (const door of runtime.state.level.doors.filter(shouldDrawObject)) {
-        const center = deps.geometry.rectCenter(door);
+        const box = deps.geometry.scaledRect(door);
+        const center = deps.geometry.rectCenter(box);
         ctx.save();
         ctx.translate(center.x, center.y);
         ctx.rotate(door.orientation === "vertical" ? Math.PI / 2 : 0);
         ctx.fillStyle = door.state === "closed" ? colors.doorClosed : colors.doorOpen;
         if (door.state === "closed") {
-          ctx.fillRect(-doorLong(door) / 2, -4, doorLong(door), 8);
+          ctx.fillRect(-doorLong(box) / 2, -4, doorLong(box), 8);
         } else {
           ctx.rotate(-0.72);
-          ctx.fillRect(-doorLong(door) / 2, -4, doorLong(door), 8);
+          ctx.fillRect(-doorLong(box) / 2, -4, doorLong(box), 8);
         }
         ctx.restore();
         drawDoorIndicator(door, center);
@@ -265,8 +271,9 @@
       ctx.fillStyle = locked ? colors.doorLocked : colors.doorUnlocked;
       ctx.strokeStyle = "rgba(0,0,0,0.65)";
       ctx.lineWidth = 2;
+      const markerRadius = deps.geometry.scaledRadius({ radius: 9 });
       ctx.beginPath();
-      ctx.arc(center.x, center.y, 9, 0, twoPi);
+      ctx.arc(center.x, center.y, markerRadius, 0, twoPi);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = "#101214";
@@ -337,8 +344,9 @@
       ctx.fillStyle = obj.harmed ? colors.enemy : colors.hostage;
       ctx.strokeStyle = obj.secured ? colors.success : "#5d5330";
       ctx.lineWidth = 3;
+      const radius = deps.geometry.scaledRadius(obj);
       ctx.beginPath();
-      ctx.arc(obj.x, obj.y, obj.radius, 0, twoPi);
+      ctx.arc(obj.x, obj.y, radius, 0, twoPi);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = "#171b1e";
@@ -378,13 +386,14 @@
       ctx.fillStyle = fill;
       ctx.strokeStyle = unit.id === runtime.state.selectedId ? colors.selected : "#111";
       ctx.lineWidth = unit.id === runtime.state.selectedId ? 3 : 2;
+      const radius = deps.geometry.scaledRadius(unit);
       ctx.beginPath();
-      ctx.arc(0, 0, unit.radius, 0, twoPi);
+      ctx.arc(0, 0, radius, 0, twoPi);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = isOperator ? colors.opDark : "#421d1d";
       ctx.beginPath();
-      ctx.moveTo(unit.radius + 8, 0);
+      ctx.moveTo(radius + 8, 0);
       ctx.lineTo(3, -5);
       ctx.lineTo(3, 5);
       ctx.closePath();
@@ -394,7 +403,7 @@
       ctx.fillStyle = colors.text;
       ctx.font = "800 10px system-ui";
       ctx.textAlign = "center";
-      ctx.fillText(label, unit.x, unit.y - unit.radius - 8);
+      ctx.fillText(label, unit.x, unit.y - radius - 8);
     }
 
     // Draws active bullet tracers.

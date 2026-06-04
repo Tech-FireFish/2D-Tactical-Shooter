@@ -181,7 +181,7 @@
       if (weapon.canFire === false) return;
       const visible = state.level.enemies
         .filter((enemy) => !enemy.down)
-        .filter((enemy) => deps.pointDistance(op, enemy) <= Math.min(weapon.range, deps.operatorSightRange(op)))
+        .filter((enemy) => deps.pointDistance(op, enemy) <= Math.min(weapon.range, deps.operatorSightRange(op)) + deps.scaledRadius(enemy))
         .filter((enemy) => deps.hasLineOfSight(op, enemy, state.level))
         .sort((a, b) => deps.pointDistance(op, a) - deps.pointDistance(op, b));
 
@@ -214,7 +214,7 @@
       }
 
       if (weapon.attackType === "melee") {
-        if (deps.pointDistance(shooter, target) > weapon.range) return;
+        if (deps.pointDistance(shooter, target) > weapon.range + deps.scaledRadius(shooter) + deps.scaledRadius(target)) return;
         if (!deps.hasLineOfSight(shooter, target, getState().level)) return;
         damageTarget(target, weapon.damage, shooter);
         deps.enemyBehavior.noticeShot(shooter, target);

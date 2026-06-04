@@ -14,7 +14,7 @@
       if (state.gameOver) return;
       const pos = deps.geometry.getMouseWorld(event);
       if (state.shootingMode === "manual") {
-        const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= op.radius + 8);
+        const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= deps.geometry.scaledRadius(op) + 8);
         if (clickedOp) {
           state.selectedId = clickedOp.id;
           deps.updateHud();
@@ -24,7 +24,7 @@
       const clickedDoor = deps.geometry.doorAtPoint(pos);
       if (clickedDoor && deps.interaction.interactDoor(deps.selectedOperator(), clickedDoor)) return;
 
-      const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= op.radius + 8);
+      const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= deps.geometry.scaledRadius(op) + 8);
       if (clickedOp) {
         state.selectedId = clickedOp.id;
         deps.updateHud();
@@ -46,7 +46,7 @@
       const state = runtime.state;
       if (!state || state.gameOver || state.shootingMode !== "manual" || event.button !== 0) return;
       const pos = deps.geometry.getMouseWorld(event);
-      const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= op.radius + 8);
+      const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= deps.geometry.scaledRadius(op) + 8);
       if (clickedOp) {
         state.selectedId = clickedOp.id;
         runtime.manualFireHeld = false;
@@ -119,8 +119,7 @@
         else if (deps.inventoryIsOpen()) deps.inventory.closeInventory();
         else if (deps.equipmentTableIsOpen()) deps.inventory.closeEquipmentTable();
         else if (deps.laptopIsOpen()) deps.cameraHack.closeLaptop();
-        else if (runtime.pauseOpen) deps.menu.closePause();
-        else deps.menu.openPause();
+        else deps.menu.togglePause();
         return;
       }
       const state = runtime.state;
@@ -284,7 +283,7 @@
       if (elements.pauseTutorialButton) elements.pauseTutorialButton.addEventListener("click", deps.menu.showTutorialMenu);
       if (elements.pauseSettingButton) elements.pauseSettingButton.addEventListener("click", deps.menu.openSettingsFromPause);
       if (elements.expandGameButton) elements.expandGameButton.addEventListener("click", () => deps.menu.toggleExpanded());
-      if (elements.expandedPauseButton) elements.expandedPauseButton.addEventListener("click", deps.menu.openPause);
+      if (elements.expandedPauseButton) elements.expandedPauseButton.addEventListener("click", deps.menu.togglePause);
       if (elements.exitToMenuButton) elements.exitToMenuButton.addEventListener("click", deps.menu.showMain);
       if (elements.resultLevelSelect) {
         elements.resultLevelSelect.addEventListener("change", () => loadWithTutorialWarning(elements.resultLevelSelect.value));

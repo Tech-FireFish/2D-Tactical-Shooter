@@ -141,7 +141,7 @@
       let bestDist = Infinity;
       for (const target of list) {
         if (!filter(target)) continue;
-        const dist = deps.geometry.pointRectDistance(op, target);
+        const dist = deps.geometry.scaledPointRectDistance(op, target);
         if (dist <= range && dist < bestDist) {
           best = target;
           bestDist = dist;
@@ -155,7 +155,7 @@
       let best = null;
       let bestDist = Infinity;
       for (const door of deps.getState().level.doors) {
-        const dist = deps.geometry.pointRectDistance(op, door);
+        const dist = deps.geometry.scaledPointRectDistance(op, door);
         if (dist <= range && dist < bestDist) {
           best = door;
           bestDist = dist;
@@ -168,7 +168,7 @@
     function doorBlockedByUnit(door) {
       const state = deps.getState();
       const units = [...state.level.operators, ...state.level.enemies].filter((unit) => !unit.down);
-      return units.some((unit) => deps.geometry.circleRectCollides(unit, door, 2));
+      return units.some((unit) => deps.geometry.circleRectCollides(unit, deps.geometry.scaledRect(door), 2));
     }
 
     return {

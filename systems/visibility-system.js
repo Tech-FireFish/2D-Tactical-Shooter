@@ -32,7 +32,7 @@
         .filter((op) => !op.down)
         .some((op) => {
           const inRange = isRect
-            ? deps.geometry.pointRectDistance(op, obj) <= operatorSightRange(op)
+            ? deps.geometry.scaledPointRectDistance(op, obj) <= operatorSightRange(op)
             : deps.geometry.pointDistance(op, target) <= operatorSightRange(op);
           if (!inRange) return false;
           if (isRect && deps.geometry.hasLineOfSightIgnoring) {

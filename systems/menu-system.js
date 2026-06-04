@@ -56,6 +56,12 @@
       deps.updateHud();
     }
 
+    // Toggles pause navigation from Esc or the expanded PAUSE button.
+    function togglePause() {
+      if (runtime.pauseOpen) closePause();
+      else openPause();
+    }
+
     // Opens main page focused on levels.
     function showLevelMenu() {
       closePause();
@@ -124,6 +130,7 @@
       showLevelMenu,
       showTutorialMenu,
       openSettingsFromPause,
+      togglePause,
       toggleExpanded,
       render
     };

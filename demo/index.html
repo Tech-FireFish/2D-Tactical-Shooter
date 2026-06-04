@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>2D tactical shooter Demo</title>
-    <style>
+    <title>Breachline 2D</title>
+  <style>
 :root {
   color-scheme: dark;
   --bg: #101214;
@@ -31,13 +31,6 @@ body {
     var(--bg);
   color: var(--text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-body.mobile-isolated,
-body.mobile-isolated * {
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
 }
 
 button,
@@ -175,7 +168,8 @@ h2 {
 }
 
 .mission-status-grid div:first-child,
-.mission-status-grid div:nth-child(2) {
+.mission-status-grid div:nth-child(2),
+.mission-status-grid div:nth-child(5) {
   grid-column: span 2;
 }
 
@@ -1292,7 +1286,7 @@ body.game-expanded .right-panel {
   display: block;
 }
 
-body.game-expanded .right-panel > :not(#hintCard) {
+body.game-expanded .right-panel > :not(#hintCard):not(#tutorialCard) {
   display: none;
 }
 
@@ -1322,6 +1316,17 @@ body.game-expanded #hintCard {
   position: fixed;
   left: 16px;
   top: 70px;
+  z-index: 7;
+  display: block;
+  width: min(340px, calc(100vw - 32px));
+  background: rgba(23, 27, 30, var(--hint-card-alpha, 0.42));
+  pointer-events: none;
+}
+
+body.game-expanded #tutorialCard:not(.hidden) {
+  position: fixed;
+  left: 16px;
+  top: 196px;
   z-index: 7;
   display: block;
   width: min(340px, calc(100vw - 32px));
@@ -1366,11 +1371,18 @@ body.game-expanded.expanded-paused .right-panel {
   right: 16px;
 }
 
-body.game-expanded.expanded-paused .right-panel > * {
+body.game-expanded.expanded-paused .right-panel > :not(.hidden) {
   display: block;
 }
 
 body.game-expanded.expanded-paused #hintCard {
+  position: static;
+  width: auto;
+  background: rgba(23, 27, 30, 0.92);
+  pointer-events: auto;
+}
+
+body.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
   position: static;
   width: auto;
   background: rgba(23, 27, 30, 0.92);
@@ -1415,6 +1427,148 @@ body.game-expanded.expanded-paused .pause-overlay {
 
 .banner {
   width: min(560px, calc(100% - 36px));
+}
+
+.weapon-pixel-advanced-carbine .tone-a,
+.weapon-pixel-advanced-carbine .tone-c {
+  background: #e8c35c;
+}
+
+.weapon-pixel-advanced-carbine .tone-b,
+.weapon-pixel-advanced-carbine .tone-d {
+  background: #30414b;
+}
+
+.weapon-pixel-compact-pdw .tone-a,
+.weapon-pixel-compact-pdw .tone-c {
+  background: #38d0b2;
+}
+
+.weapon-pixel-compact-pdw .tone-b,
+.weapon-pixel-compact-pdw .tone-d {
+  background: #263b48;
+}
+
+.weapon-pixel-marksman-pistol .tone-a,
+.weapon-pixel-marksman-pistol .tone-c {
+  background: #d473d8;
+}
+
+.weapon-pixel-marksman-pistol .tone-b,
+.weapon-pixel-marksman-pistol .tone-d {
+  background: #30313f;
+}
+
+.weapon-pixel-melee .tone-a,
+.weapon-pixel-melee .tone-c {
+  background: #f3f7fb;
+}
+
+.weapon-pixel-melee .tone-b,
+.weapon-pixel-melee .tone-d {
+  background: #7c8790;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 1050px) {
+  .shell {
+    width: min(100vw - 20px, 900px);
+    padding: 12px 0;
+  }
+
+  .play-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel,
+  .right-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .right-panel .control-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .actions {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .main-menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  canvas {
+    max-height: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .left-panel,
+  .right-panel,
+  .actions,
+  .settings-grid,
+  .settings-tabs,
+  .equipment-table-options,
+  .inventory-grid,
+  .mission-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mission-status-grid div:first-child,
+  .mission-status-grid div:nth-child(2),
+  .mission-status-grid div:nth-child(5) {
+    grid-column: auto;
+  }
+
+  .inventory-slot-grid {
+    grid-template-columns: repeat(var(--inventory-cols, 2), 38px);
+  }
+
+  .settings-overlay {
+    padding: 10px;
+  }
+
+  .settings-panel {
+    width: calc(100vw - 20px);
+    height: calc(100vh - 20px);
+  }
+
+  .banner-actions {
+    flex-direction: column;
+  }
+
+  .menu-overlay,
+  .pause-overlay {
+    padding: 10px;
+  }
+
+  #startMenuOverlay {
+    place-items: center;
+    padding: 10px;
+    background-position: center;
+  }
+
+  .credits-card {
+    position: static;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .main-menu-grid,
+  .mission-report {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+body.mobile-isolated,
+body.mobile-isolated * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .mobile-controls {
@@ -1545,146 +1699,13 @@ body.game-expanded.expanded-paused .pause-overlay {
 }
 */
 
-.weapon-pixel-advanced-carbine .tone-a,
-.weapon-pixel-advanced-carbine .tone-c {
-  background: #e8c35c;
-}
-
-.weapon-pixel-advanced-carbine .tone-b,
-.weapon-pixel-advanced-carbine .tone-d {
-  background: #30414b;
-}
-
-.weapon-pixel-compact-pdw .tone-a,
-.weapon-pixel-compact-pdw .tone-c {
-  background: #38d0b2;
-}
-
-.weapon-pixel-compact-pdw .tone-b,
-.weapon-pixel-compact-pdw .tone-d {
-  background: #263b48;
-}
-
-.weapon-pixel-marksman-pistol .tone-a,
-.weapon-pixel-marksman-pistol .tone-c {
-  background: #d473d8;
-}
-
-.weapon-pixel-marksman-pistol .tone-b,
-.weapon-pixel-marksman-pistol .tone-d {
-  background: #30313f;
-}
-
-.weapon-pixel-melee .tone-a,
-.weapon-pixel-melee .tone-c {
-  background: #f3f7fb;
-}
-
-.weapon-pixel-melee .tone-b,
-.weapon-pixel-melee .tone-d {
-  background: #7c8790;
-}
-
-.hidden {
-  display: none;
-}
-
-@media (max-width: 1050px) {
-  .shell {
-    width: min(100vw - 20px, 900px);
-    padding: 12px 0;
-  }
-
-  .play-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .left-panel,
-  .right-panel {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .right-panel .control-card:last-child {
-    grid-column: 1 / -1;
-  }
-
-  .actions {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .main-menu-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  canvas {
-    max-height: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .left-panel,
-  .right-panel,
-  .actions,
-  .settings-grid,
-  .settings-tabs,
-  .equipment-table-options,
-  .inventory-grid,
-  .mission-status-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .mission-status-grid div:first-child,
-  .mission-status-grid div:nth-child(2) {
-    grid-column: auto;
-  }
-
-  .inventory-slot-grid {
-    grid-template-columns: repeat(var(--inventory-cols, 2), 38px);
-  }
-
-  .settings-overlay {
-    padding: 10px;
-  }
-
-  .settings-panel {
-    width: calc(100vw - 20px);
-    height: calc(100vh - 20px);
-  }
-
-  .banner-actions {
-    flex-direction: column;
-  }
-
-  .menu-overlay,
-  .pause-overlay {
-    padding: 10px;
-  }
-
-  #startMenuOverlay {
-    place-items: center;
-    padding: 10px;
-    background-position: center;
-  }
-
-  .credits-card {
-    position: static;
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  .main-menu-grid,
-  .mission-report {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (hover: none), (pointer: coarse), (max-width: 860px) {
   .mobile-controls:not(.hidden) {
     display: block;
   }
 }
 
-    </style>
+</style>
   </head>
   <body>
     <section id="startMenuOverlay" class="menu-overlay" aria-label="Start menu" aria-modal="true" role="dialog">
@@ -2072,10 +2093,10 @@ body.game-expanded.expanded-paused .pause-overlay {
       </div>
       -->
     </div>
-<script>
-window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera House","width":1280,"height":760,"floorZones":[{"x":150,"y":100,"w":760,"h":560,"hiddenZone":"living"},{"x":930,"y":100,"w":220,"h":560,"hiddenZone":"bedrooms"}],"rooms":[{"id":"living-room","label":"Living Room","x":180,"y":140,"w":300,"h":250,"hiddenZone":"living"},{"id":"kitchen","label":"Kitchen","x":500,"y":140,"w":220,"h":250,"hiddenZone":"kitchen"},{"id":"dining-room","label":"Dining Room","x":740,"y":140,"w":170,"h":250,"hiddenZone":"kitchen"},{"id":"bathroom","label":"Bathroom","x":180,"y":420,"w":220,"h":220,"hiddenZone":"living"},{"id":"closet","label":"Closet","x":420,"y":420,"w":150,"h":220,"hiddenZone":"living"},{"id":"bedroom","label":"Bedroom","x":590,"y":420,"w":320,"h":220,"hiddenZone":"bedrooms"},{"id":"second-bedroom","label":"Bedroom","x":950,"y":140,"w":200,"h":250,"hiddenZone":"bedrooms"},{"id":"storage","label":"Closet","x":950,"y":420,"w":200,"h":220,"hiddenZone":"bedrooms"}],"labels":[{"text":"EXTERIOR CAMERA ENTRY","x":560,"y":58},{"text":"INTERIOR HIDDEN UNTIL CAMERA HACK","x":690,"y":710,"hiddenZone":"living"}],"walls":[{"x":0,"y":0,"w":1280,"h":20},{"x":0,"y":740,"w":1280,"h":20},{"x":0,"y":0,"w":20,"h":760},{"x":1260,"y":0,"w":20,"h":760},{"x":150,"y":100,"w":1000,"h":20},{"x":150,"y":660,"w":1000,"h":20},{"x":150,"y":100,"w":20,"h":245},{"x":150,"y":455,"w":20,"h":225},{"x":1130,"y":100,"w":20,"h":560},{"x":480,"y":120,"w":20,"h":115,"hiddenZone":"living"},{"x":480,"y":315,"w":20,"h":75,"hiddenZone":"living"},{"x":720,"y":120,"w":20,"h":115,"hiddenZone":"kitchen"},{"x":720,"y":315,"w":20,"h":75,"hiddenZone":"kitchen"},{"x":170,"y":390,"w":130,"h":20,"hiddenZone":"living"},{"x":410,"y":390,"w":180,"h":20,"hiddenZone":"living"},{"x":700,"y":390,"w":210,"h":20,"hiddenZone":"bedrooms"},{"x":400,"y":410,"w":20,"h":115,"hiddenZone":"living"},{"x":400,"y":605,"w":20,"h":55,"hiddenZone":"living"},{"x":570,"y":410,"w":20,"h":115,"hiddenZone":"bedrooms"},{"x":570,"y":605,"w":20,"h":55,"hiddenZone":"bedrooms"},{"x":930,"y":100,"w":20,"h":245,"hiddenZone":"bedrooms"},{"x":930,"y":455,"w":20,"h":225,"hiddenZone":"bedrooms"},{"x":950,"y":390,"w":200,"h":20,"hiddenZone":"bedrooms"}],"doors":[{"id":"front-door","x":150,"y":345,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"kitchen-door","x":480,"y":235,"w":20,"h":80,"orientation":"vertical","state":"closed","hiddenZone":"living"},{"id":"dining-door","x":720,"y":235,"w":20,"h":80,"orientation":"vertical","state":"closed","hiddenZone":"kitchen"},{"id":"bath-door","x":300,"y":390,"w":110,"h":20,"orientation":"horizontal","state":"closed","hiddenZone":"living"},{"id":"closet-door","x":400,"y":525,"w":20,"h":80,"orientation":"vertical","state":"closed","hiddenZone":"living"},{"id":"bedroom-door","x":590,"y":390,"w":110,"h":20,"orientation":"horizontal","state":"closed","hiddenZone":"bedrooms"},{"id":"east-bedroom-door","x":930,"y":345,"w":20,"h":110,"orientation":"vertical","state":"closed","hiddenZone":"bedrooms"}],"windows":[{"id":"living-window","x":260,"y":100,"w":130,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"kitchen-window","x":560,"y":100,"w":130,"h":20,"orientation":"horizontal","state":"closed","damage":8,"hiddenZone":"kitchen"},{"id":"bedroom-window","x":680,"y":660,"w":130,"h":20,"orientation":"horizontal","state":"closed","damage":8,"hiddenZone":"bedrooms"},{"id":"east-window","x":1130,"y":240,"w":20,"h":120,"orientation":"vertical","state":"closed","damage":8,"hiddenZone":"bedrooms"}],"laptops":[{"id":"outside-laptop","name":"Outside Camera Laptop","x":70,"y":480,"w":76,"h":44}],"cameras":[{"id":"c1","label":"C1","x":330,"y":175,"revealZones":["living"]},{"id":"c2","label":"C2","x":615,"y":175,"revealZones":["kitchen"]},{"id":"c3","label":"C3","x":760,"y":520,"revealZones":["bedrooms"]}],"items":[],"equipmentTables":[{"id":"outside-gear-table","name":"Outside Gear Table","x":70,"y":560,"w":76,"h":60}],"operators":[{"id":"ALPHA","x":82,"y":360,"color":"#67c98f","floor":"Exterior","zone":"Driveway"},{"id":"BRAVO","x":82,"y":410,"color":"#72b7ce","floor":"Exterior","zone":"Driveway"}],"enemies":[{"id":"E1","x":325,"y":250,"angle":3.141592653589793,"watch":{"x":355,"y":400},"patrol":[{"x":325,"y":250},{"x":420,"y":320}],"hiddenZone":"living"},{"id":"E2","x":610,"y":190,"angle":3.141592653589793,"watch":{"x":730,"y":275},"hiddenZone":"kitchen"},{"id":"E3","x":780,"y":520,"angle":-1.5707963267948966,"watch":{"x":645,"y":400},"hiddenZone":"bedrooms"}],"objective":{"x":820,"y":575,"radius":16,"secured":false,"harmed":false,"hiddenZone":"bedrooms"}},"hardpoint-gallery":{"id":"hardpoint-gallery","title":"Hardpoint Gallery","walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":90,"w":690,"h":20},{"x":120,"y":510,"w":690,"h":20},{"x":120,"y":90,"w":20,"h":175},{"x":120,"y":375,"w":20,"h":155},{"x":790,"y":90,"w":20,"h":155},{"x":790,"y":355,"w":20,"h":175},{"x":295,"y":90,"w":20,"h":110},{"x":295,"y":310,"w":20,"h":200},{"x":500,"y":90,"w":20,"h":150},{"x":500,"y":350,"w":20,"h":160},{"x":315,"y":250,"w":65,"h":20},{"x":450,"y":250,"w":50,"h":20},{"x":520,"y":250,"w":40,"h":20},{"x":670,"y":250,"w":120,"h":20},{"x":315,"y":380,"w":65,"h":20},{"x":450,"y":380,"w":50,"h":20},{"x":520,"y":380,"w":40,"h":20},{"x":670,"y":380,"w":120,"h":20},{"x":650,"y":270,"w":20,"h":110},{"x":140,"y":340,"w":155,"h":20},{"x":380,"y":110,"w":20,"h":50},{"x":705,"y":400,"w":20,"h":70}],"doors":[{"id":"entry-west","x":120,"y":265,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"office","x":295,"y":200,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lounge","x":500,"y":240,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"upper-storage","x":380,"y":250,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"lower-storage","x":380,"y":380,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"hall-east","x":790,"y":245,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"center-north","x":560,"y":250,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"center-south","x":560,"y":380,"w":110,"h":20,"orientation":"horizontal","state":"closed"}],"operators":[{"id":"ALPHA","x":72,"y":248,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":392,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":410,"y":170,"angle":3.141592653589793,"watch":{"x":415,"y":260},"patrol":[{"x":410,"y":170},{"x":455,"y":220}]},{"id":"E2","x":720,"y":175,"angle":2.356194490192345,"watch":{"x":615,"y":260},"patrol":[{"x":720,"y":175},{"x":735,"y":330}]},{"id":"E3","x":590,"y":455,"angle":3.9269908169872414,"watch":{"x":615,"y":390},"patrol":[{"x":590,"y":455},{"x":690,"y":455}]},{"id":"E4","x":355,"y":445,"angle":3.141592653589793,"watch":{"x":415,"y":390},"patrol":[{"x":355,"y":445},{"x":470,"y":445}]},{"id":"E5","x":610,"y":315,"angle":3.141592653589793,"watch":{"x":615,"y":260},"patrol":[{"x":610,"y":315},{"x":725,"y":315}]}],"objective":{"x":735,"y":455,"radius":16,"secured":false,"harmed":false}},"house-blueprint":{"id":"house-blueprint","title":"House Blueprint","width":1800,"height":760,"floorZones":[{"x":80,"y":80,"w":760,"h":600},{"x":980,"y":80,"w":760,"h":600}],"rooms":[{"id":"living-room","label":"Living Room","x":120,"y":120,"w":300,"h":240},{"id":"kitchen","label":"Kitchen","x":440,"y":120,"w":180,"h":240},{"id":"dining-room","label":"Dining Room","x":640,"y":120,"w":160,"h":240},{"id":"bathroom","label":"Bathroom","x":120,"y":400,"w":220,"h":240},{"id":"closet","label":"Closet","x":360,"y":400,"w":150,"h":240},{"id":"stair-hall-1","label":"Stair Hall","x":530,"y":400,"w":270,"h":240},{"id":"bedroom","label":"Bedroom","x":1020,"y":120,"w":310,"h":240},{"id":"bathroom-2","label":"Bathroom","x":1350,"y":120,"w":180,"h":240},{"id":"closet-2","label":"Closet","x":1550,"y":120,"w":150,"h":240},{"id":"second-living","label":"Living Room","x":1020,"y":400,"w":300,"h":240},{"id":"second-dining","label":"Dining Room","x":1340,"y":400,"w":180,"h":240},{"id":"stair-hall-2","label":"Stair Hall","x":1540,"y":400,"w":160,"h":240}],"labels":[{"text":"FIRST FLOOR","x":460,"y":56},{"text":"SECOND FLOOR","x":1360,"y":56}],"walls":[{"x":0,"y":0,"w":1800,"h":20},{"x":0,"y":740,"w":1800,"h":20},{"x":0,"y":0,"w":20,"h":760},{"x":1780,"y":0,"w":20,"h":760},{"x":880,"y":0,"w":60,"h":760},{"x":80,"y":80,"w":760,"h":20},{"x":80,"y":660,"w":760,"h":20},{"x":80,"y":80,"w":20,"h":220},{"x":80,"y":450,"w":20,"h":230},{"x":820,"y":80,"w":20,"h":250},{"x":820,"y":430,"w":20,"h":250},{"x":420,"y":100,"w":20,"h":118},{"x":420,"y":302,"w":20,"h":58},{"x":620,"y":100,"w":20,"h":118},{"x":620,"y":302,"w":20,"h":58},{"x":100,"y":360,"w":110,"h":20},{"x":310,"y":360,"w":220,"h":20},{"x":640,"y":360,"w":180,"h":20},{"x":340,"y":380,"w":20,"h":118},{"x":340,"y":582,"w":20,"h":78},{"x":510,"y":380,"w":20,"h":118},{"x":510,"y":582,"w":20,"h":78},{"x":980,"y":80,"w":760,"h":20},{"x":980,"y":660,"w":760,"h":20},{"x":980,"y":80,"w":20,"h":250},{"x":980,"y":430,"w":20,"h":250},{"x":1720,"y":80,"w":20,"h":250},{"x":1720,"y":430,"w":20,"h":250},{"x":1330,"y":100,"w":20,"h":118},{"x":1330,"y":302,"w":20,"h":58},{"x":1530,"y":100,"w":20,"h":118},{"x":1530,"y":302,"w":20,"h":58},{"x":1000,"y":360,"w":40,"h":20},{"x":1260,"y":360,"w":280,"h":20},{"x":1640,"y":360,"w":80,"h":20},{"x":1320,"y":380,"w":20,"h":118},{"x":1320,"y":582,"w":20,"h":78},{"x":1520,"y":380,"w":20,"h":118},{"x":1520,"y":582,"w":20,"h":78}],"doors":[{"id":"front-door","x":80,"y":300,"w":20,"h":150,"orientation":"vertical","state":"closed"},{"id":"kitchen-door","x":420,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"dining-door","x":620,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"bath-door","x":210,"y":360,"w":100,"h":20,"orientation":"horizontal","state":"closed"},{"id":"closet-door","x":340,"y":498,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"stair-door","x":530,"y":360,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"bedroom-digital","x":1040,"y":360,"w":220,"h":20,"orientation":"horizontal","state":"closed","lockType":"digital","locked":true},{"id":"bathroom-2-door","x":1330,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"closet-2-door","x":1530,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"second-stair-door","x":1540,"y":360,"w":100,"h":20,"orientation":"horizontal","state":"closed"}],"windows":[{"id":"living-window","x":200,"y":80,"w":110,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"kitchen-window","x":500,"y":80,"w":90,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"dining-window","x":820,"y":260,"w":20,"h":100,"orientation":"vertical","state":"closed","damage":8},{"id":"bedroom-window","x":1100,"y":80,"w":120,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"second-living-window","x":980,"y":500,"w":20,"h":100,"orientation":"vertical","state":"closed","damage":8}],"stairs":[{"id":"stairs-up","name":"Stairs Up","label":"UP","x":690,"y":520,"w":90,"h":70,"target":{"x":1600,"y":520,"floor":"Floor 2","label":"Second Floor Stair Hall"}},{"id":"stairs-down","name":"Stairs Down","label":"DOWN","x":1560,"y":520,"w":90,"h":70,"target":{"x":730,"y":520,"floor":"Floor 1","label":"First Floor Stair Hall"}}],"items":[{"id":"paper-bedroom-digital","type":"paper","name":"Bedroom Door Paper","x":470,"y":178,"w":24,"h":18,"passwordFor":"bedroom-digital"}],"equipmentTables":[{"id":"start-gear-table","name":"Entry Gear Table","x":36,"y":450,"w":34,"h":110}],"operators":[{"id":"ALPHA","x":42,"y":334,"color":"#67c98f","floor":"Floor 1","zone":"Front Entry"},{"id":"BRAVO","x":42,"y":404,"color":"#72b7ce","floor":"Floor 1","zone":"Front Entry"}],"enemies":[{"id":"E1","x":300,"y":210,"angle":3.141592653589793,"watch":{"x":430,"y":260},"patrol":[{"x":300,"y":210},{"x":370,"y":300}]},{"id":"E2","x":560,"y":210,"angle":3.141592653589793,"watch":{"x":630,"y":260},"patrol":[{"x":560,"y":210},{"x":560,"y":310}]},{"id":"E3","x":720,"y":230,"angle":3.141592653589793,"watch":{"x":630,"y":260}},{"id":"E4","x":1220,"y":230,"angle":1.5707963267948966,"watch":{"x":1340,"y":260}},{"id":"E5","x":1450,"y":230,"angle":3.141592653589793,"watch":{"x":1540,"y":260}},{"id":"E6","x":1160,"y":520,"angle":0,"watch":{"x":1150,"y":370}}],"objective":{"x":1260,"y":292,"radius":16,"secured":false,"harmed":false}},"ridge-house-entry":{"id":"ridge-house-entry","title":"Ridge House Entry","walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":90,"w":690,"h":20},{"x":120,"y":510,"w":690,"h":20},{"x":120,"y":90,"w":20,"h":175},{"x":120,"y":375,"w":20,"h":155},{"x":790,"y":90,"w":20,"h":155},{"x":790,"y":355,"w":20,"h":175},{"x":295,"y":90,"w":20,"h":110},{"x":295,"y":310,"w":20,"h":200},{"x":500,"y":90,"w":20,"h":150},{"x":500,"y":350,"w":20,"h":160},{"x":315,"y":250,"w":65,"h":20},{"x":450,"y":250,"w":50,"h":20},{"x":520,"y":250,"w":40,"h":20},{"x":670,"y":250,"w":120,"h":20},{"x":315,"y":380,"w":65,"h":20},{"x":450,"y":380,"w":50,"h":20},{"x":520,"y":380,"w":40,"h":20},{"x":670,"y":380,"w":120,"h":20},{"x":650,"y":270,"w":20,"h":110},{"x":140,"y":340,"w":155,"h":20}],"doors":[{"id":"entry-west","x":120,"y":265,"w":20,"h":110,"orientation":"vertical","state":"closed","lockType":"digital","password":"0000","locked":true},{"id":"office","x":295,"y":200,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lounge","x":500,"y":240,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"upper-storage","x":380,"y":250,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"lower-storage","x":380,"y":380,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"hall-east","x":790,"y":245,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"center-north","x":560,"y":250,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"center-south","x":560,"y":380,"w":110,"h":20,"orientation":"horizontal","state":"closed"}],"operators":[{"id":"ALPHA","x":72,"y":276,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":364,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":410,"y":174,"angle":3.141592653589793,"watch":{"x":415,"y":260},"patrol":[{"x":410,"y":174},{"x":425,"y":220}]},{"id":"E2","x":720,"y":180,"angle":1.7278759594743864,"watch":{"x":615,"y":260},"patrol":[{"x":720,"y":180},{"x":735,"y":320}]},{"id":"E3","x":600,"y":455,"angle":3.9269908169872414,"watch":{"x":615,"y":390},"patrol":[{"x":600,"y":455},{"x":705,"y":455}]}],"objective":{"x":720,"y":452,"radius":16,"secured":false,"harmed":false}},"terminal-breach":{"id":"terminal-breach","title":"Terminal Breach","width":1280,"height":800,"floorZones":[{"x":140,"y":120,"w":220,"h":240},{"x":380,"y":120,"w":240,"h":240},{"x":640,"y":120,"w":240,"h":240},{"x":900,"y":120,"w":220,"h":240},{"x":140,"y":380,"w":220,"h":180},{"x":380,"y":380,"w":240,"h":180},{"x":640,"y":380,"w":240,"h":180},{"x":900,"y":380,"w":220,"h":180},{"x":140,"y":580,"w":480,"h":120},{"x":640,"y":580,"w":480,"h":120}],"walls":[{"x":0,"y":0,"w":1280,"h":20},{"x":0,"y":780,"w":1280,"h":20},{"x":0,"y":0,"w":20,"h":800},{"x":1260,"y":0,"w":20,"h":800},{"x":120,"y":100,"w":1020,"h":20},{"x":120,"y":700,"w":1020,"h":20},{"x":120,"y":100,"w":20,"h":210},{"x":120,"y":410,"w":20,"h":290},{"x":1120,"y":100,"w":20,"h":220},{"x":1120,"y":420,"w":20,"h":280},{"x":360,"y":100,"w":20,"h":120},{"x":360,"y":330,"w":20,"h":190},{"x":360,"y":630,"w":20,"h":70},{"x":620,"y":100,"w":20,"h":150},{"x":620,"y":360,"w":20,"h":160},{"x":620,"y":630,"w":20,"h":70},{"x":880,"y":100,"w":20,"h":180},{"x":880,"y":390,"w":20,"h":130},{"x":880,"y":630,"w":20,"h":70},{"x":140,"y":360,"w":110,"h":20},{"x":330,"y":360,"w":290,"h":20},{"x":640,"y":360,"w":110,"h":20},{"x":830,"y":360,"w":290,"h":20},{"x":140,"y":560,"w":190,"h":20},{"x":430,"y":560,"w":190,"h":20},{"x":640,"y":560,"w":190,"h":20},{"x":930,"y":560,"w":190,"h":20},{"x":500,"y":420,"w":20,"h":120},{"x":760,"y":420,"w":20,"h":120},{"x":1010,"y":140,"w":20,"h":130},{"x":250,"y":590,"w":20,"h":90}],"doors":[{"id":"entry-west","x":120,"y":310,"w":20,"h":100,"orientation":"vertical","state":"closed"},{"id":"east-entry","x":1120,"y":320,"w":20,"h":100,"orientation":"vertical","state":"closed"},{"id":"alpha-office","x":360,"y":220,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"server-core","x":620,"y":250,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"archive","x":880,"y":280,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lower-west","x":360,"y":520,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lower-core","x":620,"y":520,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lower-east","x":880,"y":520,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"north-hall-a","x":250,"y":360,"w":80,"h":20,"orientation":"horizontal","state":"closed"},{"id":"north-hall-b","x":750,"y":360,"w":80,"h":20,"orientation":"horizontal","state":"closed"},{"id":"south-hall-a","x":330,"y":560,"w":100,"h":20,"orientation":"horizontal","state":"closed"},{"id":"south-hall-b","x":830,"y":560,"w":100,"h":20,"orientation":"horizontal","state":"closed"}],"equipmentTables":[{"id":"terminal-entry-table","name":"Terminal Entry Gear Table","x":52,"y":352,"w":42,"h":56}],"operators":[{"id":"ALPHA","x":72,"y":300,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":420,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":250,"y":210,"angle":3.141592653589793,"watch":{"x":370,"y":275},"patrol":[{"x":250,"y":210},{"x":315,"y":300}]},{"id":"E2","x":510,"y":205,"angle":2.356194490192345,"watch":{"x":630,"y":305},"patrol":[{"x":510,"y":205},{"x":575,"y":315}]},{"id":"E3","x":735,"y":235,"angle":3.141592653589793,"watch":{"x":630,"y":305},"patrol":[{"x":735,"y":235},{"x":825,"y":315}]},{"id":"E4","x":1010,"y":310,"angle":2.356194490192345,"watch":{"x":890,"y":335},"patrol":[{"x":1010,"y":310},{"x":935,"y":205}]},{"id":"E5","x":300,"y":635,"angle":3.141592653589793,"watch":{"x":380,"y":570},"patrol":[{"x":300,"y":635},{"x":550,"y":635}]},{"id":"E6","x":710,"y":640,"angle":3.141592653589793,"watch":{"x":630,"y":575},"patrol":[{"x":710,"y":640},{"x":880,"y":640}]},{"id":"E7","x":1015,"y":640,"angle":3.9269908169872414,"watch":{"x":890,"y":575},"patrol":[{"x":1015,"y":640},{"x":930,"y":455}]}],"objective":{"x":1040,"y":650,"radius":16,"secured":false,"harmed":false}},"warehouse-pinch":{"id":"warehouse-pinch","title":"Warehouse Pinch","walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":90,"w":690,"h":20},{"x":120,"y":510,"w":690,"h":20},{"x":120,"y":90,"w":20,"h":175},{"x":120,"y":375,"w":20,"h":155},{"x":790,"y":90,"w":20,"h":155},{"x":790,"y":355,"w":20,"h":175},{"x":295,"y":90,"w":20,"h":110},{"x":295,"y":310,"w":20,"h":200},{"x":500,"y":90,"w":20,"h":150},{"x":500,"y":350,"w":20,"h":160},{"x":315,"y":250,"w":65,"h":20},{"x":450,"y":250,"w":50,"h":20},{"x":520,"y":250,"w":40,"h":20},{"x":670,"y":250,"w":120,"h":20},{"x":315,"y":380,"w":65,"h":20},{"x":450,"y":380,"w":50,"h":20},{"x":520,"y":380,"w":40,"h":20},{"x":670,"y":380,"w":120,"h":20},{"x":650,"y":270,"w":20,"h":110},{"x":140,"y":340,"w":155,"h":20},{"x":430,"y":410,"w":20,"h":100}],"doors":[{"id":"entry-west","x":120,"y":265,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"office","x":295,"y":200,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lounge","x":500,"y":240,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"upper-storage","x":380,"y":250,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"lower-storage","x":380,"y":380,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"hall-east","x":790,"y":245,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"center-north","x":560,"y":250,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"center-south","x":560,"y":380,"w":110,"h":20,"orientation":"horizontal","state":"closed"}],"operators":[{"id":"ALPHA","x":72,"y":260,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":380,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":400,"y":174,"angle":3.141592653589793,"watch":{"x":415,"y":260},"patrol":[{"x":400,"y":174},{"x":450,"y":215}]},{"id":"E2","x":715,"y":175,"angle":2.356194490192345,"watch":{"x":615,"y":260},"patrol":[{"x":715,"y":175},{"x":725,"y":330}]},{"id":"E3","x":590,"y":455,"angle":3.9269908169872414,"watch":{"x":615,"y":390},"patrol":[{"x":590,"y":455},{"x":710,"y":455}]},{"id":"E4","x":360,"y":445,"angle":3.141592653589793,"watch":{"x":415,"y":390},"patrol":[{"x":360,"y":445},{"x":470,"y":445}]}],"objective":{"x":735,"y":452,"radius":16,"secured":false,"harmed":false}}},"tutorials":{"basics-movement":{"id":"tutorial-basics-movement","title":"Tutorial: Basics Movement","width":760,"height":520,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":80,"w":580,"h":340}],"rooms":[{"id":"movement-yard","label":"Movement Yard","x":80,"y":80,"w":580,"h":340}],"labels":[{"text":"WASD PRACTICE","x":180,"y":120},{"text":"VIP FINISH","x":590,"y":360}],"walls":[{"x":0,"y":0,"w":760,"h":20},{"x":0,"y":500,"w":760,"h":20},{"x":0,"y":0,"w":20,"h":520},{"x":740,"y":0,"w":20,"h":520},{"x":80,"y":80,"w":580,"h":20},{"x":80,"y":420,"w":580,"h":20},{"x":80,"y":80,"w":20,"h":340},{"x":660,"y":80,"w":20,"h":340},{"x":285,"y":180,"w":170,"h":20},{"x":285,"y":300,"w":170,"h":20}],"doors":[],"windows":[],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":150,"y":250,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Movement Yard"}],"enemies":[],"objective":{"x":600,"y":360,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"walk","title":"Walk","text":"Use WASD to move ALPHA around the obstacles.","completeWhen":"movementStarted"},{"id":"sneak","title":"Sneak","text":"Hold Left Ctrl while moving to sneak slowly.","completeWhen":"sneaked"},{"id":"sprint","title":"Sprint","text":"Hold Left Shift while moving to sprint quickly.","completeWhen":"sprinted"},{"id":"finish","title":"Reach the VIP","text":"Move to the VIP marker to complete the movement tutorial.","completeWhen":"objectiveSecured"}]},"tutorial-basics-movement":{"id":"tutorial-basics-movement","title":"Tutorial: Basics Movement","width":760,"height":520,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":80,"w":580,"h":340}],"rooms":[{"id":"movement-yard","label":"Movement Yard","x":80,"y":80,"w":580,"h":340}],"labels":[{"text":"WASD PRACTICE","x":180,"y":120},{"text":"VIP FINISH","x":590,"y":360}],"walls":[{"x":0,"y":0,"w":760,"h":20},{"x":0,"y":500,"w":760,"h":20},{"x":0,"y":0,"w":20,"h":520},{"x":740,"y":0,"w":20,"h":520},{"x":80,"y":80,"w":580,"h":20},{"x":80,"y":420,"w":580,"h":20},{"x":80,"y":80,"w":20,"h":340},{"x":660,"y":80,"w":20,"h":340},{"x":285,"y":180,"w":170,"h":20},{"x":285,"y":300,"w":170,"h":20}],"doors":[],"windows":[],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":150,"y":250,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Movement Yard"}],"enemies":[],"objective":{"x":600,"y":360,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"walk","title":"Walk","text":"Use WASD to move ALPHA around the obstacles.","completeWhen":"movementStarted"},{"id":"sneak","title":"Sneak","text":"Hold Left Ctrl while moving to sneak slowly.","completeWhen":"sneaked"},{"id":"sprint","title":"Sprint","text":"Hold Left Shift while moving to sprint quickly.","completeWhen":"sprinted"},{"id":"finish","title":"Reach the VIP","text":"Move to the VIP marker to complete the movement tutorial.","completeWhen":"objectiveSecured"}]},"digital-lock":{"id":"tutorial-digital-lock","title":"Tutorial: Digital Lock","width":960,"height":640,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":120,"y":120,"w":300,"h":380},{"x":500,"y":120,"w":300,"h":380}],"rooms":[{"id":"entry-yard","label":"Entry Yard","x":120,"y":120,"w":300,"h":380},{"id":"locked-room","label":"Locked Room","x":500,"y":120,"w":300,"h":380}],"labels":[{"text":"PICK UP PAPER FIRST","x":270,"y":108},{"text":"UNLOCK, THEN OPEN","x":650,"y":108}],"walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":120,"w":300,"h":20},{"x":120,"y":500,"w":300,"h":20},{"x":120,"y":120,"w":20,"h":400},{"x":420,"y":120,"w":20,"h":126},{"x":420,"y":354,"w":20,"h":166},{"x":500,"y":120,"w":300,"h":20},{"x":500,"y":500,"w":300,"h":20},{"x":800,"y":120,"w":20,"h":400},{"x":500,"y":120,"w":20,"h":126},{"x":500,"y":354,"w":20,"h":166}],"doors":[{"id":"training-digital-door","x":420,"y":246,"w":100,"h":108,"orientation":"vertical","state":"closed","lockType":"digital","locked":true}],"windows":[],"stairs":[],"items":[{"id":"paper-training-digital-door","type":"paper","name":"Door Code Paper","x":250,"y":302,"w":28,"h":20,"passwordFor":"training-digital-door"}],"equipmentTables":[],"operators":[{"id":"ALPHA","x":205,"y":320,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Entry Yard"}],"enemies":[],"objective":{"x":650,"y":318,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"move-to-paper","title":"Find The Paper Clue","text":"Move ALPHA near the yellow paper. Digital doors use random codes, so the clue matters.","completeWhen":"nearItem","itemId":"paper-training-digital-door"},{"id":"pick-paper","title":"Pick Up The Code","text":"Press E near the paper to store the code in ALPHA's inventory.","completeWhen":"itemPicked","itemId":"paper-training-digital-door"},{"id":"open-inventory","title":"Read The Inventory","text":"Press Tab to open inventory and read the code written on the paper.","completeWhen":"inventoryOpened"},{"id":"move-to-lock","title":"Approach The Door","text":"Move ALPHA near the locked digital door. The red L marker means it is still locked.","completeWhen":"nearDoor","doorId":"training-digital-door"},{"id":"open-keypad","title":"Open The Keypad","text":"Press E near the locked door to open the digital lock keypad.","completeWhen":"lockOpened","doorId":"training-digital-door"},{"id":"unlock-door","title":"Enter The Code","text":"Enter the paper code by clicking keypad numbers or typing digits, then press Unlock.","completeWhen":"doorUnlocked","doorId":"training-digital-door"},{"id":"open-door","title":"Open The Door","text":"Unlocking does not open the door. Press E again to open it, then move to the VIP.","completeWhen":"doorOpen","doorId":"training-digital-door"},{"id":"secure-objective","title":"Secure The Objective","text":"Move ALPHA to the VIP marker to complete the tutorial.","completeWhen":"objectiveSecured"}]},"tutorial-digital-lock":{"id":"tutorial-digital-lock","title":"Tutorial: Digital Lock","width":960,"height":640,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":120,"y":120,"w":300,"h":380},{"x":500,"y":120,"w":300,"h":380}],"rooms":[{"id":"entry-yard","label":"Entry Yard","x":120,"y":120,"w":300,"h":380},{"id":"locked-room","label":"Locked Room","x":500,"y":120,"w":300,"h":380}],"labels":[{"text":"PICK UP PAPER FIRST","x":270,"y":108},{"text":"UNLOCK, THEN OPEN","x":650,"y":108}],"walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":120,"w":300,"h":20},{"x":120,"y":500,"w":300,"h":20},{"x":120,"y":120,"w":20,"h":400},{"x":420,"y":120,"w":20,"h":126},{"x":420,"y":354,"w":20,"h":166},{"x":500,"y":120,"w":300,"h":20},{"x":500,"y":500,"w":300,"h":20},{"x":800,"y":120,"w":20,"h":400},{"x":500,"y":120,"w":20,"h":126},{"x":500,"y":354,"w":20,"h":166}],"doors":[{"id":"training-digital-door","x":420,"y":246,"w":100,"h":108,"orientation":"vertical","state":"closed","lockType":"digital","locked":true}],"windows":[],"stairs":[],"items":[{"id":"paper-training-digital-door","type":"paper","name":"Door Code Paper","x":250,"y":302,"w":28,"h":20,"passwordFor":"training-digital-door"}],"equipmentTables":[],"operators":[{"id":"ALPHA","x":205,"y":320,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Entry Yard"}],"enemies":[],"objective":{"x":650,"y":318,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"move-to-paper","title":"Find The Paper Clue","text":"Move ALPHA near the yellow paper. Digital doors use random codes, so the clue matters.","completeWhen":"nearItem","itemId":"paper-training-digital-door"},{"id":"pick-paper","title":"Pick Up The Code","text":"Press E near the paper to store the code in ALPHA's inventory.","completeWhen":"itemPicked","itemId":"paper-training-digital-door"},{"id":"open-inventory","title":"Read The Inventory","text":"Press Tab to open inventory and read the code written on the paper.","completeWhen":"inventoryOpened"},{"id":"move-to-lock","title":"Approach The Door","text":"Move ALPHA near the locked digital door. The red L marker means it is still locked.","completeWhen":"nearDoor","doorId":"training-digital-door"},{"id":"open-keypad","title":"Open The Keypad","text":"Press E near the locked door to open the digital lock keypad.","completeWhen":"lockOpened","doorId":"training-digital-door"},{"id":"unlock-door","title":"Enter The Code","text":"Enter the paper code by clicking keypad numbers or typing digits, then press Unlock.","completeWhen":"doorUnlocked","doorId":"training-digital-door"},{"id":"open-door","title":"Open The Door","text":"Unlocking does not open the door. Press E again to open it, then move to the VIP.","completeWhen":"doorOpen","doorId":"training-digital-door"},{"id":"secure-objective","title":"Secure The Objective","text":"Move ALPHA to the VIP marker to complete the tutorial.","completeWhen":"objectiveSecured"}]},"equipment-table":{"id":"tutorial-equipment-table","title":"Tutorial: Equipment Table","width":860,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":90,"w":700,"h":380}],"rooms":[{"id":"gear-room","label":"Gear Room","x":80,"y":90,"w":700,"h":380}],"labels":[{"text":"START UNARMED","x":150,"y":125},{"text":"EQUIPMENT TABLE","x":295,"y":365},{"text":"LIGHT THREAT","x":590,"y":230}],"walls":[{"x":0,"y":0,"w":860,"h":20},{"x":0,"y":540,"w":860,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":840,"y":0,"w":20,"h":560},{"x":80,"y":90,"w":700,"h":20},{"x":80,"y":470,"w":700,"h":20},{"x":80,"y":90,"w":20,"h":380},{"x":780,"y":90,"w":20,"h":380}],"doors":[],"windows":[],"stairs":[],"items":[],"equipmentTables":[{"id":"training-gear-table","name":"Training Gear Table","x":320,"y":350,"w":90,"h":48}],"operators":[{"id":"ALPHA","x":170,"y":280,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","backpackId":"small-backpack","floor":"Tutorial","zone":"Gear Room"}],"enemies":[{"id":"GEAR-TARGET","x":610,"y":245,"angle":3.141592653589793,"watch":{"x":410,"y":310},"weaponId":"pistol","armorId":"no-armor"}],"objective":{"x":705,"y":390,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"open-table","title":"Open The Gear Table","text":"Move near the equipment table and press E. You can also compare defaults in Settings > Operator Loadout.","completeWhen":"tableOpened"},{"id":"equip-weapon","title":"Equip A Weapon","text":"In the equipment table overlay, choose any weapon. You started with No Weapon.","completeWhen":"weaponEquipped"},{"id":"equip-armor","title":"Equip Armor","text":"In the equipment table overlay, choose armor. Armor gives you a better chance in a fight.","completeWhen":"armorEquipped"},{"id":"neutralize","title":"Test The Loadout","text":"Close the table and neutralize the light target.","completeWhen":"enemyNeutralized","enemyId":"GEAR-TARGET"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker to complete the equipment tutorial.","completeWhen":"objectiveSecured"}]},"tutorial-equipment-table":{"id":"tutorial-equipment-table","title":"Tutorial: Equipment Table","width":860,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":90,"w":700,"h":380}],"rooms":[{"id":"gear-room","label":"Gear Room","x":80,"y":90,"w":700,"h":380}],"labels":[{"text":"START UNARMED","x":150,"y":125},{"text":"EQUIPMENT TABLE","x":295,"y":365},{"text":"LIGHT THREAT","x":590,"y":230}],"walls":[{"x":0,"y":0,"w":860,"h":20},{"x":0,"y":540,"w":860,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":840,"y":0,"w":20,"h":560},{"x":80,"y":90,"w":700,"h":20},{"x":80,"y":470,"w":700,"h":20},{"x":80,"y":90,"w":20,"h":380},{"x":780,"y":90,"w":20,"h":380}],"doors":[],"windows":[],"stairs":[],"items":[],"equipmentTables":[{"id":"training-gear-table","name":"Training Gear Table","x":320,"y":350,"w":90,"h":48}],"operators":[{"id":"ALPHA","x":170,"y":280,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","backpackId":"small-backpack","floor":"Tutorial","zone":"Gear Room"}],"enemies":[{"id":"GEAR-TARGET","x":610,"y":245,"angle":3.141592653589793,"watch":{"x":410,"y":310},"weaponId":"pistol","armorId":"no-armor"}],"objective":{"x":705,"y":390,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"open-table","title":"Open The Gear Table","text":"Move near the equipment table and press E. You can also compare defaults in Settings > Operator Loadout.","completeWhen":"tableOpened"},{"id":"equip-weapon","title":"Equip A Weapon","text":"In the equipment table overlay, choose any weapon. You started with No Weapon.","completeWhen":"weaponEquipped"},{"id":"equip-armor","title":"Equip Armor","text":"In the equipment table overlay, choose armor. Armor gives you a better chance in a fight.","completeWhen":"armorEquipped"},{"id":"neutralize","title":"Test The Loadout","text":"Close the table and neutralize the light target.","completeWhen":"enemyNeutralized","enemyId":"GEAR-TARGET"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker to complete the equipment tutorial.","completeWhen":"objectiveSecured"}]},"operators-stairs":{"id":"tutorial-operators-stairs","title":"Tutorial: Operators And Stairs","width":940,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":110,"w":300,"h":300},{"x":560,"y":110,"w":300,"h":300}],"rooms":[{"id":"alpha-room","label":"Alpha Room","x":80,"y":110,"w":300,"h":300},{"id":"bravo-room","label":"Bravo Room","x":560,"y":110,"w":300,"h":300}],"labels":[{"text":"ALPHA STAIRS","x":170,"y":145},{"text":"BRAVO OBJECTIVE","x":645,"y":145}],"walls":[{"x":0,"y":0,"w":940,"h":20},{"x":0,"y":540,"w":940,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":920,"y":0,"w":20,"h":560},{"x":80,"y":110,"w":300,"h":20},{"x":80,"y":410,"w":300,"h":20},{"x":80,"y":110,"w":20,"h":300},{"x":380,"y":110,"w":20,"h":300},{"x":560,"y":110,"w":300,"h":20},{"x":560,"y":410,"w":300,"h":20},{"x":560,"y":110,"w":20,"h":300},{"x":860,"y":110,"w":20,"h":300}],"doors":[],"windows":[],"stairs":[{"id":"alpha-stairs","name":"Training Stairs","label":"UP","x":265,"y":255,"w":68,"h":64,"target":{"x":635,"y":286,"floor":"Tutorial","label":"Bravo Room"}},{"id":"bravo-stairs","name":"Return Stairs","label":"DOWN","x":620,"y":255,"w":68,"h":64,"target":{"x":300,"y":286,"floor":"Tutorial","label":"Alpha Room"}}],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":170,"y":286,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Alpha Room"},{"id":"BRAVO","x":700,"y":286,"color":"#72b7ce","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Bravo Room"}],"enemies":[],"objective":{"x":790,"y":286,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"use-stairs","title":"Use Stairs","text":"Move ALPHA near the stairs and press E. Stairs can connect isolated rooms.","completeWhen":"stairUsed","stairId":"alpha-stairs"},{"id":"select-bravo","title":"Select BRAVO","text":"Click BRAVO or use the health card to control the operator in the other room.","completeWhen":"operatorSelected","operatorId":"BRAVO"},{"id":"finish","title":"Secure With BRAVO","text":"Move BRAVO to the VIP marker to complete the operator navigation tutorial.","completeWhen":"objectiveSecured"}]},"tutorial-operators-stairs":{"id":"tutorial-operators-stairs","title":"Tutorial: Operators And Stairs","width":940,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":110,"w":300,"h":300},{"x":560,"y":110,"w":300,"h":300}],"rooms":[{"id":"alpha-room","label":"Alpha Room","x":80,"y":110,"w":300,"h":300},{"id":"bravo-room","label":"Bravo Room","x":560,"y":110,"w":300,"h":300}],"labels":[{"text":"ALPHA STAIRS","x":170,"y":145},{"text":"BRAVO OBJECTIVE","x":645,"y":145}],"walls":[{"x":0,"y":0,"w":940,"h":20},{"x":0,"y":540,"w":940,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":920,"y":0,"w":20,"h":560},{"x":80,"y":110,"w":300,"h":20},{"x":80,"y":410,"w":300,"h":20},{"x":80,"y":110,"w":20,"h":300},{"x":380,"y":110,"w":20,"h":300},{"x":560,"y":110,"w":300,"h":20},{"x":560,"y":410,"w":300,"h":20},{"x":560,"y":110,"w":20,"h":300},{"x":860,"y":110,"w":20,"h":300}],"doors":[],"windows":[],"stairs":[{"id":"alpha-stairs","name":"Training Stairs","label":"UP","x":265,"y":255,"w":68,"h":64,"target":{"x":635,"y":286,"floor":"Tutorial","label":"Bravo Room"}},{"id":"bravo-stairs","name":"Return Stairs","label":"DOWN","x":620,"y":255,"w":68,"h":64,"target":{"x":300,"y":286,"floor":"Tutorial","label":"Alpha Room"}}],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":170,"y":286,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Alpha Room"},{"id":"BRAVO","x":700,"y":286,"color":"#72b7ce","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Bravo Room"}],"enemies":[],"objective":{"x":790,"y":286,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"use-stairs","title":"Use Stairs","text":"Move ALPHA near the stairs and press E. Stairs can connect isolated rooms.","completeWhen":"stairUsed","stairId":"alpha-stairs"},{"id":"select-bravo","title":"Select BRAVO","text":"Click BRAVO or use the health card to control the operator in the other room.","completeWhen":"operatorSelected","operatorId":"BRAVO"},{"id":"finish","title":"Secure With BRAVO","text":"Move BRAVO to the VIP marker to complete the operator navigation tutorial.","completeWhen":"objectiveSecured"}]},"shooting-modes":{"id":"tutorial-shooting-modes","title":"Tutorial: Shooting Modes","width":860,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":80,"w":700,"h":380}],"rooms":[{"id":"range","label":"Training Range","x":80,"y":80,"w":700,"h":380}],"labels":[{"text":"AUTO / MANUAL RANGE","x":220,"y":120},{"text":"RESPAWN TARGET","x":585,"y":250},{"text":"VIP FINISH","x":705,"y":398}],"walls":[{"x":0,"y":0,"w":860,"h":20},{"x":0,"y":540,"w":860,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":840,"y":0,"w":20,"h":560},{"x":80,"y":80,"w":700,"h":20},{"x":80,"y":460,"w":700,"h":20},{"x":80,"y":80,"w":20,"h":380},{"x":780,"y":80,"w":20,"h":380},{"x":410,"y":100,"w":20,"h":118},{"x":410,"y":322,"w":20,"h":138}],"doors":[{"id":"range-gap","x":410,"y":218,"w":20,"h":104,"orientation":"vertical","state":"open"}],"windows":[],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":180,"y":280,"color":"#67c98f","weaponId":"rifle","armorId":"no-armor","floor":"Tutorial","zone":"Training Range"}],"enemies":[{"id":"TARGET","x":610,"y":280,"angle":3.141592653589793,"watch":{"x":420,"y":270},"weaponId":"no-weapon","armorId":"no-armor","respawnDelay":3}],"objective":{"x":720,"y":398,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"auto","title":"Automatic Shooting","text":"Leave Shooting on Automatic and face the target. Operators fire when they have range and line of sight.","completeWhen":"automaticShotFired"},{"id":"down-target","title":"Neutralize A Target","text":"Down the target once. It will return every 3 seconds so you can practice.","completeWhen":"enemyNeutralized","enemyId":"TARGET"},{"id":"manual-mode","title":"Switch To Manual","text":"Open Settings > Mission Setup > Shooting, choose Manual, then close Settings.","completeWhen":"shootingMode","mode":"manual"},{"id":"manual-fire","title":"Hold To Fire","text":"Hold the left mouse button on the canvas to fire manually, then release to stop.","completeWhen":"manualShotFired"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker when you are done testing both modes.","completeWhen":"objectiveSecured"}]},"tutorial-shooting-modes":{"id":"tutorial-shooting-modes","title":"Tutorial: Shooting Modes","width":860,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":80,"w":700,"h":380}],"rooms":[{"id":"range","label":"Training Range","x":80,"y":80,"w":700,"h":380}],"labels":[{"text":"AUTO / MANUAL RANGE","x":220,"y":120},{"text":"RESPAWN TARGET","x":585,"y":250},{"text":"VIP FINISH","x":705,"y":398}],"walls":[{"x":0,"y":0,"w":860,"h":20},{"x":0,"y":540,"w":860,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":840,"y":0,"w":20,"h":560},{"x":80,"y":80,"w":700,"h":20},{"x":80,"y":460,"w":700,"h":20},{"x":80,"y":80,"w":20,"h":380},{"x":780,"y":80,"w":20,"h":380},{"x":410,"y":100,"w":20,"h":118},{"x":410,"y":322,"w":20,"h":138}],"doors":[{"id":"range-gap","x":410,"y":218,"w":20,"h":104,"orientation":"vertical","state":"open"}],"windows":[],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":180,"y":280,"color":"#67c98f","weaponId":"rifle","armorId":"no-armor","floor":"Tutorial","zone":"Training Range"}],"enemies":[{"id":"TARGET","x":610,"y":280,"angle":3.141592653589793,"watch":{"x":420,"y":270},"weaponId":"no-weapon","armorId":"no-armor","respawnDelay":3}],"objective":{"x":720,"y":398,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"auto","title":"Automatic Shooting","text":"Leave Shooting on Automatic and face the target. Operators fire when they have range and line of sight.","completeWhen":"automaticShotFired"},{"id":"down-target","title":"Neutralize A Target","text":"Down the target once. It will return every 3 seconds so you can practice.","completeWhen":"enemyNeutralized","enemyId":"TARGET"},{"id":"manual-mode","title":"Switch To Manual","text":"Open Settings > Mission Setup > Shooting, choose Manual, then close Settings.","completeWhen":"shootingMode","mode":"manual"},{"id":"manual-fire","title":"Hold To Fire","text":"Hold the left mouse button on the canvas to fire manually, then release to stop.","completeWhen":"manualShotFired"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker when you are done testing both modes.","completeWhen":"objectiveSecured"}]},"windows":{"id":"tutorial-windows","title":"Tutorial: Windows","width":900,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":90,"w":330,"h":380},{"x":450,"y":90,"w":330,"h":380}],"rooms":[{"id":"outside","label":"Outside","x":80,"y":90,"w":330,"h":380},{"id":"inside","label":"Inside","x":450,"y":90,"w":330,"h":380}],"labels":[{"text":"OPEN BY HAND","x":260,"y":165},{"text":"BREAK BY SHOOTING","x":512,"y":165},{"text":"BULLETS PASS WINDOWS","x":515,"y":395}],"walls":[{"x":0,"y":0,"w":900,"h":20},{"x":0,"y":540,"w":900,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":880,"y":0,"w":20,"h":560},{"x":80,"y":90,"w":700,"h":20},{"x":80,"y":470,"w":700,"h":20},{"x":80,"y":90,"w":20,"h":380},{"x":780,"y":90,"w":20,"h":380},{"x":410,"y":90,"w":20,"h":130},{"x":410,"y":300,"w":20,"h":170},{"x":410,"y":220,"w":20,"h":80}],"doors":[],"windows":[{"id":"hand-window","x":410,"y":210,"w":20,"h":72,"orientation":"vertical","state":"closed","damage":8},{"id":"shoot-window","x":410,"y":318,"w":20,"h":72,"orientation":"vertical","state":"closed","damage":8}],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":215,"y":248,"color":"#67c98f","weaponId":"rifle","armorId":"light-armor","floor":"Tutorial","zone":"Outside"}],"enemies":[{"id":"WINDOW-TARGET","x":585,"y":354,"angle":3.141592653589793,"watch":{"x":430,"y":354},"weaponId":"no-weapon","armorId":"no-armor"}],"objective":{"x":705,"y":248,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"open-window","title":"Open By Hand","text":"Move near the upper window and press E. Opening by hand causes no damage.","completeWhen":"windowOpened","windowId":"hand-window"},{"id":"vault-window","title":"Vault Through","text":"Press E again at the open window to climb through safely.","completeWhen":"windowVaulted","windowId":"hand-window"},{"id":"manual","title":"Switch To Manual","text":"Set Shooting to Manual so you can aim at the lower window.","completeWhen":"shootingMode","mode":"manual"},{"id":"break-window","title":"Break By Shooting","text":"Hold left mouse toward the lower window. Bullets break glass and keep traveling.","completeWhen":"windowBroken","windowId":"shoot-window"},{"id":"shoot-through","title":"Shoot Through Windows","text":"Hit the target behind the window to prove bullets pass through window openings.","completeWhen":"enemyNeutralized","enemyId":"WINDOW-TARGET"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker to complete the window tutorial.","completeWhen":"objectiveSecured"}]},"tutorial-windows":{"id":"tutorial-windows","title":"Tutorial: Windows","width":900,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":90,"w":330,"h":380},{"x":450,"y":90,"w":330,"h":380}],"rooms":[{"id":"outside","label":"Outside","x":80,"y":90,"w":330,"h":380},{"id":"inside","label":"Inside","x":450,"y":90,"w":330,"h":380}],"labels":[{"text":"OPEN BY HAND","x":260,"y":165},{"text":"BREAK BY SHOOTING","x":512,"y":165},{"text":"BULLETS PASS WINDOWS","x":515,"y":395}],"walls":[{"x":0,"y":0,"w":900,"h":20},{"x":0,"y":540,"w":900,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":880,"y":0,"w":20,"h":560},{"x":80,"y":90,"w":700,"h":20},{"x":80,"y":470,"w":700,"h":20},{"x":80,"y":90,"w":20,"h":380},{"x":780,"y":90,"w":20,"h":380},{"x":410,"y":90,"w":20,"h":130},{"x":410,"y":300,"w":20,"h":170},{"x":410,"y":220,"w":20,"h":80}],"doors":[],"windows":[{"id":"hand-window","x":410,"y":210,"w":20,"h":72,"orientation":"vertical","state":"closed","damage":8},{"id":"shoot-window","x":410,"y":318,"w":20,"h":72,"orientation":"vertical","state":"closed","damage":8}],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":215,"y":248,"color":"#67c98f","weaponId":"rifle","armorId":"light-armor","floor":"Tutorial","zone":"Outside"}],"enemies":[{"id":"WINDOW-TARGET","x":585,"y":354,"angle":3.141592653589793,"watch":{"x":430,"y":354},"weaponId":"no-weapon","armorId":"no-armor"}],"objective":{"x":705,"y":248,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"open-window","title":"Open By Hand","text":"Move near the upper window and press E. Opening by hand causes no damage.","completeWhen":"windowOpened","windowId":"hand-window"},{"id":"vault-window","title":"Vault Through","text":"Press E again at the open window to climb through safely.","completeWhen":"windowVaulted","windowId":"hand-window"},{"id":"manual","title":"Switch To Manual","text":"Set Shooting to Manual so you can aim at the lower window.","completeWhen":"shootingMode","mode":"manual"},{"id":"break-window","title":"Break By Shooting","text":"Hold left mouse toward the lower window. Bullets break glass and keep traveling.","completeWhen":"windowBroken","windowId":"shoot-window"},{"id":"shoot-through","title":"Shoot Through Windows","text":"Hit the target behind the window to prove bullets pass through window openings.","completeWhen":"enemyNeutralized","enemyId":"WINDOW-TARGET"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker to complete the window tutorial.","completeWhen":"objectiveSecured"}]}},"equipment":{"advanced-carbine":{"id":"advanced-carbine","name":"Advanced Carbine","role":"Privilege 2 precision carbine","range":285,"damage":22,"magSize":34,"reserveBullets":150,"reloadTime":1.25,"fireInterval":0.13,"reactionDelay":0.3,"tracerTtl":0.07,"unlockPrivilege":2,"pixelPalette":"gold"},"compact-pdw":{"id":"compact-pdw","name":"Compact PDW","role":"Privilege 2 high-speed compact weapon","range":215,"damage":15,"magSize":40,"reserveBullets":210,"reloadTime":1.05,"fireInterval":0.06,"reactionDelay":0.24,"tracerTtl":0.05,"unlockPrivilege":2,"pixelPalette":"teal"},"heavy-armor":{"id":"heavy-armor","name":"Heavy Armor","role":"High protection with slower movement","armor":80,"speedMultiplier":0.88},"large-backpack":{"id":"large-backpack","name":"Large Backpack","role":"Large kit with extra ammunition","ammoMultiplier":1.45,"slots":6,"speedMultiplier":0.9},"light-armor":{"id":"light-armor","name":"Light Armor","role":"Low-profile armor with full mobility","armor":25,"speedMultiplier":1},"marksman-pistol":{"id":"marksman-pistol","name":"Marksman Pistol","role":"Privilege 2 precision sidearm","range":215,"damage":32,"magSize":14,"reserveBullets":84,"reloadTime":0.95,"fireInterval":0.31,"reactionDelay":0.22,"tracerTtl":0.08,"unlockPrivilege":2,"pixelPalette":"magenta"},"medium-armor":{"id":"medium-armor","name":"Medium Armor","role":"Balanced protection with a small mobility cost","armor":50,"speedMultiplier":0.94},"medium-backpack":{"id":"medium-backpack","name":"Medium Backpack","role":"Balanced field storage","ammoMultiplier":1,"slots":4,"speedMultiplier":0.96},"melee":{"id":"melee","name":"Melee","role":"Close-contact takedown weapon","range":34,"damage":200,"magSize":0,"reserveBullets":0,"reloadTime":0,"fireInterval":0.55,"reactionDelay":0.12,"tracerTtl":0,"attackType":"melee","canFire":true,"unlockPrivilege":0,"pixelPalette":"steel"},"no-armor":{"id":"no-armor","name":"No Armor","role":"No protection and full mobility","armor":0,"speedMultiplier":1},"no-weapon":{"id":"no-weapon","name":"No Weapon","role":"Unarmed training start","range":0,"damage":0,"magSize":0,"reserveBullets":0,"reloadTime":0,"fireInterval":999,"reactionDelay":999,"tracerTtl":0,"canFire":false},"pistol":{"id":"pistol","name":"Pistol","role":"Controlled sidearm","range":165,"damage":24,"magSize":12,"reserveBullets":60,"reloadTime":1,"fireInterval":0.38,"reactionDelay":0.28,"tracerTtl":0.1},"rifle":{"id":"rifle","name":"Rifle","role":"Balanced automatic rifle","range":245,"damage":18,"magSize":30,"reserveBullets":120,"reloadTime":1.4,"fireInterval":0.16,"reactionDelay":0.4,"tracerTtl":0.08},"small-backpack":{"id":"small-backpack","name":"Small Backpack","role":"Light kit with limited storage","ammoMultiplier":0.75,"slots":2,"speedMultiplier":1},"smg":{"id":"smg","name":"SMG","role":"Fast close-quarters weapon","range":185,"damage":12,"magSize":32,"reserveBullets":160,"reloadTime":1.15,"fireInterval":0.08,"reactionDelay":0.32,"tracerTtl":0.06}}};
-</script>
-<script>
+  <script>
+window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera House","width":1280,"height":760,"floorZones":[{"x":150,"y":100,"w":760,"h":560,"hiddenZone":"living"},{"x":930,"y":100,"w":220,"h":560,"hiddenZone":"bedrooms"}],"rooms":[{"id":"living-room","label":"Living Room","x":180,"y":140,"w":300,"h":250,"hiddenZone":"living"},{"id":"kitchen","label":"Kitchen","x":500,"y":140,"w":220,"h":250,"hiddenZone":"kitchen"},{"id":"dining-room","label":"Dining Room","x":740,"y":140,"w":170,"h":250,"hiddenZone":"kitchen"},{"id":"bathroom","label":"Bathroom","x":180,"y":420,"w":220,"h":220,"hiddenZone":"living"},{"id":"closet","label":"Closet","x":420,"y":420,"w":150,"h":220,"hiddenZone":"living"},{"id":"bedroom","label":"Bedroom","x":590,"y":420,"w":320,"h":220,"hiddenZone":"bedrooms"},{"id":"second-bedroom","label":"Bedroom","x":950,"y":140,"w":200,"h":250,"hiddenZone":"bedrooms"},{"id":"storage","label":"Closet","x":950,"y":420,"w":200,"h":220,"hiddenZone":"bedrooms"}],"labels":[{"text":"EXTERIOR CAMERA ENTRY","x":560,"y":58},{"text":"INTERIOR HIDDEN UNTIL CAMERA HACK","x":690,"y":710,"hiddenZone":"living"}],"walls":[{"x":0,"y":0,"w":1280,"h":20},{"x":0,"y":740,"w":1280,"h":20},{"x":0,"y":0,"w":20,"h":760},{"x":1260,"y":0,"w":20,"h":760},{"x":150,"y":100,"w":1000,"h":20},{"x":150,"y":660,"w":1000,"h":20},{"x":150,"y":100,"w":20,"h":245},{"x":150,"y":455,"w":20,"h":225},{"x":1130,"y":100,"w":20,"h":560},{"x":480,"y":120,"w":20,"h":115,"hiddenZone":"living"},{"x":480,"y":315,"w":20,"h":75,"hiddenZone":"living"},{"x":720,"y":120,"w":20,"h":115,"hiddenZone":"kitchen"},{"x":720,"y":315,"w":20,"h":75,"hiddenZone":"kitchen"},{"x":170,"y":390,"w":130,"h":20,"hiddenZone":"living"},{"x":410,"y":390,"w":180,"h":20,"hiddenZone":"living"},{"x":700,"y":390,"w":210,"h":20,"hiddenZone":"bedrooms"},{"x":400,"y":410,"w":20,"h":115,"hiddenZone":"living"},{"x":400,"y":605,"w":20,"h":55,"hiddenZone":"living"},{"x":570,"y":410,"w":20,"h":115,"hiddenZone":"bedrooms"},{"x":570,"y":605,"w":20,"h":55,"hiddenZone":"bedrooms"},{"x":930,"y":100,"w":20,"h":245,"hiddenZone":"bedrooms"},{"x":930,"y":455,"w":20,"h":225,"hiddenZone":"bedrooms"},{"x":950,"y":390,"w":200,"h":20,"hiddenZone":"bedrooms"}],"doors":[{"id":"front-door","x":150,"y":345,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"kitchen-door","x":480,"y":235,"w":20,"h":80,"orientation":"vertical","state":"closed","hiddenZone":"living"},{"id":"dining-door","x":720,"y":235,"w":20,"h":80,"orientation":"vertical","state":"closed","hiddenZone":"kitchen"},{"id":"bath-door","x":300,"y":390,"w":110,"h":20,"orientation":"horizontal","state":"closed","hiddenZone":"living"},{"id":"closet-door","x":400,"y":525,"w":20,"h":80,"orientation":"vertical","state":"closed","hiddenZone":"living"},{"id":"bedroom-door","x":590,"y":390,"w":110,"h":20,"orientation":"horizontal","state":"closed","hiddenZone":"bedrooms"},{"id":"east-bedroom-door","x":930,"y":345,"w":20,"h":110,"orientation":"vertical","state":"closed","hiddenZone":"bedrooms"}],"windows":[{"id":"living-window","x":260,"y":100,"w":130,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"kitchen-window","x":560,"y":100,"w":130,"h":20,"orientation":"horizontal","state":"closed","damage":8,"hiddenZone":"kitchen"},{"id":"bedroom-window","x":680,"y":660,"w":130,"h":20,"orientation":"horizontal","state":"closed","damage":8,"hiddenZone":"bedrooms"},{"id":"east-window","x":1130,"y":240,"w":20,"h":120,"orientation":"vertical","state":"closed","damage":8,"hiddenZone":"bedrooms"}],"laptops":[{"id":"outside-laptop","name":"Outside Camera Laptop","x":70,"y":480,"w":76,"h":44}],"cameras":[{"id":"c1","label":"C1","x":330,"y":175,"revealZones":["living"]},{"id":"c2","label":"C2","x":615,"y":175,"revealZones":["kitchen"]},{"id":"c3","label":"C3","x":760,"y":520,"revealZones":["bedrooms"]}],"items":[],"equipmentTables":[{"id":"outside-gear-table","name":"Outside Gear Table","x":70,"y":560,"w":76,"h":60}],"operators":[{"id":"ALPHA","x":82,"y":360,"color":"#67c98f","floor":"Exterior","zone":"Driveway"},{"id":"BRAVO","x":82,"y":410,"color":"#72b7ce","floor":"Exterior","zone":"Driveway"}],"enemies":[{"id":"E1","x":325,"y":250,"angle":3.141592653589793,"watch":{"x":355,"y":400},"patrol":[{"x":325,"y":250},{"x":420,"y":320}],"hiddenZone":"living"},{"id":"E2","x":610,"y":190,"angle":3.141592653589793,"watch":{"x":730,"y":275},"hiddenZone":"kitchen"},{"id":"E3","x":780,"y":520,"angle":-1.5707963267948966,"watch":{"x":645,"y":400},"hiddenZone":"bedrooms"}],"objective":{"x":820,"y":575,"radius":16,"secured":false,"harmed":false,"hiddenZone":"bedrooms"}},"level/camera-house.json":{"id":"camera-house","title":"Camera House","width":1280,"height":760,"floorZones":[{"x":150,"y":100,"w":760,"h":560,"hiddenZone":"living"},{"x":930,"y":100,"w":220,"h":560,"hiddenZone":"bedrooms"}],"rooms":[{"id":"living-room","label":"Living Room","x":180,"y":140,"w":300,"h":250,"hiddenZone":"living"},{"id":"kitchen","label":"Kitchen","x":500,"y":140,"w":220,"h":250,"hiddenZone":"kitchen"},{"id":"dining-room","label":"Dining Room","x":740,"y":140,"w":170,"h":250,"hiddenZone":"kitchen"},{"id":"bathroom","label":"Bathroom","x":180,"y":420,"w":220,"h":220,"hiddenZone":"living"},{"id":"closet","label":"Closet","x":420,"y":420,"w":150,"h":220,"hiddenZone":"living"},{"id":"bedroom","label":"Bedroom","x":590,"y":420,"w":320,"h":220,"hiddenZone":"bedrooms"},{"id":"second-bedroom","label":"Bedroom","x":950,"y":140,"w":200,"h":250,"hiddenZone":"bedrooms"},{"id":"storage","label":"Closet","x":950,"y":420,"w":200,"h":220,"hiddenZone":"bedrooms"}],"labels":[{"text":"EXTERIOR CAMERA ENTRY","x":560,"y":58},{"text":"INTERIOR HIDDEN UNTIL CAMERA HACK","x":690,"y":710,"hiddenZone":"living"}],"walls":[{"x":0,"y":0,"w":1280,"h":20},{"x":0,"y":740,"w":1280,"h":20},{"x":0,"y":0,"w":20,"h":760},{"x":1260,"y":0,"w":20,"h":760},{"x":150,"y":100,"w":1000,"h":20},{"x":150,"y":660,"w":1000,"h":20},{"x":150,"y":100,"w":20,"h":245},{"x":150,"y":455,"w":20,"h":225},{"x":1130,"y":100,"w":20,"h":560},{"x":480,"y":120,"w":20,"h":115,"hiddenZone":"living"},{"x":480,"y":315,"w":20,"h":75,"hiddenZone":"living"},{"x":720,"y":120,"w":20,"h":115,"hiddenZone":"kitchen"},{"x":720,"y":315,"w":20,"h":75,"hiddenZone":"kitchen"},{"x":170,"y":390,"w":130,"h":20,"hiddenZone":"living"},{"x":410,"y":390,"w":180,"h":20,"hiddenZone":"living"},{"x":700,"y":390,"w":210,"h":20,"hiddenZone":"bedrooms"},{"x":400,"y":410,"w":20,"h":115,"hiddenZone":"living"},{"x":400,"y":605,"w":20,"h":55,"hiddenZone":"living"},{"x":570,"y":410,"w":20,"h":115,"hiddenZone":"bedrooms"},{"x":570,"y":605,"w":20,"h":55,"hiddenZone":"bedrooms"},{"x":930,"y":100,"w":20,"h":245,"hiddenZone":"bedrooms"},{"x":930,"y":455,"w":20,"h":225,"hiddenZone":"bedrooms"},{"x":950,"y":390,"w":200,"h":20,"hiddenZone":"bedrooms"}],"doors":[{"id":"front-door","x":150,"y":345,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"kitchen-door","x":480,"y":235,"w":20,"h":80,"orientation":"vertical","state":"closed","hiddenZone":"living"},{"id":"dining-door","x":720,"y":235,"w":20,"h":80,"orientation":"vertical","state":"closed","hiddenZone":"kitchen"},{"id":"bath-door","x":300,"y":390,"w":110,"h":20,"orientation":"horizontal","state":"closed","hiddenZone":"living"},{"id":"closet-door","x":400,"y":525,"w":20,"h":80,"orientation":"vertical","state":"closed","hiddenZone":"living"},{"id":"bedroom-door","x":590,"y":390,"w":110,"h":20,"orientation":"horizontal","state":"closed","hiddenZone":"bedrooms"},{"id":"east-bedroom-door","x":930,"y":345,"w":20,"h":110,"orientation":"vertical","state":"closed","hiddenZone":"bedrooms"}],"windows":[{"id":"living-window","x":260,"y":100,"w":130,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"kitchen-window","x":560,"y":100,"w":130,"h":20,"orientation":"horizontal","state":"closed","damage":8,"hiddenZone":"kitchen"},{"id":"bedroom-window","x":680,"y":660,"w":130,"h":20,"orientation":"horizontal","state":"closed","damage":8,"hiddenZone":"bedrooms"},{"id":"east-window","x":1130,"y":240,"w":20,"h":120,"orientation":"vertical","state":"closed","damage":8,"hiddenZone":"bedrooms"}],"laptops":[{"id":"outside-laptop","name":"Outside Camera Laptop","x":70,"y":480,"w":76,"h":44}],"cameras":[{"id":"c1","label":"C1","x":330,"y":175,"revealZones":["living"]},{"id":"c2","label":"C2","x":615,"y":175,"revealZones":["kitchen"]},{"id":"c3","label":"C3","x":760,"y":520,"revealZones":["bedrooms"]}],"items":[],"equipmentTables":[{"id":"outside-gear-table","name":"Outside Gear Table","x":70,"y":560,"w":76,"h":60}],"operators":[{"id":"ALPHA","x":82,"y":360,"color":"#67c98f","floor":"Exterior","zone":"Driveway"},{"id":"BRAVO","x":82,"y":410,"color":"#72b7ce","floor":"Exterior","zone":"Driveway"}],"enemies":[{"id":"E1","x":325,"y":250,"angle":3.141592653589793,"watch":{"x":355,"y":400},"patrol":[{"x":325,"y":250},{"x":420,"y":320}],"hiddenZone":"living"},{"id":"E2","x":610,"y":190,"angle":3.141592653589793,"watch":{"x":730,"y":275},"hiddenZone":"kitchen"},{"id":"E3","x":780,"y":520,"angle":-1.5707963267948966,"watch":{"x":645,"y":400},"hiddenZone":"bedrooms"}],"objective":{"x":820,"y":575,"radius":16,"secured":false,"harmed":false,"hiddenZone":"bedrooms"}},"hardpoint-gallery":{"id":"hardpoint-gallery","title":"Hardpoint Gallery","walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":90,"w":690,"h":20},{"x":120,"y":510,"w":690,"h":20},{"x":120,"y":90,"w":20,"h":175},{"x":120,"y":375,"w":20,"h":155},{"x":790,"y":90,"w":20,"h":155},{"x":790,"y":355,"w":20,"h":175},{"x":295,"y":90,"w":20,"h":110},{"x":295,"y":310,"w":20,"h":200},{"x":500,"y":90,"w":20,"h":150},{"x":500,"y":350,"w":20,"h":160},{"x":315,"y":250,"w":65,"h":20},{"x":450,"y":250,"w":50,"h":20},{"x":520,"y":250,"w":40,"h":20},{"x":670,"y":250,"w":120,"h":20},{"x":315,"y":380,"w":65,"h":20},{"x":450,"y":380,"w":50,"h":20},{"x":520,"y":380,"w":40,"h":20},{"x":670,"y":380,"w":120,"h":20},{"x":650,"y":270,"w":20,"h":110},{"x":140,"y":340,"w":155,"h":20},{"x":380,"y":110,"w":20,"h":50},{"x":705,"y":400,"w":20,"h":70}],"doors":[{"id":"entry-west","x":120,"y":265,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"office","x":295,"y":200,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lounge","x":500,"y":240,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"upper-storage","x":380,"y":250,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"lower-storage","x":380,"y":380,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"hall-east","x":790,"y":245,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"center-north","x":560,"y":250,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"center-south","x":560,"y":380,"w":110,"h":20,"orientation":"horizontal","state":"closed"}],"operators":[{"id":"ALPHA","x":72,"y":248,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":392,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":410,"y":170,"angle":3.141592653589793,"watch":{"x":415,"y":260},"patrol":[{"x":410,"y":170},{"x":455,"y":220}]},{"id":"E2","x":720,"y":175,"angle":2.356194490192345,"watch":{"x":615,"y":260},"patrol":[{"x":720,"y":175},{"x":735,"y":330}]},{"id":"E3","x":590,"y":455,"angle":3.9269908169872414,"watch":{"x":615,"y":390},"patrol":[{"x":590,"y":455},{"x":690,"y":455}]},{"id":"E4","x":355,"y":445,"angle":3.141592653589793,"watch":{"x":415,"y":390},"patrol":[{"x":355,"y":445},{"x":470,"y":445}]},{"id":"E5","x":610,"y":315,"angle":3.141592653589793,"watch":{"x":615,"y":260},"patrol":[{"x":610,"y":315},{"x":725,"y":315}]}],"objective":{"x":735,"y":455,"radius":16,"secured":false,"harmed":false}},"level/hardpoint-gallery.json":{"id":"hardpoint-gallery","title":"Hardpoint Gallery","walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":90,"w":690,"h":20},{"x":120,"y":510,"w":690,"h":20},{"x":120,"y":90,"w":20,"h":175},{"x":120,"y":375,"w":20,"h":155},{"x":790,"y":90,"w":20,"h":155},{"x":790,"y":355,"w":20,"h":175},{"x":295,"y":90,"w":20,"h":110},{"x":295,"y":310,"w":20,"h":200},{"x":500,"y":90,"w":20,"h":150},{"x":500,"y":350,"w":20,"h":160},{"x":315,"y":250,"w":65,"h":20},{"x":450,"y":250,"w":50,"h":20},{"x":520,"y":250,"w":40,"h":20},{"x":670,"y":250,"w":120,"h":20},{"x":315,"y":380,"w":65,"h":20},{"x":450,"y":380,"w":50,"h":20},{"x":520,"y":380,"w":40,"h":20},{"x":670,"y":380,"w":120,"h":20},{"x":650,"y":270,"w":20,"h":110},{"x":140,"y":340,"w":155,"h":20},{"x":380,"y":110,"w":20,"h":50},{"x":705,"y":400,"w":20,"h":70}],"doors":[{"id":"entry-west","x":120,"y":265,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"office","x":295,"y":200,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lounge","x":500,"y":240,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"upper-storage","x":380,"y":250,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"lower-storage","x":380,"y":380,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"hall-east","x":790,"y":245,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"center-north","x":560,"y":250,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"center-south","x":560,"y":380,"w":110,"h":20,"orientation":"horizontal","state":"closed"}],"operators":[{"id":"ALPHA","x":72,"y":248,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":392,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":410,"y":170,"angle":3.141592653589793,"watch":{"x":415,"y":260},"patrol":[{"x":410,"y":170},{"x":455,"y":220}]},{"id":"E2","x":720,"y":175,"angle":2.356194490192345,"watch":{"x":615,"y":260},"patrol":[{"x":720,"y":175},{"x":735,"y":330}]},{"id":"E3","x":590,"y":455,"angle":3.9269908169872414,"watch":{"x":615,"y":390},"patrol":[{"x":590,"y":455},{"x":690,"y":455}]},{"id":"E4","x":355,"y":445,"angle":3.141592653589793,"watch":{"x":415,"y":390},"patrol":[{"x":355,"y":445},{"x":470,"y":445}]},{"id":"E5","x":610,"y":315,"angle":3.141592653589793,"watch":{"x":615,"y":260},"patrol":[{"x":610,"y":315},{"x":725,"y":315}]}],"objective":{"x":735,"y":455,"radius":16,"secured":false,"harmed":false}},"house-blueprint":{"id":"house-blueprint","title":"House Blueprint","width":1800,"height":760,"floorZones":[{"x":80,"y":80,"w":760,"h":600},{"x":980,"y":80,"w":760,"h":600}],"rooms":[{"id":"living-room","label":"Living Room","x":120,"y":120,"w":300,"h":240},{"id":"kitchen","label":"Kitchen","x":440,"y":120,"w":180,"h":240},{"id":"dining-room","label":"Dining Room","x":640,"y":120,"w":160,"h":240},{"id":"bathroom","label":"Bathroom","x":120,"y":400,"w":220,"h":240},{"id":"closet","label":"Closet","x":360,"y":400,"w":150,"h":240},{"id":"stair-hall-1","label":"Stair Hall","x":530,"y":400,"w":270,"h":240},{"id":"bedroom","label":"Bedroom","x":1020,"y":120,"w":310,"h":240},{"id":"bathroom-2","label":"Bathroom","x":1350,"y":120,"w":180,"h":240},{"id":"closet-2","label":"Closet","x":1550,"y":120,"w":150,"h":240},{"id":"second-living","label":"Living Room","x":1020,"y":400,"w":300,"h":240},{"id":"second-dining","label":"Dining Room","x":1340,"y":400,"w":180,"h":240},{"id":"stair-hall-2","label":"Stair Hall","x":1540,"y":400,"w":160,"h":240}],"labels":[{"text":"FIRST FLOOR","x":460,"y":56},{"text":"SECOND FLOOR","x":1360,"y":56}],"walls":[{"x":0,"y":0,"w":1800,"h":20},{"x":0,"y":740,"w":1800,"h":20},{"x":0,"y":0,"w":20,"h":760},{"x":1780,"y":0,"w":20,"h":760},{"x":880,"y":0,"w":60,"h":760},{"x":80,"y":80,"w":760,"h":20},{"x":80,"y":660,"w":760,"h":20},{"x":80,"y":80,"w":20,"h":220},{"x":80,"y":450,"w":20,"h":230},{"x":820,"y":80,"w":20,"h":250},{"x":820,"y":430,"w":20,"h":250},{"x":420,"y":100,"w":20,"h":118},{"x":420,"y":302,"w":20,"h":58},{"x":620,"y":100,"w":20,"h":118},{"x":620,"y":302,"w":20,"h":58},{"x":100,"y":360,"w":110,"h":20},{"x":310,"y":360,"w":220,"h":20},{"x":640,"y":360,"w":180,"h":20},{"x":340,"y":380,"w":20,"h":118},{"x":340,"y":582,"w":20,"h":78},{"x":510,"y":380,"w":20,"h":118},{"x":510,"y":582,"w":20,"h":78},{"x":980,"y":80,"w":760,"h":20},{"x":980,"y":660,"w":760,"h":20},{"x":980,"y":80,"w":20,"h":250},{"x":980,"y":430,"w":20,"h":250},{"x":1720,"y":80,"w":20,"h":250},{"x":1720,"y":430,"w":20,"h":250},{"x":1330,"y":100,"w":20,"h":118},{"x":1330,"y":302,"w":20,"h":58},{"x":1530,"y":100,"w":20,"h":118},{"x":1530,"y":302,"w":20,"h":58},{"x":1000,"y":360,"w":40,"h":20},{"x":1260,"y":360,"w":280,"h":20},{"x":1640,"y":360,"w":80,"h":20},{"x":1320,"y":380,"w":20,"h":118},{"x":1320,"y":582,"w":20,"h":78},{"x":1520,"y":380,"w":20,"h":118},{"x":1520,"y":582,"w":20,"h":78}],"doors":[{"id":"front-door","x":80,"y":300,"w":20,"h":150,"orientation":"vertical","state":"closed"},{"id":"kitchen-door","x":420,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"dining-door","x":620,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"bath-door","x":210,"y":360,"w":100,"h":20,"orientation":"horizontal","state":"closed"},{"id":"closet-door","x":340,"y":498,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"stair-door","x":530,"y":360,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"bedroom-digital","x":1040,"y":360,"w":220,"h":20,"orientation":"horizontal","state":"closed","lockType":"digital","locked":true},{"id":"bathroom-2-door","x":1330,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"closet-2-door","x":1530,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"second-stair-door","x":1540,"y":360,"w":100,"h":20,"orientation":"horizontal","state":"closed"}],"windows":[{"id":"living-window","x":200,"y":80,"w":110,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"kitchen-window","x":500,"y":80,"w":90,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"dining-window","x":820,"y":260,"w":20,"h":100,"orientation":"vertical","state":"closed","damage":8},{"id":"bedroom-window","x":1100,"y":80,"w":120,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"second-living-window","x":980,"y":500,"w":20,"h":100,"orientation":"vertical","state":"closed","damage":8}],"stairs":[{"id":"stairs-up","name":"Stairs Up","label":"UP","x":690,"y":520,"w":90,"h":70,"target":{"x":1600,"y":520,"floor":"Floor 2","label":"Second Floor Stair Hall"}},{"id":"stairs-down","name":"Stairs Down","label":"DOWN","x":1560,"y":520,"w":90,"h":70,"target":{"x":730,"y":520,"floor":"Floor 1","label":"First Floor Stair Hall"}}],"items":[{"id":"paper-bedroom-digital","type":"paper","name":"Bedroom Door Paper","x":470,"y":178,"w":24,"h":18,"passwordFor":"bedroom-digital"}],"equipmentTables":[{"id":"start-gear-table","name":"Entry Gear Table","x":36,"y":450,"w":34,"h":110}],"operators":[{"id":"ALPHA","x":42,"y":334,"color":"#67c98f","floor":"Floor 1","zone":"Front Entry"},{"id":"BRAVO","x":42,"y":404,"color":"#72b7ce","floor":"Floor 1","zone":"Front Entry"}],"enemies":[{"id":"E1","x":300,"y":210,"angle":3.141592653589793,"watch":{"x":430,"y":260},"patrol":[{"x":300,"y":210},{"x":370,"y":300}]},{"id":"E2","x":560,"y":210,"angle":3.141592653589793,"watch":{"x":630,"y":260},"patrol":[{"x":560,"y":210},{"x":560,"y":310}]},{"id":"E3","x":720,"y":230,"angle":3.141592653589793,"watch":{"x":630,"y":260}},{"id":"E4","x":1220,"y":230,"angle":1.5707963267948966,"watch":{"x":1340,"y":260}},{"id":"E5","x":1450,"y":230,"angle":3.141592653589793,"watch":{"x":1540,"y":260}},{"id":"E6","x":1160,"y":520,"angle":0,"watch":{"x":1150,"y":370}}],"objective":{"x":1260,"y":292,"radius":16,"secured":false,"harmed":false}},"level/house-blueprint.json":{"id":"house-blueprint","title":"House Blueprint","width":1800,"height":760,"floorZones":[{"x":80,"y":80,"w":760,"h":600},{"x":980,"y":80,"w":760,"h":600}],"rooms":[{"id":"living-room","label":"Living Room","x":120,"y":120,"w":300,"h":240},{"id":"kitchen","label":"Kitchen","x":440,"y":120,"w":180,"h":240},{"id":"dining-room","label":"Dining Room","x":640,"y":120,"w":160,"h":240},{"id":"bathroom","label":"Bathroom","x":120,"y":400,"w":220,"h":240},{"id":"closet","label":"Closet","x":360,"y":400,"w":150,"h":240},{"id":"stair-hall-1","label":"Stair Hall","x":530,"y":400,"w":270,"h":240},{"id":"bedroom","label":"Bedroom","x":1020,"y":120,"w":310,"h":240},{"id":"bathroom-2","label":"Bathroom","x":1350,"y":120,"w":180,"h":240},{"id":"closet-2","label":"Closet","x":1550,"y":120,"w":150,"h":240},{"id":"second-living","label":"Living Room","x":1020,"y":400,"w":300,"h":240},{"id":"second-dining","label":"Dining Room","x":1340,"y":400,"w":180,"h":240},{"id":"stair-hall-2","label":"Stair Hall","x":1540,"y":400,"w":160,"h":240}],"labels":[{"text":"FIRST FLOOR","x":460,"y":56},{"text":"SECOND FLOOR","x":1360,"y":56}],"walls":[{"x":0,"y":0,"w":1800,"h":20},{"x":0,"y":740,"w":1800,"h":20},{"x":0,"y":0,"w":20,"h":760},{"x":1780,"y":0,"w":20,"h":760},{"x":880,"y":0,"w":60,"h":760},{"x":80,"y":80,"w":760,"h":20},{"x":80,"y":660,"w":760,"h":20},{"x":80,"y":80,"w":20,"h":220},{"x":80,"y":450,"w":20,"h":230},{"x":820,"y":80,"w":20,"h":250},{"x":820,"y":430,"w":20,"h":250},{"x":420,"y":100,"w":20,"h":118},{"x":420,"y":302,"w":20,"h":58},{"x":620,"y":100,"w":20,"h":118},{"x":620,"y":302,"w":20,"h":58},{"x":100,"y":360,"w":110,"h":20},{"x":310,"y":360,"w":220,"h":20},{"x":640,"y":360,"w":180,"h":20},{"x":340,"y":380,"w":20,"h":118},{"x":340,"y":582,"w":20,"h":78},{"x":510,"y":380,"w":20,"h":118},{"x":510,"y":582,"w":20,"h":78},{"x":980,"y":80,"w":760,"h":20},{"x":980,"y":660,"w":760,"h":20},{"x":980,"y":80,"w":20,"h":250},{"x":980,"y":430,"w":20,"h":250},{"x":1720,"y":80,"w":20,"h":250},{"x":1720,"y":430,"w":20,"h":250},{"x":1330,"y":100,"w":20,"h":118},{"x":1330,"y":302,"w":20,"h":58},{"x":1530,"y":100,"w":20,"h":118},{"x":1530,"y":302,"w":20,"h":58},{"x":1000,"y":360,"w":40,"h":20},{"x":1260,"y":360,"w":280,"h":20},{"x":1640,"y":360,"w":80,"h":20},{"x":1320,"y":380,"w":20,"h":118},{"x":1320,"y":582,"w":20,"h":78},{"x":1520,"y":380,"w":20,"h":118},{"x":1520,"y":582,"w":20,"h":78}],"doors":[{"id":"front-door","x":80,"y":300,"w":20,"h":150,"orientation":"vertical","state":"closed"},{"id":"kitchen-door","x":420,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"dining-door","x":620,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"bath-door","x":210,"y":360,"w":100,"h":20,"orientation":"horizontal","state":"closed"},{"id":"closet-door","x":340,"y":498,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"stair-door","x":530,"y":360,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"bedroom-digital","x":1040,"y":360,"w":220,"h":20,"orientation":"horizontal","state":"closed","lockType":"digital","locked":true},{"id":"bathroom-2-door","x":1330,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"closet-2-door","x":1530,"y":218,"w":20,"h":84,"orientation":"vertical","state":"closed"},{"id":"second-stair-door","x":1540,"y":360,"w":100,"h":20,"orientation":"horizontal","state":"closed"}],"windows":[{"id":"living-window","x":200,"y":80,"w":110,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"kitchen-window","x":500,"y":80,"w":90,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"dining-window","x":820,"y":260,"w":20,"h":100,"orientation":"vertical","state":"closed","damage":8},{"id":"bedroom-window","x":1100,"y":80,"w":120,"h":20,"orientation":"horizontal","state":"closed","damage":8},{"id":"second-living-window","x":980,"y":500,"w":20,"h":100,"orientation":"vertical","state":"closed","damage":8}],"stairs":[{"id":"stairs-up","name":"Stairs Up","label":"UP","x":690,"y":520,"w":90,"h":70,"target":{"x":1600,"y":520,"floor":"Floor 2","label":"Second Floor Stair Hall"}},{"id":"stairs-down","name":"Stairs Down","label":"DOWN","x":1560,"y":520,"w":90,"h":70,"target":{"x":730,"y":520,"floor":"Floor 1","label":"First Floor Stair Hall"}}],"items":[{"id":"paper-bedroom-digital","type":"paper","name":"Bedroom Door Paper","x":470,"y":178,"w":24,"h":18,"passwordFor":"bedroom-digital"}],"equipmentTables":[{"id":"start-gear-table","name":"Entry Gear Table","x":36,"y":450,"w":34,"h":110}],"operators":[{"id":"ALPHA","x":42,"y":334,"color":"#67c98f","floor":"Floor 1","zone":"Front Entry"},{"id":"BRAVO","x":42,"y":404,"color":"#72b7ce","floor":"Floor 1","zone":"Front Entry"}],"enemies":[{"id":"E1","x":300,"y":210,"angle":3.141592653589793,"watch":{"x":430,"y":260},"patrol":[{"x":300,"y":210},{"x":370,"y":300}]},{"id":"E2","x":560,"y":210,"angle":3.141592653589793,"watch":{"x":630,"y":260},"patrol":[{"x":560,"y":210},{"x":560,"y":310}]},{"id":"E3","x":720,"y":230,"angle":3.141592653589793,"watch":{"x":630,"y":260}},{"id":"E4","x":1220,"y":230,"angle":1.5707963267948966,"watch":{"x":1340,"y":260}},{"id":"E5","x":1450,"y":230,"angle":3.141592653589793,"watch":{"x":1540,"y":260}},{"id":"E6","x":1160,"y":520,"angle":0,"watch":{"x":1150,"y":370}}],"objective":{"x":1260,"y":292,"radius":16,"secured":false,"harmed":false}},"ridge-house-entry":{"id":"ridge-house-entry","title":"Ridge House Entry","walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":90,"w":690,"h":20},{"x":120,"y":510,"w":690,"h":20},{"x":120,"y":90,"w":20,"h":175},{"x":120,"y":375,"w":20,"h":155},{"x":790,"y":90,"w":20,"h":155},{"x":790,"y":355,"w":20,"h":175},{"x":295,"y":90,"w":20,"h":110},{"x":295,"y":310,"w":20,"h":200},{"x":500,"y":90,"w":20,"h":150},{"x":500,"y":350,"w":20,"h":160},{"x":315,"y":250,"w":65,"h":20},{"x":450,"y":250,"w":50,"h":20},{"x":520,"y":250,"w":40,"h":20},{"x":670,"y":250,"w":120,"h":20},{"x":315,"y":380,"w":65,"h":20},{"x":450,"y":380,"w":50,"h":20},{"x":520,"y":380,"w":40,"h":20},{"x":670,"y":380,"w":120,"h":20},{"x":650,"y":270,"w":20,"h":110},{"x":140,"y":340,"w":155,"h":20}],"doors":[{"id":"entry-west","x":120,"y":265,"w":20,"h":110,"orientation":"vertical","state":"closed","lockType":"digital","password":"0000","locked":true},{"id":"office","x":295,"y":200,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lounge","x":500,"y":240,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"upper-storage","x":380,"y":250,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"lower-storage","x":380,"y":380,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"hall-east","x":790,"y":245,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"center-north","x":560,"y":250,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"center-south","x":560,"y":380,"w":110,"h":20,"orientation":"horizontal","state":"closed"}],"operators":[{"id":"ALPHA","x":72,"y":276,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":364,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":410,"y":174,"angle":3.141592653589793,"watch":{"x":415,"y":260},"patrol":[{"x":410,"y":174},{"x":425,"y":220}]},{"id":"E2","x":720,"y":180,"angle":1.7278759594743864,"watch":{"x":615,"y":260},"patrol":[{"x":720,"y":180},{"x":735,"y":320}]},{"id":"E3","x":600,"y":455,"angle":3.9269908169872414,"watch":{"x":615,"y":390},"patrol":[{"x":600,"y":455},{"x":705,"y":455}]}],"objective":{"x":720,"y":452,"radius":16,"secured":false,"harmed":false}},"level/ridge-house-entry.json":{"id":"ridge-house-entry","title":"Ridge House Entry","walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":90,"w":690,"h":20},{"x":120,"y":510,"w":690,"h":20},{"x":120,"y":90,"w":20,"h":175},{"x":120,"y":375,"w":20,"h":155},{"x":790,"y":90,"w":20,"h":155},{"x":790,"y":355,"w":20,"h":175},{"x":295,"y":90,"w":20,"h":110},{"x":295,"y":310,"w":20,"h":200},{"x":500,"y":90,"w":20,"h":150},{"x":500,"y":350,"w":20,"h":160},{"x":315,"y":250,"w":65,"h":20},{"x":450,"y":250,"w":50,"h":20},{"x":520,"y":250,"w":40,"h":20},{"x":670,"y":250,"w":120,"h":20},{"x":315,"y":380,"w":65,"h":20},{"x":450,"y":380,"w":50,"h":20},{"x":520,"y":380,"w":40,"h":20},{"x":670,"y":380,"w":120,"h":20},{"x":650,"y":270,"w":20,"h":110},{"x":140,"y":340,"w":155,"h":20}],"doors":[{"id":"entry-west","x":120,"y":265,"w":20,"h":110,"orientation":"vertical","state":"closed","lockType":"digital","password":"0000","locked":true},{"id":"office","x":295,"y":200,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lounge","x":500,"y":240,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"upper-storage","x":380,"y":250,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"lower-storage","x":380,"y":380,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"hall-east","x":790,"y":245,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"center-north","x":560,"y":250,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"center-south","x":560,"y":380,"w":110,"h":20,"orientation":"horizontal","state":"closed"}],"operators":[{"id":"ALPHA","x":72,"y":276,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":364,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":410,"y":174,"angle":3.141592653589793,"watch":{"x":415,"y":260},"patrol":[{"x":410,"y":174},{"x":425,"y":220}]},{"id":"E2","x":720,"y":180,"angle":1.7278759594743864,"watch":{"x":615,"y":260},"patrol":[{"x":720,"y":180},{"x":735,"y":320}]},{"id":"E3","x":600,"y":455,"angle":3.9269908169872414,"watch":{"x":615,"y":390},"patrol":[{"x":600,"y":455},{"x":705,"y":455}]}],"objective":{"x":720,"y":452,"radius":16,"secured":false,"harmed":false}},"terminal-breach":{"id":"terminal-breach","title":"Terminal Breach","width":1280,"height":800,"floorZones":[{"x":140,"y":120,"w":220,"h":240},{"x":380,"y":120,"w":240,"h":240},{"x":640,"y":120,"w":240,"h":240},{"x":900,"y":120,"w":220,"h":240},{"x":140,"y":380,"w":220,"h":180},{"x":380,"y":380,"w":240,"h":180},{"x":640,"y":380,"w":240,"h":180},{"x":900,"y":380,"w":220,"h":180},{"x":140,"y":580,"w":480,"h":120},{"x":640,"y":580,"w":480,"h":120}],"walls":[{"x":0,"y":0,"w":1280,"h":20},{"x":0,"y":780,"w":1280,"h":20},{"x":0,"y":0,"w":20,"h":800},{"x":1260,"y":0,"w":20,"h":800},{"x":120,"y":100,"w":1020,"h":20},{"x":120,"y":700,"w":1020,"h":20},{"x":120,"y":100,"w":20,"h":210},{"x":120,"y":410,"w":20,"h":290},{"x":1120,"y":100,"w":20,"h":220},{"x":1120,"y":420,"w":20,"h":280},{"x":360,"y":100,"w":20,"h":120},{"x":360,"y":330,"w":20,"h":190},{"x":360,"y":630,"w":20,"h":70},{"x":620,"y":100,"w":20,"h":150},{"x":620,"y":360,"w":20,"h":160},{"x":620,"y":630,"w":20,"h":70},{"x":880,"y":100,"w":20,"h":180},{"x":880,"y":390,"w":20,"h":130},{"x":880,"y":630,"w":20,"h":70},{"x":140,"y":360,"w":110,"h":20},{"x":330,"y":360,"w":290,"h":20},{"x":640,"y":360,"w":110,"h":20},{"x":830,"y":360,"w":290,"h":20},{"x":140,"y":560,"w":190,"h":20},{"x":430,"y":560,"w":190,"h":20},{"x":640,"y":560,"w":190,"h":20},{"x":930,"y":560,"w":190,"h":20},{"x":500,"y":420,"w":20,"h":120},{"x":760,"y":420,"w":20,"h":120},{"x":1010,"y":140,"w":20,"h":130},{"x":250,"y":590,"w":20,"h":90}],"doors":[{"id":"entry-west","x":120,"y":310,"w":20,"h":100,"orientation":"vertical","state":"closed"},{"id":"east-entry","x":1120,"y":320,"w":20,"h":100,"orientation":"vertical","state":"closed"},{"id":"alpha-office","x":360,"y":220,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"server-core","x":620,"y":250,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"archive","x":880,"y":280,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lower-west","x":360,"y":520,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lower-core","x":620,"y":520,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lower-east","x":880,"y":520,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"north-hall-a","x":250,"y":360,"w":80,"h":20,"orientation":"horizontal","state":"closed"},{"id":"north-hall-b","x":750,"y":360,"w":80,"h":20,"orientation":"horizontal","state":"closed"},{"id":"south-hall-a","x":330,"y":560,"w":100,"h":20,"orientation":"horizontal","state":"closed"},{"id":"south-hall-b","x":830,"y":560,"w":100,"h":20,"orientation":"horizontal","state":"closed"}],"equipmentTables":[{"id":"terminal-entry-table","name":"Terminal Entry Gear Table","x":52,"y":352,"w":42,"h":56}],"operators":[{"id":"ALPHA","x":72,"y":300,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":420,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":250,"y":210,"angle":3.141592653589793,"watch":{"x":370,"y":275},"patrol":[{"x":250,"y":210},{"x":315,"y":300}]},{"id":"E2","x":510,"y":205,"angle":2.356194490192345,"watch":{"x":630,"y":305},"patrol":[{"x":510,"y":205},{"x":575,"y":315}]},{"id":"E3","x":735,"y":235,"angle":3.141592653589793,"watch":{"x":630,"y":305},"patrol":[{"x":735,"y":235},{"x":825,"y":315}]},{"id":"E4","x":1010,"y":310,"angle":2.356194490192345,"watch":{"x":890,"y":335},"patrol":[{"x":1010,"y":310},{"x":935,"y":205}]},{"id":"E5","x":300,"y":635,"angle":3.141592653589793,"watch":{"x":380,"y":570},"patrol":[{"x":300,"y":635},{"x":550,"y":635}]},{"id":"E6","x":710,"y":640,"angle":3.141592653589793,"watch":{"x":630,"y":575},"patrol":[{"x":710,"y":640},{"x":880,"y":640}]},{"id":"E7","x":1015,"y":640,"angle":3.9269908169872414,"watch":{"x":890,"y":575},"patrol":[{"x":1015,"y":640},{"x":930,"y":455}]}],"objective":{"x":1040,"y":650,"radius":16,"secured":false,"harmed":false}},"level/terminal-breach.json":{"id":"terminal-breach","title":"Terminal Breach","width":1280,"height":800,"floorZones":[{"x":140,"y":120,"w":220,"h":240},{"x":380,"y":120,"w":240,"h":240},{"x":640,"y":120,"w":240,"h":240},{"x":900,"y":120,"w":220,"h":240},{"x":140,"y":380,"w":220,"h":180},{"x":380,"y":380,"w":240,"h":180},{"x":640,"y":380,"w":240,"h":180},{"x":900,"y":380,"w":220,"h":180},{"x":140,"y":580,"w":480,"h":120},{"x":640,"y":580,"w":480,"h":120}],"walls":[{"x":0,"y":0,"w":1280,"h":20},{"x":0,"y":780,"w":1280,"h":20},{"x":0,"y":0,"w":20,"h":800},{"x":1260,"y":0,"w":20,"h":800},{"x":120,"y":100,"w":1020,"h":20},{"x":120,"y":700,"w":1020,"h":20},{"x":120,"y":100,"w":20,"h":210},{"x":120,"y":410,"w":20,"h":290},{"x":1120,"y":100,"w":20,"h":220},{"x":1120,"y":420,"w":20,"h":280},{"x":360,"y":100,"w":20,"h":120},{"x":360,"y":330,"w":20,"h":190},{"x":360,"y":630,"w":20,"h":70},{"x":620,"y":100,"w":20,"h":150},{"x":620,"y":360,"w":20,"h":160},{"x":620,"y":630,"w":20,"h":70},{"x":880,"y":100,"w":20,"h":180},{"x":880,"y":390,"w":20,"h":130},{"x":880,"y":630,"w":20,"h":70},{"x":140,"y":360,"w":110,"h":20},{"x":330,"y":360,"w":290,"h":20},{"x":640,"y":360,"w":110,"h":20},{"x":830,"y":360,"w":290,"h":20},{"x":140,"y":560,"w":190,"h":20},{"x":430,"y":560,"w":190,"h":20},{"x":640,"y":560,"w":190,"h":20},{"x":930,"y":560,"w":190,"h":20},{"x":500,"y":420,"w":20,"h":120},{"x":760,"y":420,"w":20,"h":120},{"x":1010,"y":140,"w":20,"h":130},{"x":250,"y":590,"w":20,"h":90}],"doors":[{"id":"entry-west","x":120,"y":310,"w":20,"h":100,"orientation":"vertical","state":"closed"},{"id":"east-entry","x":1120,"y":320,"w":20,"h":100,"orientation":"vertical","state":"closed"},{"id":"alpha-office","x":360,"y":220,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"server-core","x":620,"y":250,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"archive","x":880,"y":280,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lower-west","x":360,"y":520,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lower-core","x":620,"y":520,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lower-east","x":880,"y":520,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"north-hall-a","x":250,"y":360,"w":80,"h":20,"orientation":"horizontal","state":"closed"},{"id":"north-hall-b","x":750,"y":360,"w":80,"h":20,"orientation":"horizontal","state":"closed"},{"id":"south-hall-a","x":330,"y":560,"w":100,"h":20,"orientation":"horizontal","state":"closed"},{"id":"south-hall-b","x":830,"y":560,"w":100,"h":20,"orientation":"horizontal","state":"closed"}],"equipmentTables":[{"id":"terminal-entry-table","name":"Terminal Entry Gear Table","x":52,"y":352,"w":42,"h":56}],"operators":[{"id":"ALPHA","x":72,"y":300,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":420,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":250,"y":210,"angle":3.141592653589793,"watch":{"x":370,"y":275},"patrol":[{"x":250,"y":210},{"x":315,"y":300}]},{"id":"E2","x":510,"y":205,"angle":2.356194490192345,"watch":{"x":630,"y":305},"patrol":[{"x":510,"y":205},{"x":575,"y":315}]},{"id":"E3","x":735,"y":235,"angle":3.141592653589793,"watch":{"x":630,"y":305},"patrol":[{"x":735,"y":235},{"x":825,"y":315}]},{"id":"E4","x":1010,"y":310,"angle":2.356194490192345,"watch":{"x":890,"y":335},"patrol":[{"x":1010,"y":310},{"x":935,"y":205}]},{"id":"E5","x":300,"y":635,"angle":3.141592653589793,"watch":{"x":380,"y":570},"patrol":[{"x":300,"y":635},{"x":550,"y":635}]},{"id":"E6","x":710,"y":640,"angle":3.141592653589793,"watch":{"x":630,"y":575},"patrol":[{"x":710,"y":640},{"x":880,"y":640}]},{"id":"E7","x":1015,"y":640,"angle":3.9269908169872414,"watch":{"x":890,"y":575},"patrol":[{"x":1015,"y":640},{"x":930,"y":455}]}],"objective":{"x":1040,"y":650,"radius":16,"secured":false,"harmed":false}},"warehouse-pinch":{"id":"warehouse-pinch","title":"Warehouse Pinch","walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":90,"w":690,"h":20},{"x":120,"y":510,"w":690,"h":20},{"x":120,"y":90,"w":20,"h":175},{"x":120,"y":375,"w":20,"h":155},{"x":790,"y":90,"w":20,"h":155},{"x":790,"y":355,"w":20,"h":175},{"x":295,"y":90,"w":20,"h":110},{"x":295,"y":310,"w":20,"h":200},{"x":500,"y":90,"w":20,"h":150},{"x":500,"y":350,"w":20,"h":160},{"x":315,"y":250,"w":65,"h":20},{"x":450,"y":250,"w":50,"h":20},{"x":520,"y":250,"w":40,"h":20},{"x":670,"y":250,"w":120,"h":20},{"x":315,"y":380,"w":65,"h":20},{"x":450,"y":380,"w":50,"h":20},{"x":520,"y":380,"w":40,"h":20},{"x":670,"y":380,"w":120,"h":20},{"x":650,"y":270,"w":20,"h":110},{"x":140,"y":340,"w":155,"h":20},{"x":430,"y":410,"w":20,"h":100}],"doors":[{"id":"entry-west","x":120,"y":265,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"office","x":295,"y":200,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lounge","x":500,"y":240,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"upper-storage","x":380,"y":250,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"lower-storage","x":380,"y":380,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"hall-east","x":790,"y":245,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"center-north","x":560,"y":250,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"center-south","x":560,"y":380,"w":110,"h":20,"orientation":"horizontal","state":"closed"}],"operators":[{"id":"ALPHA","x":72,"y":260,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":380,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":400,"y":174,"angle":3.141592653589793,"watch":{"x":415,"y":260},"patrol":[{"x":400,"y":174},{"x":450,"y":215}]},{"id":"E2","x":715,"y":175,"angle":2.356194490192345,"watch":{"x":615,"y":260},"patrol":[{"x":715,"y":175},{"x":725,"y":330}]},{"id":"E3","x":590,"y":455,"angle":3.9269908169872414,"watch":{"x":615,"y":390},"patrol":[{"x":590,"y":455},{"x":710,"y":455}]},{"id":"E4","x":360,"y":445,"angle":3.141592653589793,"watch":{"x":415,"y":390},"patrol":[{"x":360,"y":445},{"x":470,"y":445}]}],"objective":{"x":735,"y":452,"radius":16,"secured":false,"harmed":false}},"level/warehouse-pinch.json":{"id":"warehouse-pinch","title":"Warehouse Pinch","walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":90,"w":690,"h":20},{"x":120,"y":510,"w":690,"h":20},{"x":120,"y":90,"w":20,"h":175},{"x":120,"y":375,"w":20,"h":155},{"x":790,"y":90,"w":20,"h":155},{"x":790,"y":355,"w":20,"h":175},{"x":295,"y":90,"w":20,"h":110},{"x":295,"y":310,"w":20,"h":200},{"x":500,"y":90,"w":20,"h":150},{"x":500,"y":350,"w":20,"h":160},{"x":315,"y":250,"w":65,"h":20},{"x":450,"y":250,"w":50,"h":20},{"x":520,"y":250,"w":40,"h":20},{"x":670,"y":250,"w":120,"h":20},{"x":315,"y":380,"w":65,"h":20},{"x":450,"y":380,"w":50,"h":20},{"x":520,"y":380,"w":40,"h":20},{"x":670,"y":380,"w":120,"h":20},{"x":650,"y":270,"w":20,"h":110},{"x":140,"y":340,"w":155,"h":20},{"x":430,"y":410,"w":20,"h":100}],"doors":[{"id":"entry-west","x":120,"y":265,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"office","x":295,"y":200,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"lounge","x":500,"y":240,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"upper-storage","x":380,"y":250,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"lower-storage","x":380,"y":380,"w":70,"h":20,"orientation":"horizontal","state":"closed"},{"id":"hall-east","x":790,"y":245,"w":20,"h":110,"orientation":"vertical","state":"closed"},{"id":"center-north","x":560,"y":250,"w":110,"h":20,"orientation":"horizontal","state":"closed"},{"id":"center-south","x":560,"y":380,"w":110,"h":20,"orientation":"horizontal","state":"closed"}],"operators":[{"id":"ALPHA","x":72,"y":260,"color":"#67c98f"},{"id":"BRAVO","x":72,"y":380,"color":"#72b7ce"}],"enemies":[{"id":"E1","x":400,"y":174,"angle":3.141592653589793,"watch":{"x":415,"y":260},"patrol":[{"x":400,"y":174},{"x":450,"y":215}]},{"id":"E2","x":715,"y":175,"angle":2.356194490192345,"watch":{"x":615,"y":260},"patrol":[{"x":715,"y":175},{"x":725,"y":330}]},{"id":"E3","x":590,"y":455,"angle":3.9269908169872414,"watch":{"x":615,"y":390},"patrol":[{"x":590,"y":455},{"x":710,"y":455}]},{"id":"E4","x":360,"y":445,"angle":3.141592653589793,"watch":{"x":415,"y":390},"patrol":[{"x":360,"y":445},{"x":470,"y":445}]}],"objective":{"x":735,"y":452,"radius":16,"secured":false,"harmed":false}}},"tutorials":{"tutorial-basics-movement":{"id":"tutorial-basics-movement","title":"Tutorial: Basics Movement","width":760,"height":520,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":80,"w":580,"h":340}],"rooms":[{"id":"movement-yard","label":"Movement Yard","x":80,"y":80,"w":580,"h":340}],"labels":[{"text":"WASD PRACTICE","x":180,"y":120},{"text":"VIP FINISH","x":590,"y":360}],"walls":[{"x":0,"y":0,"w":760,"h":20},{"x":0,"y":500,"w":760,"h":20},{"x":0,"y":0,"w":20,"h":520},{"x":740,"y":0,"w":20,"h":520},{"x":80,"y":80,"w":580,"h":20},{"x":80,"y":420,"w":580,"h":20},{"x":80,"y":80,"w":20,"h":340},{"x":660,"y":80,"w":20,"h":340},{"x":285,"y":180,"w":170,"h":20},{"x":285,"y":300,"w":170,"h":20}],"doors":[],"windows":[],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":150,"y":250,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Movement Yard"}],"enemies":[],"objective":{"x":600,"y":360,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"walk","title":"Walk","text":"Use WASD to move ALPHA around the obstacles.","completeWhen":"movementStarted"},{"id":"sneak","title":"Sneak","text":"Hold Left Ctrl while moving to sneak slowly.","completeWhen":"sneaked"},{"id":"sprint","title":"Sprint","text":"Hold Left Shift while moving to sprint quickly.","completeWhen":"sprinted"},{"id":"finish","title":"Reach the VIP","text":"Move to the VIP marker to complete the movement tutorial.","completeWhen":"objectiveSecured"}]},"tutorials/basics-movement.json":{"id":"tutorial-basics-movement","title":"Tutorial: Basics Movement","width":760,"height":520,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":80,"w":580,"h":340}],"rooms":[{"id":"movement-yard","label":"Movement Yard","x":80,"y":80,"w":580,"h":340}],"labels":[{"text":"WASD PRACTICE","x":180,"y":120},{"text":"VIP FINISH","x":590,"y":360}],"walls":[{"x":0,"y":0,"w":760,"h":20},{"x":0,"y":500,"w":760,"h":20},{"x":0,"y":0,"w":20,"h":520},{"x":740,"y":0,"w":20,"h":520},{"x":80,"y":80,"w":580,"h":20},{"x":80,"y":420,"w":580,"h":20},{"x":80,"y":80,"w":20,"h":340},{"x":660,"y":80,"w":20,"h":340},{"x":285,"y":180,"w":170,"h":20},{"x":285,"y":300,"w":170,"h":20}],"doors":[],"windows":[],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":150,"y":250,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Movement Yard"}],"enemies":[],"objective":{"x":600,"y":360,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"walk","title":"Walk","text":"Use WASD to move ALPHA around the obstacles.","completeWhen":"movementStarted"},{"id":"sneak","title":"Sneak","text":"Hold Left Ctrl while moving to sneak slowly.","completeWhen":"sneaked"},{"id":"sprint","title":"Sprint","text":"Hold Left Shift while moving to sprint quickly.","completeWhen":"sprinted"},{"id":"finish","title":"Reach the VIP","text":"Move to the VIP marker to complete the movement tutorial.","completeWhen":"objectiveSecured"}]},"tutorial-digital-lock":{"id":"tutorial-digital-lock","title":"Tutorial: Digital Lock","width":960,"height":640,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":120,"y":120,"w":300,"h":380},{"x":500,"y":120,"w":300,"h":380}],"rooms":[{"id":"entry-yard","label":"Entry Yard","x":120,"y":120,"w":300,"h":380},{"id":"locked-room","label":"Locked Room","x":500,"y":120,"w":300,"h":380}],"labels":[{"text":"PICK UP PAPER FIRST","x":270,"y":108},{"text":"UNLOCK, THEN OPEN","x":650,"y":108}],"walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":120,"w":300,"h":20},{"x":120,"y":500,"w":300,"h":20},{"x":120,"y":120,"w":20,"h":400},{"x":420,"y":120,"w":20,"h":126},{"x":420,"y":354,"w":20,"h":166},{"x":500,"y":120,"w":300,"h":20},{"x":500,"y":500,"w":300,"h":20},{"x":800,"y":120,"w":20,"h":400},{"x":500,"y":120,"w":20,"h":126},{"x":500,"y":354,"w":20,"h":166}],"doors":[{"id":"training-digital-door","x":420,"y":246,"w":100,"h":108,"orientation":"vertical","state":"closed","lockType":"digital","locked":true}],"windows":[],"stairs":[],"items":[{"id":"paper-training-digital-door","type":"paper","name":"Door Code Paper","x":250,"y":302,"w":28,"h":20,"passwordFor":"training-digital-door"}],"equipmentTables":[],"operators":[{"id":"ALPHA","x":205,"y":320,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Entry Yard"}],"enemies":[],"objective":{"x":650,"y":318,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"move-to-paper","title":"Find The Paper Clue","text":"Move ALPHA near the yellow paper. Digital doors use random codes, so the clue matters.","completeWhen":"nearItem","itemId":"paper-training-digital-door"},{"id":"pick-paper","title":"Pick Up The Code","text":"Press E near the paper to store the code in ALPHA's inventory.","completeWhen":"itemPicked","itemId":"paper-training-digital-door"},{"id":"open-inventory","title":"Read The Inventory","text":"Press Tab to open inventory and read the code written on the paper.","completeWhen":"inventoryOpened"},{"id":"move-to-lock","title":"Approach The Door","text":"Move ALPHA near the locked digital door. The red L marker means it is still locked.","completeWhen":"nearDoor","doorId":"training-digital-door"},{"id":"open-keypad","title":"Open The Keypad","text":"Press E near the locked door to open the digital lock keypad.","completeWhen":"lockOpened","doorId":"training-digital-door"},{"id":"unlock-door","title":"Enter The Code","text":"Enter the paper code by clicking keypad numbers or typing digits, then press Unlock.","completeWhen":"doorUnlocked","doorId":"training-digital-door"},{"id":"open-door","title":"Open The Door","text":"Unlocking does not open the door. Press E again to open it, then move to the VIP.","completeWhen":"doorOpen","doorId":"training-digital-door"},{"id":"secure-objective","title":"Secure The Objective","text":"Move ALPHA to the VIP marker to complete the tutorial.","completeWhen":"objectiveSecured"}]},"tutorials/digital-lock.json":{"id":"tutorial-digital-lock","title":"Tutorial: Digital Lock","width":960,"height":640,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":120,"y":120,"w":300,"h":380},{"x":500,"y":120,"w":300,"h":380}],"rooms":[{"id":"entry-yard","label":"Entry Yard","x":120,"y":120,"w":300,"h":380},{"id":"locked-room","label":"Locked Room","x":500,"y":120,"w":300,"h":380}],"labels":[{"text":"PICK UP PAPER FIRST","x":270,"y":108},{"text":"UNLOCK, THEN OPEN","x":650,"y":108}],"walls":[{"x":0,"y":0,"w":960,"h":20},{"x":0,"y":620,"w":960,"h":20},{"x":0,"y":0,"w":20,"h":640},{"x":940,"y":0,"w":20,"h":640},{"x":120,"y":120,"w":300,"h":20},{"x":120,"y":500,"w":300,"h":20},{"x":120,"y":120,"w":20,"h":400},{"x":420,"y":120,"w":20,"h":126},{"x":420,"y":354,"w":20,"h":166},{"x":500,"y":120,"w":300,"h":20},{"x":500,"y":500,"w":300,"h":20},{"x":800,"y":120,"w":20,"h":400},{"x":500,"y":120,"w":20,"h":126},{"x":500,"y":354,"w":20,"h":166}],"doors":[{"id":"training-digital-door","x":420,"y":246,"w":100,"h":108,"orientation":"vertical","state":"closed","lockType":"digital","locked":true}],"windows":[],"stairs":[],"items":[{"id":"paper-training-digital-door","type":"paper","name":"Door Code Paper","x":250,"y":302,"w":28,"h":20,"passwordFor":"training-digital-door"}],"equipmentTables":[],"operators":[{"id":"ALPHA","x":205,"y":320,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Entry Yard"}],"enemies":[],"objective":{"x":650,"y":318,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"move-to-paper","title":"Find The Paper Clue","text":"Move ALPHA near the yellow paper. Digital doors use random codes, so the clue matters.","completeWhen":"nearItem","itemId":"paper-training-digital-door"},{"id":"pick-paper","title":"Pick Up The Code","text":"Press E near the paper to store the code in ALPHA's inventory.","completeWhen":"itemPicked","itemId":"paper-training-digital-door"},{"id":"open-inventory","title":"Read The Inventory","text":"Press Tab to open inventory and read the code written on the paper.","completeWhen":"inventoryOpened"},{"id":"move-to-lock","title":"Approach The Door","text":"Move ALPHA near the locked digital door. The red L marker means it is still locked.","completeWhen":"nearDoor","doorId":"training-digital-door"},{"id":"open-keypad","title":"Open The Keypad","text":"Press E near the locked door to open the digital lock keypad.","completeWhen":"lockOpened","doorId":"training-digital-door"},{"id":"unlock-door","title":"Enter The Code","text":"Enter the paper code by clicking keypad numbers or typing digits, then press Unlock.","completeWhen":"doorUnlocked","doorId":"training-digital-door"},{"id":"open-door","title":"Open The Door","text":"Unlocking does not open the door. Press E again to open it, then move to the VIP.","completeWhen":"doorOpen","doorId":"training-digital-door"},{"id":"secure-objective","title":"Secure The Objective","text":"Move ALPHA to the VIP marker to complete the tutorial.","completeWhen":"objectiveSecured"}]},"tutorial-equipment-table":{"id":"tutorial-equipment-table","title":"Tutorial: Equipment Table","width":860,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":90,"w":700,"h":380}],"rooms":[{"id":"gear-room","label":"Gear Room","x":80,"y":90,"w":700,"h":380}],"labels":[{"text":"START UNARMED","x":150,"y":125},{"text":"EQUIPMENT TABLE","x":295,"y":365},{"text":"LIGHT THREAT","x":590,"y":230}],"walls":[{"x":0,"y":0,"w":860,"h":20},{"x":0,"y":540,"w":860,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":840,"y":0,"w":20,"h":560},{"x":80,"y":90,"w":700,"h":20},{"x":80,"y":470,"w":700,"h":20},{"x":80,"y":90,"w":20,"h":380},{"x":780,"y":90,"w":20,"h":380}],"doors":[],"windows":[],"stairs":[],"items":[],"equipmentTables":[{"id":"training-gear-table","name":"Training Gear Table","x":320,"y":350,"w":90,"h":48}],"operators":[{"id":"ALPHA","x":170,"y":280,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","backpackId":"small-backpack","floor":"Tutorial","zone":"Gear Room"}],"enemies":[{"id":"GEAR-TARGET","x":610,"y":245,"angle":3.141592653589793,"watch":{"x":410,"y":310},"weaponId":"pistol","armorId":"no-armor"}],"objective":{"x":705,"y":390,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"open-table","title":"Open The Gear Table","text":"Move near the equipment table and press E. You can also compare defaults in Settings > Operator Loadout.","completeWhen":"tableOpened"},{"id":"equip-weapon","title":"Equip A Weapon","text":"In the equipment table overlay, choose any weapon. You started with No Weapon.","completeWhen":"weaponEquipped"},{"id":"equip-armor","title":"Equip Armor","text":"In the equipment table overlay, choose armor. Armor gives you a better chance in a fight.","completeWhen":"armorEquipped"},{"id":"neutralize","title":"Test The Loadout","text":"Close the table and neutralize the light target.","completeWhen":"enemyNeutralized","enemyId":"GEAR-TARGET"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker to complete the equipment tutorial.","completeWhen":"objectiveSecured"}]},"tutorials/equipment-table.json":{"id":"tutorial-equipment-table","title":"Tutorial: Equipment Table","width":860,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":90,"w":700,"h":380}],"rooms":[{"id":"gear-room","label":"Gear Room","x":80,"y":90,"w":700,"h":380}],"labels":[{"text":"START UNARMED","x":150,"y":125},{"text":"EQUIPMENT TABLE","x":295,"y":365},{"text":"LIGHT THREAT","x":590,"y":230}],"walls":[{"x":0,"y":0,"w":860,"h":20},{"x":0,"y":540,"w":860,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":840,"y":0,"w":20,"h":560},{"x":80,"y":90,"w":700,"h":20},{"x":80,"y":470,"w":700,"h":20},{"x":80,"y":90,"w":20,"h":380},{"x":780,"y":90,"w":20,"h":380}],"doors":[],"windows":[],"stairs":[],"items":[],"equipmentTables":[{"id":"training-gear-table","name":"Training Gear Table","x":320,"y":350,"w":90,"h":48}],"operators":[{"id":"ALPHA","x":170,"y":280,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","backpackId":"small-backpack","floor":"Tutorial","zone":"Gear Room"}],"enemies":[{"id":"GEAR-TARGET","x":610,"y":245,"angle":3.141592653589793,"watch":{"x":410,"y":310},"weaponId":"pistol","armorId":"no-armor"}],"objective":{"x":705,"y":390,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"open-table","title":"Open The Gear Table","text":"Move near the equipment table and press E. You can also compare defaults in Settings > Operator Loadout.","completeWhen":"tableOpened"},{"id":"equip-weapon","title":"Equip A Weapon","text":"In the equipment table overlay, choose any weapon. You started with No Weapon.","completeWhen":"weaponEquipped"},{"id":"equip-armor","title":"Equip Armor","text":"In the equipment table overlay, choose armor. Armor gives you a better chance in a fight.","completeWhen":"armorEquipped"},{"id":"neutralize","title":"Test The Loadout","text":"Close the table and neutralize the light target.","completeWhen":"enemyNeutralized","enemyId":"GEAR-TARGET"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker to complete the equipment tutorial.","completeWhen":"objectiveSecured"}]},"tutorial-operators-stairs":{"id":"tutorial-operators-stairs","title":"Tutorial: Operators And Stairs","width":940,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":110,"w":300,"h":300},{"x":560,"y":110,"w":300,"h":300}],"rooms":[{"id":"alpha-room","label":"Alpha Room","x":80,"y":110,"w":300,"h":300},{"id":"bravo-room","label":"Bravo Room","x":560,"y":110,"w":300,"h":300}],"labels":[{"text":"ALPHA STAIRS","x":170,"y":145},{"text":"BRAVO OBJECTIVE","x":645,"y":145}],"walls":[{"x":0,"y":0,"w":940,"h":20},{"x":0,"y":540,"w":940,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":920,"y":0,"w":20,"h":560},{"x":80,"y":110,"w":300,"h":20},{"x":80,"y":410,"w":300,"h":20},{"x":80,"y":110,"w":20,"h":300},{"x":380,"y":110,"w":20,"h":300},{"x":560,"y":110,"w":300,"h":20},{"x":560,"y":410,"w":300,"h":20},{"x":560,"y":110,"w":20,"h":300},{"x":860,"y":110,"w":20,"h":300}],"doors":[],"windows":[],"stairs":[{"id":"alpha-stairs","name":"Training Stairs","label":"UP","x":265,"y":255,"w":68,"h":64,"target":{"x":635,"y":286,"floor":"Tutorial","label":"Bravo Room"}},{"id":"bravo-stairs","name":"Return Stairs","label":"DOWN","x":620,"y":255,"w":68,"h":64,"target":{"x":300,"y":286,"floor":"Tutorial","label":"Alpha Room"}}],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":170,"y":286,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Alpha Room"},{"id":"BRAVO","x":700,"y":286,"color":"#72b7ce","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Bravo Room"}],"enemies":[],"objective":{"x":790,"y":286,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"use-stairs","title":"Use Stairs","text":"Move ALPHA near the stairs and press E. Stairs can connect isolated rooms.","completeWhen":"stairUsed","stairId":"alpha-stairs"},{"id":"select-bravo","title":"Select BRAVO","text":"Click BRAVO or use the health card to control the operator in the other room.","completeWhen":"operatorSelected","operatorId":"BRAVO"},{"id":"finish","title":"Secure With BRAVO","text":"Move BRAVO to the VIP marker to complete the operator navigation tutorial.","completeWhen":"objectiveSecured"}]},"tutorials/operators-stairs.json":{"id":"tutorial-operators-stairs","title":"Tutorial: Operators And Stairs","width":940,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":110,"w":300,"h":300},{"x":560,"y":110,"w":300,"h":300}],"rooms":[{"id":"alpha-room","label":"Alpha Room","x":80,"y":110,"w":300,"h":300},{"id":"bravo-room","label":"Bravo Room","x":560,"y":110,"w":300,"h":300}],"labels":[{"text":"ALPHA STAIRS","x":170,"y":145},{"text":"BRAVO OBJECTIVE","x":645,"y":145}],"walls":[{"x":0,"y":0,"w":940,"h":20},{"x":0,"y":540,"w":940,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":920,"y":0,"w":20,"h":560},{"x":80,"y":110,"w":300,"h":20},{"x":80,"y":410,"w":300,"h":20},{"x":80,"y":110,"w":20,"h":300},{"x":380,"y":110,"w":20,"h":300},{"x":560,"y":110,"w":300,"h":20},{"x":560,"y":410,"w":300,"h":20},{"x":560,"y":110,"w":20,"h":300},{"x":860,"y":110,"w":20,"h":300}],"doors":[],"windows":[],"stairs":[{"id":"alpha-stairs","name":"Training Stairs","label":"UP","x":265,"y":255,"w":68,"h":64,"target":{"x":635,"y":286,"floor":"Tutorial","label":"Bravo Room"}},{"id":"bravo-stairs","name":"Return Stairs","label":"DOWN","x":620,"y":255,"w":68,"h":64,"target":{"x":300,"y":286,"floor":"Tutorial","label":"Alpha Room"}}],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":170,"y":286,"color":"#67c98f","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Alpha Room"},{"id":"BRAVO","x":700,"y":286,"color":"#72b7ce","weaponId":"no-weapon","armorId":"no-armor","floor":"Tutorial","zone":"Bravo Room"}],"enemies":[],"objective":{"x":790,"y":286,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"use-stairs","title":"Use Stairs","text":"Move ALPHA near the stairs and press E. Stairs can connect isolated rooms.","completeWhen":"stairUsed","stairId":"alpha-stairs"},{"id":"select-bravo","title":"Select BRAVO","text":"Click BRAVO or use the health card to control the operator in the other room.","completeWhen":"operatorSelected","operatorId":"BRAVO"},{"id":"finish","title":"Secure With BRAVO","text":"Move BRAVO to the VIP marker to complete the operator navigation tutorial.","completeWhen":"objectiveSecured"}]},"tutorial-shooting-modes":{"id":"tutorial-shooting-modes","title":"Tutorial: Shooting Modes","width":860,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":80,"w":700,"h":380}],"rooms":[{"id":"range","label":"Training Range","x":80,"y":80,"w":700,"h":380}],"labels":[{"text":"AUTO / MANUAL RANGE","x":220,"y":120},{"text":"RESPAWN TARGET","x":585,"y":250},{"text":"VIP FINISH","x":705,"y":398}],"walls":[{"x":0,"y":0,"w":860,"h":20},{"x":0,"y":540,"w":860,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":840,"y":0,"w":20,"h":560},{"x":80,"y":80,"w":700,"h":20},{"x":80,"y":460,"w":700,"h":20},{"x":80,"y":80,"w":20,"h":380},{"x":780,"y":80,"w":20,"h":380},{"x":410,"y":100,"w":20,"h":118},{"x":410,"y":322,"w":20,"h":138}],"doors":[{"id":"range-gap","x":410,"y":218,"w":20,"h":104,"orientation":"vertical","state":"open"}],"windows":[],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":180,"y":280,"color":"#67c98f","weaponId":"rifle","armorId":"no-armor","floor":"Tutorial","zone":"Training Range"}],"enemies":[{"id":"TARGET","x":610,"y":280,"angle":3.141592653589793,"watch":{"x":420,"y":270},"weaponId":"no-weapon","armorId":"no-armor","respawnDelay":3}],"objective":{"x":720,"y":398,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"auto","title":"Automatic Shooting","text":"Leave Shooting on Automatic and face the target. Operators fire when they have range and line of sight.","completeWhen":"automaticShotFired"},{"id":"down-target","title":"Neutralize A Target","text":"Down the target once. It will return every 3 seconds so you can practice.","completeWhen":"enemyNeutralized","enemyId":"TARGET"},{"id":"manual-mode","title":"Switch To Manual","text":"Open Settings > Mission Setup > Shooting, choose Manual, then close Settings.","completeWhen":"shootingMode","mode":"manual"},{"id":"manual-fire","title":"Hold To Fire","text":"Hold the left mouse button on the canvas to fire manually, then release to stop.","completeWhen":"manualShotFired"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker when you are done testing both modes.","completeWhen":"objectiveSecured"}]},"tutorials/shooting-modes.json":{"id":"tutorial-shooting-modes","title":"Tutorial: Shooting Modes","width":860,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":80,"w":700,"h":380}],"rooms":[{"id":"range","label":"Training Range","x":80,"y":80,"w":700,"h":380}],"labels":[{"text":"AUTO / MANUAL RANGE","x":220,"y":120},{"text":"RESPAWN TARGET","x":585,"y":250},{"text":"VIP FINISH","x":705,"y":398}],"walls":[{"x":0,"y":0,"w":860,"h":20},{"x":0,"y":540,"w":860,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":840,"y":0,"w":20,"h":560},{"x":80,"y":80,"w":700,"h":20},{"x":80,"y":460,"w":700,"h":20},{"x":80,"y":80,"w":20,"h":380},{"x":780,"y":80,"w":20,"h":380},{"x":410,"y":100,"w":20,"h":118},{"x":410,"y":322,"w":20,"h":138}],"doors":[{"id":"range-gap","x":410,"y":218,"w":20,"h":104,"orientation":"vertical","state":"open"}],"windows":[],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":180,"y":280,"color":"#67c98f","weaponId":"rifle","armorId":"no-armor","floor":"Tutorial","zone":"Training Range"}],"enemies":[{"id":"TARGET","x":610,"y":280,"angle":3.141592653589793,"watch":{"x":420,"y":270},"weaponId":"no-weapon","armorId":"no-armor","respawnDelay":3}],"objective":{"x":720,"y":398,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"auto","title":"Automatic Shooting","text":"Leave Shooting on Automatic and face the target. Operators fire when they have range and line of sight.","completeWhen":"automaticShotFired"},{"id":"down-target","title":"Neutralize A Target","text":"Down the target once. It will return every 3 seconds so you can practice.","completeWhen":"enemyNeutralized","enemyId":"TARGET"},{"id":"manual-mode","title":"Switch To Manual","text":"Open Settings > Mission Setup > Shooting, choose Manual, then close Settings.","completeWhen":"shootingMode","mode":"manual"},{"id":"manual-fire","title":"Hold To Fire","text":"Hold the left mouse button on the canvas to fire manually, then release to stop.","completeWhen":"manualShotFired"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker when you are done testing both modes.","completeWhen":"objectiveSecured"}]},"tutorial-windows":{"id":"tutorial-windows","title":"Tutorial: Windows","width":900,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":90,"w":330,"h":380},{"x":450,"y":90,"w":330,"h":380}],"rooms":[{"id":"outside","label":"Outside","x":80,"y":90,"w":330,"h":380},{"id":"inside","label":"Inside","x":450,"y":90,"w":330,"h":380}],"labels":[{"text":"OPEN BY HAND","x":260,"y":165},{"text":"BREAK BY SHOOTING","x":512,"y":165},{"text":"BULLETS PASS WINDOWS","x":515,"y":395}],"walls":[{"x":0,"y":0,"w":900,"h":20},{"x":0,"y":540,"w":900,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":880,"y":0,"w":20,"h":560},{"x":80,"y":90,"w":700,"h":20},{"x":80,"y":470,"w":700,"h":20},{"x":80,"y":90,"w":20,"h":380},{"x":780,"y":90,"w":20,"h":380},{"x":410,"y":90,"w":20,"h":130},{"x":410,"y":300,"w":20,"h":170},{"x":410,"y":220,"w":20,"h":80}],"doors":[],"windows":[{"id":"hand-window","x":410,"y":210,"w":20,"h":72,"orientation":"vertical","state":"closed","damage":8},{"id":"shoot-window","x":410,"y":318,"w":20,"h":72,"orientation":"vertical","state":"closed","damage":8}],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":215,"y":248,"color":"#67c98f","weaponId":"rifle","armorId":"light-armor","floor":"Tutorial","zone":"Outside"}],"enemies":[{"id":"WINDOW-TARGET","x":585,"y":354,"angle":3.141592653589793,"watch":{"x":430,"y":354},"weaponId":"no-weapon","armorId":"no-armor"}],"objective":{"x":705,"y":248,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"open-window","title":"Open By Hand","text":"Move near the upper window and press E. Opening by hand causes no damage.","completeWhen":"windowOpened","windowId":"hand-window"},{"id":"vault-window","title":"Vault Through","text":"Press E again at the open window to climb through safely.","completeWhen":"windowVaulted","windowId":"hand-window"},{"id":"manual","title":"Switch To Manual","text":"Set Shooting to Manual so you can aim at the lower window.","completeWhen":"shootingMode","mode":"manual"},{"id":"break-window","title":"Break By Shooting","text":"Hold left mouse toward the lower window. Bullets break glass and keep traveling.","completeWhen":"windowBroken","windowId":"shoot-window"},{"id":"shoot-through","title":"Shoot Through Windows","text":"Hit the target behind the window to prove bullets pass through window openings.","completeWhen":"enemyNeutralized","enemyId":"WINDOW-TARGET"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker to complete the window tutorial.","completeWhen":"objectiveSecured"}]},"tutorials/windows.json":{"id":"tutorial-windows","title":"Tutorial: Windows","width":900,"height":560,"forceLoadouts":true,"requireObjective":true,"floorZones":[{"x":80,"y":90,"w":330,"h":380},{"x":450,"y":90,"w":330,"h":380}],"rooms":[{"id":"outside","label":"Outside","x":80,"y":90,"w":330,"h":380},{"id":"inside","label":"Inside","x":450,"y":90,"w":330,"h":380}],"labels":[{"text":"OPEN BY HAND","x":260,"y":165},{"text":"BREAK BY SHOOTING","x":512,"y":165},{"text":"BULLETS PASS WINDOWS","x":515,"y":395}],"walls":[{"x":0,"y":0,"w":900,"h":20},{"x":0,"y":540,"w":900,"h":20},{"x":0,"y":0,"w":20,"h":560},{"x":880,"y":0,"w":20,"h":560},{"x":80,"y":90,"w":700,"h":20},{"x":80,"y":470,"w":700,"h":20},{"x":80,"y":90,"w":20,"h":380},{"x":780,"y":90,"w":20,"h":380},{"x":410,"y":90,"w":20,"h":130},{"x":410,"y":300,"w":20,"h":170},{"x":410,"y":220,"w":20,"h":80}],"doors":[],"windows":[{"id":"hand-window","x":410,"y":210,"w":20,"h":72,"orientation":"vertical","state":"closed","damage":8},{"id":"shoot-window","x":410,"y":318,"w":20,"h":72,"orientation":"vertical","state":"closed","damage":8}],"stairs":[],"items":[],"equipmentTables":[],"operators":[{"id":"ALPHA","x":215,"y":248,"color":"#67c98f","weaponId":"rifle","armorId":"light-armor","floor":"Tutorial","zone":"Outside"}],"enemies":[{"id":"WINDOW-TARGET","x":585,"y":354,"angle":3.141592653589793,"watch":{"x":430,"y":354},"weaponId":"no-weapon","armorId":"no-armor"}],"objective":{"x":705,"y":248,"radius":16,"secured":false,"harmed":false},"tutorialSteps":[{"id":"open-window","title":"Open By Hand","text":"Move near the upper window and press E. Opening by hand causes no damage.","completeWhen":"windowOpened","windowId":"hand-window"},{"id":"vault-window","title":"Vault Through","text":"Press E again at the open window to climb through safely.","completeWhen":"windowVaulted","windowId":"hand-window"},{"id":"manual","title":"Switch To Manual","text":"Set Shooting to Manual so you can aim at the lower window.","completeWhen":"shootingMode","mode":"manual"},{"id":"break-window","title":"Break By Shooting","text":"Hold left mouse toward the lower window. Bullets break glass and keep traveling.","completeWhen":"windowBroken","windowId":"shoot-window"},{"id":"shoot-through","title":"Shoot Through Windows","text":"Hit the target behind the window to prove bullets pass through window openings.","completeWhen":"enemyNeutralized","enemyId":"WINDOW-TARGET"},{"id":"finish","title":"Secure The VIP","text":"Move to the VIP marker to complete the window tutorial.","completeWhen":"objectiveSecured"}]}},"equipment":{"advanced-carbine":{"id":"advanced-carbine","name":"Advanced Carbine","role":"Privilege 2 precision carbine","range":285,"damage":22,"magSize":34,"reserveBullets":150,"reloadTime":1.25,"fireInterval":0.13,"reactionDelay":0.3,"tracerTtl":0.07,"unlockPrivilege":2,"pixelPalette":"gold"},"equipment/advanced-carbine.json":{"id":"advanced-carbine","name":"Advanced Carbine","role":"Privilege 2 precision carbine","range":285,"damage":22,"magSize":34,"reserveBullets":150,"reloadTime":1.25,"fireInterval":0.13,"reactionDelay":0.3,"tracerTtl":0.07,"unlockPrivilege":2,"pixelPalette":"gold"},"compact-pdw":{"id":"compact-pdw","name":"Compact PDW","role":"Privilege 2 high-speed compact weapon","range":215,"damage":15,"magSize":40,"reserveBullets":210,"reloadTime":1.05,"fireInterval":0.06,"reactionDelay":0.24,"tracerTtl":0.05,"unlockPrivilege":2,"pixelPalette":"teal"},"equipment/compact-pdw.json":{"id":"compact-pdw","name":"Compact PDW","role":"Privilege 2 high-speed compact weapon","range":215,"damage":15,"magSize":40,"reserveBullets":210,"reloadTime":1.05,"fireInterval":0.06,"reactionDelay":0.24,"tracerTtl":0.05,"unlockPrivilege":2,"pixelPalette":"teal"},"heavy-armor":{"id":"heavy-armor","name":"Heavy Armor","role":"High protection with slower movement","armor":80,"speedMultiplier":0.88},"equipment/heavy-armor.json":{"id":"heavy-armor","name":"Heavy Armor","role":"High protection with slower movement","armor":80,"speedMultiplier":0.88},"large-backpack":{"id":"large-backpack","name":"Large Backpack","role":"Large kit with extra ammunition","ammoMultiplier":1.45,"slots":6,"speedMultiplier":0.9},"equipment/large-backpack.json":{"id":"large-backpack","name":"Large Backpack","role":"Large kit with extra ammunition","ammoMultiplier":1.45,"slots":6,"speedMultiplier":0.9},"light-armor":{"id":"light-armor","name":"Light Armor","role":"Low-profile armor with full mobility","armor":25,"speedMultiplier":1},"equipment/light-armor.json":{"id":"light-armor","name":"Light Armor","role":"Low-profile armor with full mobility","armor":25,"speedMultiplier":1},"marksman-pistol":{"id":"marksman-pistol","name":"Marksman Pistol","role":"Privilege 2 precision sidearm","range":215,"damage":32,"magSize":14,"reserveBullets":84,"reloadTime":0.95,"fireInterval":0.31,"reactionDelay":0.22,"tracerTtl":0.08,"unlockPrivilege":2,"pixelPalette":"magenta"},"equipment/marksman-pistol.json":{"id":"marksman-pistol","name":"Marksman Pistol","role":"Privilege 2 precision sidearm","range":215,"damage":32,"magSize":14,"reserveBullets":84,"reloadTime":0.95,"fireInterval":0.31,"reactionDelay":0.22,"tracerTtl":0.08,"unlockPrivilege":2,"pixelPalette":"magenta"},"medium-armor":{"id":"medium-armor","name":"Medium Armor","role":"Balanced protection with a small mobility cost","armor":50,"speedMultiplier":0.94},"equipment/medium-armor.json":{"id":"medium-armor","name":"Medium Armor","role":"Balanced protection with a small mobility cost","armor":50,"speedMultiplier":0.94},"medium-backpack":{"id":"medium-backpack","name":"Medium Backpack","role":"Balanced field storage","ammoMultiplier":1,"slots":4,"speedMultiplier":0.96},"equipment/medium-backpack.json":{"id":"medium-backpack","name":"Medium Backpack","role":"Balanced field storage","ammoMultiplier":1,"slots":4,"speedMultiplier":0.96},"melee":{"id":"melee","name":"Melee","role":"Close-contact takedown weapon","range":34,"damage":200,"magSize":0,"reserveBullets":0,"reloadTime":0,"fireInterval":0.55,"reactionDelay":0.12,"tracerTtl":0,"attackType":"melee","canFire":true,"unlockPrivilege":0,"pixelPalette":"steel"},"equipment/melee.json":{"id":"melee","name":"Melee","role":"Close-contact takedown weapon","range":34,"damage":200,"magSize":0,"reserveBullets":0,"reloadTime":0,"fireInterval":0.55,"reactionDelay":0.12,"tracerTtl":0,"attackType":"melee","canFire":true,"unlockPrivilege":0,"pixelPalette":"steel"},"no-armor":{"id":"no-armor","name":"No Armor","role":"No protection and full mobility","armor":0,"speedMultiplier":1},"equipment/no-armor.json":{"id":"no-armor","name":"No Armor","role":"No protection and full mobility","armor":0,"speedMultiplier":1},"no-weapon":{"id":"no-weapon","name":"No Weapon","role":"Unarmed training start","range":0,"damage":0,"magSize":0,"reserveBullets":0,"reloadTime":0,"fireInterval":999,"reactionDelay":999,"tracerTtl":0,"canFire":false},"equipment/no-weapon.json":{"id":"no-weapon","name":"No Weapon","role":"Unarmed training start","range":0,"damage":0,"magSize":0,"reserveBullets":0,"reloadTime":0,"fireInterval":999,"reactionDelay":999,"tracerTtl":0,"canFire":false},"pistol":{"id":"pistol","name":"Pistol","role":"Controlled sidearm","range":165,"damage":24,"magSize":12,"reserveBullets":60,"reloadTime":1,"fireInterval":0.38,"reactionDelay":0.28,"tracerTtl":0.1},"equipment/pistol.json":{"id":"pistol","name":"Pistol","role":"Controlled sidearm","range":165,"damage":24,"magSize":12,"reserveBullets":60,"reloadTime":1,"fireInterval":0.38,"reactionDelay":0.28,"tracerTtl":0.1},"rifle":{"id":"rifle","name":"Rifle","role":"Balanced automatic rifle","range":245,"damage":18,"magSize":30,"reserveBullets":120,"reloadTime":1.4,"fireInterval":0.16,"reactionDelay":0.4,"tracerTtl":0.08},"equipment/rifle.json":{"id":"rifle","name":"Rifle","role":"Balanced automatic rifle","range":245,"damage":18,"magSize":30,"reserveBullets":120,"reloadTime":1.4,"fireInterval":0.16,"reactionDelay":0.4,"tracerTtl":0.08},"small-backpack":{"id":"small-backpack","name":"Small Backpack","role":"Light kit with limited storage","ammoMultiplier":0.75,"slots":2,"speedMultiplier":1},"equipment/small-backpack.json":{"id":"small-backpack","name":"Small Backpack","role":"Light kit with limited storage","ammoMultiplier":0.75,"slots":2,"speedMultiplier":1},"smg":{"id":"smg","name":"SMG","role":"Fast close-quarters weapon","range":185,"damage":12,"magSize":32,"reserveBullets":160,"reloadTime":1.15,"fireInterval":0.08,"reactionDelay":0.32,"tracerTtl":0.06},"equipment/smg.json":{"id":"smg","name":"SMG","role":"Fast close-quarters weapon","range":185,"damage":12,"magSize":32,"reserveBullets":160,"reloadTime":1.15,"fireInterval":0.08,"reactionDelay":0.32,"tracerTtl":0.06}}};
+
+/* systems/audio-system.js */
 "use strict";
 
 (function () {
@@ -2208,8 +2229,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.AudioSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/keybinding-system.js */
 "use strict";
 
 (function () {
@@ -2346,8 +2367,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.KeybindingSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/camera-system.js */
 "use strict";
 
 (function () {
@@ -2453,8 +2474,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.CameraSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/geometry-system.js */
 "use strict";
 
 (function () {
@@ -2463,6 +2484,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
     const runtime = deps.runtime;
     const canvas = deps.canvas;
     const twoPi = deps.twoPi;
+    const objectScale = deps.objectScale;
 
     // Converts a browser mouse event into canvas world coordinates.
     function getMouseWorld(event) {
@@ -2499,11 +2521,12 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
 
     // Tests a circular unit body against a rectangular blocker.
     function circleRectCollides(circle, rect, padding = 0) {
-      const closestX = clamp(circle.x, rect.x - padding, rect.x + rect.w + padding);
-      const closestY = clamp(circle.y, rect.y - padding, rect.y + rect.h + padding);
-      const dx = circle.x - closestX;
-      const dy = circle.y - closestY;
-      return dx * dx + dy * dy <= circle.radius * circle.radius;
+      const scaledCircle = objectScale ? objectScale.scaledCircle(circle) : circle;
+      const closestX = clamp(scaledCircle.x, rect.x - padding, rect.x + rect.w + padding);
+      const closestY = clamp(scaledCircle.y, rect.y - padding, rect.y + rect.h + padding);
+      const dx = scaledCircle.x - closestX;
+      const dy = scaledCircle.y - closestY;
+      return dx * dx + dy * dy <= scaledCircle.radius * scaledCircle.radius;
     }
 
     // Finds the shortest distance from a point to a rectangle.
@@ -2518,6 +2541,21 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       return { x: rect.x + rect.w / 2, y: rect.y + rect.h / 2 };
     }
 
+    // Scales non-wall object rectangles around their center.
+    function scaledRect(rect) {
+      return objectScale ? objectScale.scaledRect(rect) : rect;
+    }
+
+    // Scales non-wall object radii around their center.
+    function scaledRadius(obj) {
+      return objectScale ? objectScale.scaledRadius(obj) : obj.radius;
+    }
+
+    // Measures from a point to a scaled non-wall rectangle.
+    function scaledPointRectDistance(point, rect) {
+      return pointRectDistance(point, scaledRect(rect));
+    }
+
     // Treats closed doors as blocking movement and sight.
     function doorBlocks(door) {
       return door.state === "closed";
@@ -2527,8 +2565,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
     function blockingRects(level) {
       return [
         ...level.walls,
-        ...level.doors.filter(doorBlocks),
-        ...(level.windows || []).filter(windowBlocks)
+        ...level.doors.filter(doorBlocks).map(scaledRect),
+        ...(level.windows || []).filter(windowBlocks).map(scaledRect)
       ];
     }
 
@@ -2568,7 +2606,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
     function hasLineOfSight(a, b, level) {
       const blockers = [
         ...level.walls,
-        ...level.doors.filter(doorBlocks)
+        ...level.doors.filter(doorBlocks).map(scaledRect)
       ];
       return !blockers.some((rect) => segmentBlockedByRectThroughWindows(a, b, rect, level));
     }
@@ -2578,14 +2616,17 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       const blockers = [
         ...level.walls,
         ...level.doors.filter(doorBlocks)
-      ].filter((rect) => rect !== ignoredRect);
+      ].filter((rect) => rect !== ignoredRect).map((rect) => level.walls.includes(rect) ? rect : scaledRect(rect));
       return !blockers.some((rect) => segmentBlockedByRectThroughWindows(a, b, rect, level));
     }
 
     // Lets sight and bullets pass through wall sections occupied by windows.
     function segmentBlockedByRectThroughWindows(a, b, rect, level) {
       if (!segmentIntersectsRect(a, b, rect)) return false;
-      const windowOpening = (level.windows || []).some((win) => segmentIntersectsRect(a, b, win) && rectsOverlap(rect, win));
+      const windowOpening = (level.windows || []).some((win) => {
+        const scaledWindow = scaledRect(win);
+        return segmentIntersectsRect(a, b, scaledWindow) && rectsOverlap(rect, scaledWindow);
+      });
       return !windowOpening;
     }
 
@@ -2613,8 +2654,9 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       let bestDist = Infinity;
       for (const door of runtime.state.level.doors) {
         if (!doorBlocks(door)) continue;
-        const crossing = segmentIntersectsRect({ x: op.x, y: op.y }, next, inflateRect(door, 8));
-        const distance = pointRectDistance(op, door);
+        const scaledDoor = scaledRect(door);
+        const crossing = segmentIntersectsRect({ x: op.x, y: op.y }, next, inflateRect(scaledDoor, 8));
+        const distance = pointRectDistance(op, scaledDoor);
         const close = distance < 38;
         if ((crossing || close) && close && distance < bestDist) {
           best = door;
@@ -2630,7 +2672,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       let bestDist = Infinity;
       for (const door of runtime.state.level.doors) {
         if (!doorBlocks(door)) continue;
-        const distance = pointRectDistance(op, door);
+        const distance = scaledPointRectDistance(op, door);
         if (distance < maxDistance && distance < bestDist) {
           best = door;
           bestDist = distance;
@@ -2641,12 +2683,12 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
 
     // Finds a closed door under a click/touch point.
     function doorAtPoint(point) {
-      return runtime.state.level.doors.find((door) => doorBlocks(door) && pointInRect(point, inflateRect(door, 6)));
+      return runtime.state.level.doors.find((door) => doorBlocks(door) && pointInRect(point, inflateRect(scaledRect(door), 6)));
     }
 
     // Finds a window under a click/touch point.
     function windowAtPoint(point) {
-      return (runtime.state.level.windows || []).find((win) => pointInRect(point, inflateRect(win, 6)));
+      return (runtime.state.level.windows || []).find((win) => pointInRect(point, inflateRect(scaledRect(win), 6)));
     }
 
     // Expands a rectangle outward for forgiving interaction checks.
@@ -2677,6 +2719,9 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       angleTo,
       circleRectCollides,
       pointRectDistance,
+      scaledRect,
+      scaledRadius,
+      scaledPointRectDistance,
       rectCenter,
       doorBlocks,
       blockingRects,
@@ -2703,8 +2748,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.GeometrySystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/shooting-system.js */
 "use strict";
 
 (function () {
@@ -2855,7 +2900,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       for (const enemy of state.level.enemies) {
         if (enemy.down) continue;
         const distance = deps.geometry.pointDistance(op, enemy);
-        if (distance > weapon.range) continue;
+        const enemyRadius = deps.geometry.scaledRadius ? deps.geometry.scaledRadius(enemy) : enemy.radius;
+        if (distance > weapon.range + enemyRadius) continue;
         if (!deps.geometry.hasLineOfSight(op, enemy, state.level)) continue;
         if (!best || distance < best.distance) best = { enemy, distance };
       }
@@ -2867,7 +2913,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       const state = deps.getState();
       for (const win of state.level.windows || []) {
         if (win.state !== "closed") continue;
-        if (deps.geometry.segmentIntersectsRect(a, b, win)) {
+        if (deps.geometry.segmentIntersectsRect(a, b, deps.geometry.scaledRect(win))) {
           win.state = "broken";
           deps.audio.play("window-break");
           state.message = `${win.id} broken`;
@@ -2881,7 +2927,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       let best = null;
       for (const enemy of state.level.enemies) {
         if (enemy.down) continue;
-        const hit = segmentCircleHit(a, b, enemy, enemy.radius + 2);
+        const radius = deps.geometry.scaledRadius ? deps.geometry.scaledRadius(enemy) : enemy.radius;
+        const hit = segmentCircleHit(a, b, enemy, radius + 2);
         if (hit && (!best || hit.t < best.t)) best = { enemy, t: hit.t };
       }
       return best;
@@ -2893,7 +2940,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       let best = null;
       const blockers = [
         ...state.level.walls,
-        ...state.level.doors.filter((door) => deps.geometry.doorBlocks(door))
+        ...state.level.doors.filter((door) => deps.geometry.doorBlocks(door)).map((door) => deps.geometry.scaledRect(door))
       ];
       for (const rect of blockers) {
         if (deps.geometry.segmentBlockedByRectThroughWindows && !deps.geometry.segmentBlockedByRectThroughWindows(a, b, rect, state.level)) continue;
@@ -2943,8 +2990,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.ShootingSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/inventory-system.js */
 "use strict";
 
 (function () {
@@ -3352,8 +3399,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.InventorySystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/interaction-system.js */
 "use strict";
 
 (function () {
@@ -3497,7 +3544,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       let bestDist = Infinity;
       for (const target of list) {
         if (!filter(target)) continue;
-        const dist = deps.geometry.pointRectDistance(op, target);
+        const dist = deps.geometry.scaledPointRectDistance(op, target);
         if (dist <= range && dist < bestDist) {
           best = target;
           bestDist = dist;
@@ -3511,7 +3558,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       let best = null;
       let bestDist = Infinity;
       for (const door of deps.getState().level.doors) {
-        const dist = deps.geometry.pointRectDistance(op, door);
+        const dist = deps.geometry.scaledPointRectDistance(op, door);
         if (dist <= range && dist < bestDist) {
           best = door;
           bestDist = dist;
@@ -3524,7 +3571,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
     function doorBlockedByUnit(door) {
       const state = deps.getState();
       const units = [...state.level.operators, ...state.level.enemies].filter((unit) => !unit.down);
-      return units.some((unit) => deps.geometry.circleRectCollides(unit, door, 2));
+      return units.some((unit) => deps.geometry.circleRectCollides(unit, deps.geometry.scaledRect(door), 2));
     }
 
     return {
@@ -3542,8 +3589,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.InteractionSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/camera-hack-system.js */
 "use strict";
 
 (function () {
@@ -3680,8 +3727,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.CameraHackSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/tutorial-system.js */
 "use strict";
 
 (function () {
@@ -3885,8 +3932,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.TutorialSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/progression-system.js */
 "use strict";
 
 (function () {
@@ -4022,8 +4069,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.ProgressionSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/menu-system.js */
 "use strict";
 
 (function () {
@@ -4080,6 +4127,12 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       if (runtime.state && !runtime.state.gameOver && runtime.pauseResumeRunning) runtime.state.running = true;
       runtime.pauseResumeRunning = false;
       deps.updateHud();
+    }
+
+    // Toggles pause navigation from Esc or the expanded PAUSE button.
+    function togglePause() {
+      if (runtime.pauseOpen) closePause();
+      else openPause();
     }
 
     // Opens main page focused on levels.
@@ -4150,6 +4203,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       showLevelMenu,
       showTutorialMenu,
       openSettingsFromPause,
+      togglePause,
       toggleExpanded,
       render
     };
@@ -4158,8 +4212,91 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.MenuSystem = { create };
 }());
 
-</script>
-<script>
+
+/* mobile/object-scale-system.js */
+"use strict";
+
+(function () {
+  // Builds low-resolution object scaling for non-wall gameplay objects.
+  function create(deps) {
+    const config = deps.config || {};
+    const baseWidth = Number(config.baseWidth) || 1920;
+    const baseHeight = Number(config.baseHeight) || 1080;
+    const minObjectScale = Number(config.minObjectScale) || 0.65;
+    const scaleHitboxes = config.scaleHitboxes !== false;
+    let scale = 1;
+
+    // Recomputes scale from the current viewport.
+    function update() {
+      const viewport = deps.camera && deps.camera.getViewport
+        ? deps.camera.getViewport()
+        : { w: window.innerWidth || baseWidth, h: window.innerHeight || baseHeight };
+      const next = Math.min(viewport.w / baseWidth, viewport.h / baseHeight);
+      scale = Math.max(minObjectScale, Math.min(1, next || 1));
+      return scale;
+    }
+
+    // Returns the current object scale.
+    function objectScale() {
+      return scale;
+    }
+
+    // Scales a radius when hitbox scaling is enabled.
+    function scaledRadius(obj) {
+      const radius = Number(obj && obj.radius) || 0;
+      return scaleHitboxes ? radius * scale : radius;
+    }
+
+    // Scales a rectangle around its center.
+    function scaledRect(rect) {
+      if (!rect || !scaleHitboxes) return rect;
+      return scaledRectVisual(rect);
+    }
+
+    // Scales a rectangle visually around its center.
+    function scaledRectVisual(rect) {
+      if (!rect) return rect;
+      const w = rect.w * scale;
+      const h = rect.h * scale;
+      return {
+        ...rect,
+        x: rect.x + (rect.w - w) / 2,
+        y: rect.y + (rect.h - h) / 2,
+        w,
+        h
+      };
+    }
+
+    // Scales a circle-like unit around its center.
+    function scaledCircle(circle) {
+      if (!circle || !scaleHitboxes) return circle;
+      return { ...circle, radius: scaledRadius(circle) };
+    }
+
+    // Measures point-to-scaled-rectangle distance.
+    function scaledPointRectDistance(point, rect) {
+      return deps.pointRectDistance(point, scaledRect(rect));
+    }
+
+    update();
+
+    return {
+      update,
+      objectScale,
+      scaledRadius,
+      scaledRect,
+      scaledRectVisual,
+      scaledCircle,
+      scaledPointRectDistance,
+      scaleHitboxes: () => scaleHitboxes
+    };
+  }
+
+  window.ObjectScaleSystem = { create };
+}());
+
+
+/* mobile/mobile-control-system.js */
 "use strict";
 
 (function () {
@@ -4190,7 +4327,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
         elements.mobileMoveJoystick.addEventListener("pointercancel", stopJoystick);
         elements.mobileMoveJoystick.addEventListener("pointerleave", stopJoystick);
       }
-      if (elements.mobilePauseButton) elements.mobilePauseButton.addEventListener("click", deps.menu.openPause);
+      if (elements.mobilePauseButton) elements.mobilePauseButton.addEventListener("click", deps.menu.togglePause);
       if (elements.mobileInteractButton) {
         elements.mobileInteractButton.addEventListener("pointerdown", handleMobileInteract);
         elements.mobileInteractButton.addEventListener("click", () => deps.interaction.interactNearest());
@@ -4211,6 +4348,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       if (elements.mobileControls) elements.mobileControls.classList.toggle("hidden", !mobile);
       if (mobile) deps.menu.toggleExpanded(true);
       if (!mobile) clearMovement();
+      if (deps.objectScale && deps.objectScale.update) deps.objectScale.update();
     }
 
     // Starts joystick movement from a touch/pointer gesture.
@@ -4318,8 +4456,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.MobileControlSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/equipment-system.js */
 "use strict";
 
 (function () {
@@ -4494,26 +4632,29 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       }).join("");
     }
 
-    // Loads all weapon and armor JSON definitions from embedded demo data.
+    // Loads all weapon, armor, and backpack definitions from embedded demo data.
     async function loadEquipment() {
       weapons.clear();
       armors.clear();
       backpacks.clear();
-      const data = window.DemoData && window.DemoData.equipment ? window.DemoData.equipment : {};
-      const embedded = (meta) => data[meta.id] || data[String(meta.file).split("/").pop().replace(/\.json$/, "")];
-      for (const meta of deps.weaponOptions) {
-        const weapon = embedded(meta);
-        if (!weapon) throw new Error(`Missing embedded equipment: ${meta.id}`);
+      const source = window.DemoData && window.DemoData.equipment ? window.DemoData.equipment : {};
+      const cloneEquipment = (meta) => {
+        const data = source[meta.id] || source[meta.file];
+        if (!data) {
+          throw new Error(`Unable to load embedded equipment ${meta.file}`);
+        }
+        return JSON.parse(JSON.stringify(data));
+      };
+      const loadedWeapons = deps.weaponOptions.map(cloneEquipment);
+      const loadedArmors = deps.armorOptions.map(cloneEquipment);
+      const loadedBackpacks = deps.backpackOptions.map(cloneEquipment);
+      for (const weapon of loadedWeapons) {
         weapons.set(weapon.id, weapon);
       }
-      for (const meta of deps.armorOptions) {
-        const armor = embedded(meta);
-        if (!armor) throw new Error(`Missing embedded equipment: ${meta.id}`);
+      for (const armor of loadedArmors) {
         armors.set(armor.id, armor);
       }
-      for (const meta of deps.backpackOptions) {
-        const backpack = embedded(meta);
-        if (!backpack) throw new Error(`Missing embedded equipment: ${meta.id}`);
+      for (const backpack of loadedBackpacks) {
         backpacks.set(backpack.id, backpack);
       }
       populateEquipmentSelects();
@@ -4890,8 +5031,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.EquipmentSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/level-system.js */
 "use strict";
 
 (function () {
@@ -5145,12 +5286,11 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       }
     }
 
-    // Loads embedded demo level data and starts it when loading succeeds.
+    // Fetches a level JSON file and starts it when loading succeeds.
     async function loadLevel(levelId) {
       const storyMeta = deps.levelOptions.find((level) => level.id === levelId);
       const tutorialMeta = (deps.tutorialOptions || []).find((level) => level.id === levelId);
       const meta = storyMeta || tutorialMeta || deps.levelOptions[0];
-      const embeddedKey = String(meta.file || "").split("/").pop().replace(/\.json$/, "");
       runtime.currentLevelMeta = meta;
       runtime.activeMode = tutorialMeta ? "tutorial" : "level";
       elements.levelSelect.value = storyMeta ? meta.id : "";
@@ -5160,11 +5300,12 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       elements.levelTitle.textContent = "Loading...";
 
       try {
-        const source = tutorialMeta
-          ? (window.DemoData.tutorials[meta.id] || window.DemoData.tutorials[embeddedKey])
-          : (window.DemoData.levels[meta.id] || window.DemoData.levels[embeddedKey]);
-        if (!source) throw new Error(`Missing embedded level data: ${meta.id}`);
-        runtime.currentLevel = JSON.parse(JSON.stringify(source));
+        const source = window.DemoData && window.DemoData.levels ? window.DemoData.levels : {};
+        const embeddedLevel = source[meta.id] || source[meta.file];
+        if (!embeddedLevel) {
+          throw new Error(`Unable to load embedded level ${meta.file}`);
+        }
+        runtime.currentLevel = JSON.parse(JSON.stringify(embeddedLevel));
         runtime.currentLevel.id = runtime.currentLevel.id || meta.id;
         runtime.currentLevel.title = runtime.currentLevel.title || meta.title;
         restart();
@@ -5223,8 +5364,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.LevelSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/visibility-system.js */
 "use strict";
 
 (function () {
@@ -5259,7 +5400,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
         .filter((op) => !op.down)
         .some((op) => {
           const inRange = isRect
-            ? deps.geometry.pointRectDistance(op, obj) <= operatorSightRange(op)
+            ? deps.geometry.scaledPointRectDistance(op, obj) <= operatorSightRange(op)
             : deps.geometry.pointDistance(op, target) <= operatorSightRange(op);
           if (!inRange) return false;
           if (isRect && deps.geometry.hasLineOfSightIgnoring) {
@@ -5289,8 +5430,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.VisibilitySystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/settings-system.js */
 "use strict";
 
 (function () {
@@ -5409,8 +5550,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.SettingsSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/digital-lock-system.js */
 "use strict";
 
 (function () {
@@ -5534,8 +5675,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.DigitalLockSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/enemy-behavior-system.js */
 "use strict";
 
 (function () {
@@ -5814,8 +5955,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.EnemyBehaviorSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/mission-system.js */
 "use strict";
 
 (function () {
@@ -5830,7 +5971,12 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       const obj = state.level.objective;
       if (obj.secured || obj.harmed) return;
 
-      const opNear = state.level.operators.some((op) => !op.down && deps.geometry.pointDistance(op, obj) < 34);
+      const objectiveRadius = deps.objectScale ? deps.objectScale.scaledRadius(obj) : obj.radius;
+      const opNear = state.level.operators.some((op) => {
+        if (op.down) return false;
+        const opRadius = deps.objectScale ? deps.objectScale.scaledRadius(op) : op.radius;
+        return deps.geometry.pointDistance(op, obj) < opRadius + objectiveRadius + 6;
+      });
       if (opNear) {
         if (deps.tutorial && deps.tutorial.shouldGateObjective(state)) {
           deps.tutorial.recordPrematureObjectiveTouch(state);
@@ -5925,8 +6071,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.MissionSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/render-system.js */
 "use strict";
 
 (function () {
@@ -6056,19 +6202,20 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
     // Draws windows with open, closed, and broken states.
     function drawWindows() {
       for (const win of (runtime.state.level.windows || []).filter(shouldDrawObject)) {
+        const box = deps.geometry.scaledRect(win);
         ctx.save();
         ctx.fillStyle = win.state === "broken" ? "#92d5e9" : (win.state === "open" ? "#72b7ce" : "#b9e8f3");
         ctx.strokeStyle = win.state === "broken" ? "#ffffff" : "#24434b";
         ctx.lineWidth = 2;
-        ctx.fillRect(win.x, win.y, win.w, win.h);
-        ctx.strokeRect(win.x, win.y, win.w, win.h);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         if (win.state === "broken") {
           ctx.strokeStyle = "#ffffff";
           ctx.beginPath();
-          ctx.moveTo(win.x + 3, win.y + 3);
-          ctx.lineTo(win.x + win.w - 3, win.y + win.h - 3);
-          ctx.moveTo(win.x + win.w - 3, win.y + 3);
-          ctx.lineTo(win.x + 3, win.y + win.h - 3);
+          ctx.moveTo(box.x + 3, box.y + 3);
+          ctx.lineTo(box.x + box.w - 3, box.y + box.h - 3);
+          ctx.moveTo(box.x + box.w - 3, box.y + 3);
+          ctx.lineTo(box.x + 3, box.y + box.h - 3);
           ctx.stroke();
         }
         ctx.restore();
@@ -6078,23 +6225,24 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
     // Draws stair connectors and target direction.
     function drawStairs() {
       for (const stair of (runtime.state.level.stairs || []).filter(shouldDrawObject)) {
+        const box = deps.geometry.scaledRect(stair);
         ctx.save();
         ctx.fillStyle = "#8ec6c0";
         ctx.strokeStyle = "#1d3a3a";
         ctx.lineWidth = 2;
-        ctx.fillRect(stair.x, stair.y, stair.w, stair.h);
-        ctx.strokeRect(stair.x, stair.y, stair.w, stair.h);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         ctx.strokeStyle = "#102526";
-        for (let i = 6; i < stair.w; i += 10) {
+        for (let i = 6; i < box.w; i += 10) {
           ctx.beginPath();
-          ctx.moveTo(stair.x + i, stair.y + 4);
-          ctx.lineTo(stair.x + i, stair.y + stair.h - 4);
+          ctx.moveTo(box.x + i, box.y + 4);
+          ctx.lineTo(box.x + i, box.y + box.h - 4);
           ctx.stroke();
         }
         ctx.fillStyle = "#102526";
         ctx.font = "800 10px system-ui";
         ctx.textAlign = "center";
-        ctx.fillText(stair.label || "STAIRS", stair.x + stair.w / 2, stair.y + stair.h / 2 + 4);
+        ctx.fillText(stair.label || "STAIRS", box.x + box.w / 2, box.y + box.h / 2 + 4);
         ctx.restore();
       }
     }
@@ -6103,61 +6251,65 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
     function drawItems() {
       for (const item of (runtime.state.level.items || []).filter(shouldDrawObject)) {
         if (item.picked) continue;
+        const box = deps.geometry.scaledRect({ ...item, w: item.w || 20, h: item.h || 16 });
         ctx.fillStyle = item.type === "paper" ? "#f5e6a6" : "#d9d9d9";
         ctx.strokeStyle = "#6c6132";
         ctx.lineWidth = 1.5;
-        ctx.fillRect(item.x, item.y, item.w || 20, item.h || 16);
-        ctx.strokeRect(item.x, item.y, item.w || 20, item.h || 16);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         ctx.fillStyle = "#27240e";
         ctx.font = "900 9px system-ui";
         ctx.textAlign = "center";
-        ctx.fillText("P", item.x + (item.w || 20) / 2, item.y + (item.h || 16) / 2 + 3);
+        ctx.fillText("P", box.x + box.w / 2, box.y + box.h / 2 + 3);
       }
     }
 
     // Draws interactable equipment tables.
     function drawEquipmentTables() {
       for (const table of (runtime.state.level.equipmentTables || []).filter(shouldDrawObject)) {
+        const box = deps.geometry.scaledRect(table);
         ctx.fillStyle = "#6b6f75";
         ctx.strokeStyle = "#25282c";
         ctx.lineWidth = 2;
-        ctx.fillRect(table.x, table.y, table.w, table.h);
-        ctx.strokeRect(table.x, table.y, table.w, table.h);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         ctx.fillStyle = "#eef3ef";
         ctx.font = "800 9px system-ui";
         ctx.textAlign = "center";
-        ctx.fillText("GEAR", table.x + table.w / 2, table.y + table.h / 2 + 3);
+        ctx.fillText("GEAR", box.x + box.w / 2, box.y + box.h / 2 + 3);
       }
     }
 
     // Draws exterior laptop terminals used for camera hacking.
     function drawLaptops() {
       for (const laptop of runtime.state.level.laptops || []) {
+        const box = deps.geometry.scaledRect(laptop);
         ctx.fillStyle = "#202a31";
         ctx.strokeStyle = "#72b7ce";
         ctx.lineWidth = 2;
-        ctx.fillRect(laptop.x, laptop.y, laptop.w, laptop.h);
-        ctx.strokeRect(laptop.x, laptop.y, laptop.w, laptop.h);
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
         ctx.fillStyle = "#72b7ce";
         ctx.font = "900 9px system-ui";
         ctx.textAlign = "center";
-        ctx.fillText("LAPTOP", laptop.x + laptop.w / 2, laptop.y + laptop.h / 2 + 3);
+        ctx.fillText("LAPTOP", box.x + box.w / 2, box.y + box.h / 2 + 3);
       }
     }
 
     // Draws each door in closed or open orientation.
     function drawDoors() {
       for (const door of runtime.state.level.doors.filter(shouldDrawObject)) {
-        const center = deps.geometry.rectCenter(door);
+        const box = deps.geometry.scaledRect(door);
+        const center = deps.geometry.rectCenter(box);
         ctx.save();
         ctx.translate(center.x, center.y);
         ctx.rotate(door.orientation === "vertical" ? Math.PI / 2 : 0);
         ctx.fillStyle = door.state === "closed" ? colors.doorClosed : colors.doorOpen;
         if (door.state === "closed") {
-          ctx.fillRect(-doorLong(door) / 2, -4, doorLong(door), 8);
+          ctx.fillRect(-doorLong(box) / 2, -4, doorLong(box), 8);
         } else {
           ctx.rotate(-0.72);
-          ctx.fillRect(-doorLong(door) / 2, -4, doorLong(door), 8);
+          ctx.fillRect(-doorLong(box) / 2, -4, doorLong(box), 8);
         }
         ctx.restore();
         drawDoorIndicator(door, center);
@@ -6194,8 +6346,9 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       ctx.fillStyle = locked ? colors.doorLocked : colors.doorUnlocked;
       ctx.strokeStyle = "rgba(0,0,0,0.65)";
       ctx.lineWidth = 2;
+      const markerRadius = deps.geometry.scaledRadius({ radius: 9 });
       ctx.beginPath();
-      ctx.arc(center.x, center.y, 9, 0, twoPi);
+      ctx.arc(center.x, center.y, markerRadius, 0, twoPi);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = "#101214";
@@ -6266,8 +6419,9 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       ctx.fillStyle = obj.harmed ? colors.enemy : colors.hostage;
       ctx.strokeStyle = obj.secured ? colors.success : "#5d5330";
       ctx.lineWidth = 3;
+      const radius = deps.geometry.scaledRadius(obj);
       ctx.beginPath();
-      ctx.arc(obj.x, obj.y, obj.radius, 0, twoPi);
+      ctx.arc(obj.x, obj.y, radius, 0, twoPi);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = "#171b1e";
@@ -6307,13 +6461,14 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       ctx.fillStyle = fill;
       ctx.strokeStyle = unit.id === runtime.state.selectedId ? colors.selected : "#111";
       ctx.lineWidth = unit.id === runtime.state.selectedId ? 3 : 2;
+      const radius = deps.geometry.scaledRadius(unit);
       ctx.beginPath();
-      ctx.arc(0, 0, unit.radius, 0, twoPi);
+      ctx.arc(0, 0, radius, 0, twoPi);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = isOperator ? colors.opDark : "#421d1d";
       ctx.beginPath();
-      ctx.moveTo(unit.radius + 8, 0);
+      ctx.moveTo(radius + 8, 0);
       ctx.lineTo(3, -5);
       ctx.lineTo(3, 5);
       ctx.closePath();
@@ -6323,7 +6478,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       ctx.fillStyle = colors.text;
       ctx.font = "800 10px system-ui";
       ctx.textAlign = "center";
-      ctx.fillText(label, unit.x, unit.y - unit.radius - 8);
+      ctx.fillText(label, unit.x, unit.y - radius - 8);
     }
 
     // Draws active bullet tracers.
@@ -6430,8 +6585,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.RenderSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/input-system.js */
 "use strict";
 
 (function () {
@@ -6448,7 +6603,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       if (state.gameOver) return;
       const pos = deps.geometry.getMouseWorld(event);
       if (state.shootingMode === "manual") {
-        const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= op.radius + 8);
+        const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= deps.geometry.scaledRadius(op) + 8);
         if (clickedOp) {
           state.selectedId = clickedOp.id;
           deps.updateHud();
@@ -6458,7 +6613,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       const clickedDoor = deps.geometry.doorAtPoint(pos);
       if (clickedDoor && deps.interaction.interactDoor(deps.selectedOperator(), clickedDoor)) return;
 
-      const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= op.radius + 8);
+      const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= deps.geometry.scaledRadius(op) + 8);
       if (clickedOp) {
         state.selectedId = clickedOp.id;
         deps.updateHud();
@@ -6480,7 +6635,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       const state = runtime.state;
       if (!state || state.gameOver || state.shootingMode !== "manual" || event.button !== 0) return;
       const pos = deps.geometry.getMouseWorld(event);
-      const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= op.radius + 8);
+      const clickedOp = state.level.operators.find((op) => !op.down && deps.geometry.pointDistance(op, pos) <= deps.geometry.scaledRadius(op) + 8);
       if (clickedOp) {
         state.selectedId = clickedOp.id;
         runtime.manualFireHeld = false;
@@ -6553,8 +6708,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
         else if (deps.inventoryIsOpen()) deps.inventory.closeInventory();
         else if (deps.equipmentTableIsOpen()) deps.inventory.closeEquipmentTable();
         else if (deps.laptopIsOpen()) deps.cameraHack.closeLaptop();
-        else if (runtime.pauseOpen) deps.menu.closePause();
-        else deps.menu.openPause();
+        else deps.menu.togglePause();
         return;
       }
       const state = runtime.state;
@@ -6718,7 +6872,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       if (elements.pauseTutorialButton) elements.pauseTutorialButton.addEventListener("click", deps.menu.showTutorialMenu);
       if (elements.pauseSettingButton) elements.pauseSettingButton.addEventListener("click", deps.menu.openSettingsFromPause);
       if (elements.expandGameButton) elements.expandGameButton.addEventListener("click", () => deps.menu.toggleExpanded());
-      if (elements.expandedPauseButton) elements.expandedPauseButton.addEventListener("click", deps.menu.openPause);
+      if (elements.expandedPauseButton) elements.expandedPauseButton.addEventListener("click", deps.menu.togglePause);
       if (elements.exitToMenuButton) elements.exitToMenuButton.addEventListener("click", deps.menu.showMain);
       if (elements.resultLevelSelect) {
         elements.resultLevelSelect.addEventListener("change", () => loadWithTutorialWarning(elements.resultLevelSelect.value));
@@ -6901,8 +7055,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.InputSystem = { create };
 }());
 
-</script>
-<script>
+
+/* systems/action-system.js */
 "use strict";
 
 (function () {
@@ -7086,7 +7240,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       if (weapon.canFire === false) return;
       const visible = state.level.enemies
         .filter((enemy) => !enemy.down)
-        .filter((enemy) => deps.pointDistance(op, enemy) <= Math.min(weapon.range, deps.operatorSightRange(op)))
+        .filter((enemy) => deps.pointDistance(op, enemy) <= Math.min(weapon.range, deps.operatorSightRange(op)) + deps.scaledRadius(enemy))
         .filter((enemy) => deps.hasLineOfSight(op, enemy, state.level))
         .sort((a, b) => deps.pointDistance(op, a) - deps.pointDistance(op, b));
 
@@ -7119,7 +7273,7 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
       }
 
       if (weapon.attackType === "melee") {
-        if (deps.pointDistance(shooter, target) > weapon.range) return;
+        if (deps.pointDistance(shooter, target) > weapon.range + deps.scaledRadius(shooter) + deps.scaledRadius(target)) return;
         if (!deps.hasLineOfSight(shooter, target, getState().level)) return;
         damageTarget(target, weapon.damage, shooter);
         deps.enemyBehavior.noticeShot(shooter, target);
@@ -7213,8 +7367,8 @@ window.DemoData = {"levels":{"camera-house":{"id":"camera-house","title":"Camera
   window.ActionSystem = { create };
 }());
 
-</script>
-<script>
+
+/* main.js */
 "use strict";
 
 const elements = {
@@ -7405,6 +7559,13 @@ const SOUND_OPTIONS = [
   { id: "enemy-walk", file: "sounds/enemy-walk.wav" }
 ];
 
+const MOBILE_OBJECT_SCALE_CONFIG = {
+  baseWidth: 1920,
+  baseHeight: 1080,
+  minObjectScale: 0.65,
+  scaleHitboxes: true
+};
+
 const runtime = {
   state: null,
   currentLevel: null,
@@ -7459,6 +7620,7 @@ let cameraHack;
 let tutorial;
 let progression;
 let menu;
+let objectScale;
 let mobileControls;
 let equipment;
 let level;
@@ -7646,6 +7808,7 @@ function initializeSystems() {
   assertSystem("Tutorial system", window.TutorialSystem);
   assertSystem("Progression system", window.ProgressionSystem);
   assertSystem("Menu system", window.MenuSystem);
+  assertSystem("Object scale system", window.ObjectScaleSystem);
   assertSystem("Mobile control system", window.MobileControlSystem);
   assertSystem("Audio system", window.AudioSystem);
   assertSystem("Equipment system", window.EquipmentSystem);
@@ -7677,11 +7840,22 @@ function initializeSystems() {
     selectedOperator
   });
 
+  objectScale = window.ObjectScaleSystem.create({
+    config: MOBILE_OBJECT_SCALE_CONFIG,
+    camera,
+    pointRectDistance: (point, rect) => {
+      const closestX = Math.max(rect.x, Math.min(rect.x + rect.w, point.x));
+      const closestY = Math.max(rect.y, Math.min(rect.y + rect.h, point.y));
+      return Math.hypot(point.x - closestX, point.y - closestY);
+    }
+  });
+
   geometry = window.GeometrySystem.create({
     runtime,
     canvas: elements.canvas,
     twoPi: TWO_PI,
-    camera
+    camera,
+    objectScale
   });
 
   progression = window.ProgressionSystem.create({
@@ -7784,7 +7958,7 @@ function initializeSystems() {
     runtime,
     elements,
     pointDistance: geometry.pointDistance,
-    pointRectDistance: geometry.pointRectDistance
+    pointRectDistance: geometry.scaledPointRectDistance
   });
 
   level = window.LevelSystem.create({
@@ -7795,7 +7969,10 @@ function initializeSystems() {
     unitRadius: UNIT_RADIUS,
     levelOptions: LEVEL_OPTIONS,
     tutorialOptions: TUTORIAL_OPTIONS,
-    resizeCanvas: () => camera && camera.resizeCanvas(),
+    resizeCanvas: () => {
+      if (camera) camera.resizeCanvas();
+      if (objectScale) objectScale.update();
+    },
     equipment,
     shooting,
     operatorLoadouts,
@@ -7841,6 +8018,7 @@ function initializeSystems() {
     runtime,
     elements,
     geometry,
+    objectScale,
     audio,
     levelOptions: LEVEL_OPTIONS,
     tutorialOptions: TUTORIAL_OPTIONS,
@@ -7864,7 +8042,8 @@ function initializeSystems() {
     collidesWithMap: geometry.collidesWithMap,
     hasLineOfSight: geometry.hasLineOfSight,
     inFieldOfView: geometry.inFieldOfView,
-    pointRectDistance: geometry.pointRectDistance,
+    pointRectDistance: geometry.scaledPointRectDistance,
+    scaledRadius: geometry.scaledRadius,
     nearestClosedDoorToOperator: geometry.nearestClosedDoorToOperator,
     isLockedDigitalDoor: geometry.isLockedDigitalDoor,
     weaponById: equipment.weaponById,
@@ -7924,6 +8103,7 @@ function initializeSystems() {
     menu: {
       openPause: () => menu && menu.openPause(),
       closePause: () => menu && menu.closePause(),
+      togglePause: () => menu && menu.togglePause(),
       showMain: () => menu && menu.showMain(),
       showLevelMenu: () => menu && menu.showLevelMenu(),
       showTutorialMenu: () => menu && menu.showTutorialMenu(),
@@ -7945,7 +8125,10 @@ function initializeSystems() {
     settings,
     inventory,
     progression,
-    resizeCanvas: () => camera && camera.resizeCanvas(),
+    resizeCanvas: () => {
+      if (camera) camera.resizeCanvas();
+      if (objectScale) objectScale.update();
+    },
     setDifficulty,
     updateHud
   });
@@ -7958,18 +8141,24 @@ function initializeSystems() {
     menu,
     shooting,
     interaction,
+    objectScale,
     selectedOperator,
     updateHud
   });
   mobileControls.bindEvents();
   camera.resizeCanvas();
-  window.addEventListener("resize", () => camera.resizeCanvas());
+  objectScale.update();
+  window.addEventListener("resize", () => {
+    camera.resizeCanvas();
+    objectScale.update();
+  });
 }
 
 window.__breachline = {
   getState: () => runtime.state,
   getWeapons: () => [...weapons.values()],
   getArmors: () => [...armors.values()],
+  getObjectScale: () => objectScale ? objectScale.objectScale() : 1,
   restart: () => level.restart(),
   loadLevel: (levelId) => level.loadLevel(levelId),
   loadTutorial: (tutorialId) => level.loadLevel(tutorialId),
@@ -8000,6 +8189,7 @@ async function boot() {
 initializeSystems();
 boot();
 requestAnimationFrame(loop);
+
 
 </script>
   </body>

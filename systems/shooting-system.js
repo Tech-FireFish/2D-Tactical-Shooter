@@ -148,7 +148,8 @@
       for (const enemy of state.level.enemies) {
         if (enemy.down) continue;
         const distance = deps.geometry.pointDistance(op, enemy);
-        if (distance > weapon.range) continue;
+        const enemyRadius = deps.geometry.scaledRadius ? deps.geometry.scaledRadius(enemy) : enemy.radius;
+        if (distance > weapon.range + enemyRadius) continue;
         if (!deps.geometry.hasLineOfSight(op, enemy, state.level)) continue;
         if (!best || distance < best.distance) best = { enemy, distance };
       }
@@ -160,7 +161,7 @@
       const state = deps.getState();
       for (const win of state.level.windows || []) {
         if (win.state !== "closed") continue;
-        if (deps.geometry.segmentIntersectsRect(a, b, win)) {
+        if (deps.geometry.segmentIntersectsRect(a, b, deps.geometry.scaledRect(win))) {
           win.state = "broken";
           deps.audio.play("window-break");
           state.message = `${win.id} broken`;
@@ -174,7 +175,8 @@
       let best = null;
       for (const enemy of state.level.enemies) {
         if (enemy.down) continue;
-        const hit = segmentCircleHit(a, b, enemy, enemy.radius + 2);
+        const radius = deps.geometry.scaledRadius ? deps.geometry.scaledRadius(enemy) : enemy.radius;
+        const hit = segmentCircleHit(a, b, enemy, radius + 2);
         if (hit && (!best || hit.t < best.t)) best = { enemy, t: hit.t };
       }
       return best;
@@ -186,7 +188,7 @@
       let best = null;
       const blockers = [
         ...state.level.walls,
-        ...state.level.doors.filter((door) => deps.geometry.doorBlocks(door))
+        ...state.level.doors.filter((door) => deps.geometry.doorBlocks(door)).map((door) => deps.geometry.scaledRect(door))
       ];
       for (const rect of blockers) {
         if (deps.geometry.segmentBlockedByRectThroughWindows && !deps.geometry.segmentBlockedByRectThroughWindows(a, b, rect, state.level)) continue;
