@@ -17,6 +17,7 @@ const elements = {
   levelTitle: document.getElementById("levelTitle"),
   levelSelect: document.getElementById("levelSelect"),
   tutorialSelect: document.getElementById("tutorialSelect"),
+  tempLevelSelect: document.getElementById("tempLevelSelect"),
   operatorCountSelect: document.getElementById("operatorCountSelect"),
   modeLabel: document.getElementById("modeLabel"),
   objectiveLabel: document.getElementById("objectiveLabel"),
@@ -49,6 +50,7 @@ const elements = {
   shootingModeSelect: document.getElementById("shootingModeSelect"),
   enemyTraceSelect: document.getElementById("enemyTraceSelect"),
   hintOpacityRange: document.getElementById("hintOpacityRange"),
+  viewRange: document.getElementById("viewRange"),
   keyBindingList: document.getElementById("keyBindingList"),
   enemyLoadoutList: document.getElementById("enemyLoadoutList"),
   digitalLockOverlay: document.getElementById("digitalLockOverlay"),
@@ -153,6 +155,10 @@ const TUTORIAL_OPTIONS = [
   { id: "tutorial-digital-lock", title: "Tutorial: Digital Lock", file: "tutorials/digital-lock.json" }
 ];
 
+const TEMP_LEVEL_OPTIONS = [
+  { id: "temp-ridge-scene-source", title: "Temp: Ridge Scene Source", file: "temp/ridge-house-entry-scene-source.json" }
+];
+
 const WEAPON_OPTIONS = [
   { id: "no-weapon", file: "equipment/no-weapon.json" },
   { id: "rifle", file: "equipment/rifle.json" },
@@ -222,6 +228,7 @@ const runtime = {
   expandedPaused: false,
   mobileMode: false,
   hintOpacity: 0.42,
+  viewValue: 50,
   showAllHealth: false,
   activeSettingsTab: "keys",
   capturingKeyAction: null,
@@ -397,6 +404,9 @@ function updateHud() {
   if (elements.hintOpacityRange && Number(elements.hintOpacityRange.value) !== runtime.hintOpacity) {
     elements.hintOpacityRange.value = String(runtime.hintOpacity);
   }
+  if (elements.viewRange && Number(elements.viewRange.value) !== runtime.viewValue) {
+    elements.viewRange.value = String(runtime.viewValue);
+  }
   if (runtime.inventoryOpen) inventory.renderInventory();
   if (runtime.laptopOpen && cameraHack) cameraHack.render();
   if (tutorial) tutorial.update();
@@ -567,6 +577,7 @@ function initializeSystems() {
     operatorBackpackLoadouts,
     enemyLoadouts,
     enemyArmorLoadouts,
+    camera,
     renderEnemyLoadouts: () => equipment.renderEnemyLoadouts(),
     updateHud
   });
@@ -601,6 +612,7 @@ function initializeSystems() {
     unitRadius: UNIT_RADIUS,
     levelOptions: LEVEL_OPTIONS,
     tutorialOptions: TUTORIAL_OPTIONS,
+    tempLevelOptions: TEMP_LEVEL_OPTIONS,
     resizeCanvas: () => {
       if (camera) camera.resizeCanvas();
       if (objectScale) objectScale.update();
@@ -654,6 +666,7 @@ function initializeSystems() {
     audio,
     levelOptions: LEVEL_OPTIONS,
     tutorialOptions: TUTORIAL_OPTIONS,
+    tempLevelOptions: TEMP_LEVEL_OPTIONS,
     currentLevelIndex: () => level.currentLevelIndex(),
     currentTutorialIndex: () => level.currentTutorialIndex(),
     tutorial,
@@ -711,6 +724,7 @@ function initializeSystems() {
     keysDown,
     keybindings,
     geometry,
+    camera,
     actions,
     interaction,
     shooting,
@@ -753,6 +767,7 @@ function initializeSystems() {
     keysDown,
     levelOptions: LEVEL_OPTIONS,
     tutorialOptions: TUTORIAL_OPTIONS,
+    tempLevelOptions: TEMP_LEVEL_OPTIONS,
     level,
     settings,
     inventory,
