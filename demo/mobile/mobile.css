@@ -86,6 +86,98 @@ body.mobile-isolated * {
   touch-action: none;
 }
 
+.mobile-switch-button {
+  position: fixed;
+  right: 126px;
+  bottom: 56px;
+  z-index: 13;
+  width: 68px;
+  height: 68px;
+  min-height: 68px;
+  border-radius: 50%;
+  border-color: rgba(114, 183, 206, 0.58);
+  background:
+    radial-gradient(circle at center, rgba(114, 183, 206, 0.2), rgba(23, 27, 30, 0.78)),
+    rgba(23, 27, 30, 0.78);
+  color: var(--cyan);
+  font-size: 26px;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+body.mobile-isolated .control-card,
+body.mobile-isolated .settings-panel,
+body.mobile-isolated .pause-panel,
+body.mobile-isolated .banner {
+  font-size: calc(12px * var(--mobile-ui-scale, 0.78));
+}
+
+body.mobile-isolated .panel-label,
+body.mobile-isolated .eyebrow,
+body.mobile-isolated .mission-status-grid span,
+body.mobile-isolated .keybinding-row span,
+body.mobile-isolated .hint-text,
+body.mobile-isolated .tutorial-card p,
+body.mobile-isolated .health-card,
+body.mobile-isolated .inventory-summary,
+body.mobile-isolated .weapon-stats {
+  font-size: calc(11px * var(--mobile-ui-scale, 0.78));
+}
+
+body.mobile-isolated .control-card {
+  padding: calc(10px * var(--mobile-ui-scale, 0.78));
+  gap: calc(8px * var(--mobile-ui-scale, 0.78));
+}
+
+body.mobile-isolated .pause-overlay {
+  align-items: start;
+  justify-items: center;
+  padding: 54px 10px 0;
+  pointer-events: none;
+}
+
+body.mobile-isolated .pause-overlay .pause-panel {
+  width: min(92vw, 360px);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+body.mobile-isolated .pause-actions {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+}
+
+body.mobile-isolated .pause-actions button {
+  min-height: 32px;
+  padding: 5px 4px;
+  font-size: 10px;
+}
+
+body.mobile-isolated.game-expanded.expanded-paused .left-panel,
+body.mobile-isolated.game-expanded.expanded-paused .right-panel {
+  left: 12px;
+  right: 12px;
+  width: auto;
+  max-width: none;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+body.mobile-isolated.game-expanded.expanded-paused .left-panel {
+  top: 134px;
+  bottom: 52%;
+}
+
+body.mobile-isolated.game-expanded.expanded-paused .right-panel {
+  top: calc(48% + 8px);
+  bottom: 104px;
+}
+
+body.mobile-isolated.game-expanded.expanded-paused #hintCard,
+body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
+  background: rgba(23, 27, 30, 0.84);
+}
+
 /*
 .mobile-pad {
   position: fixed;

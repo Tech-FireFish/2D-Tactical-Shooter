@@ -78,6 +78,7 @@ const elements = {
   tutorialProgress: document.getElementById("tutorialProgress"),
   pauseOverlay: document.getElementById("pauseOverlay"),
   pauseResumeButton: document.getElementById("pauseResumeButton"),
+  pauseRestartButton: document.getElementById("pauseRestartButton"),
   pauseLevelButton: document.getElementById("pauseLevelButton"),
   pauseTutorialButton: document.getElementById("pauseTutorialButton"),
   pauseSettingButton: document.getElementById("pauseSettingButton"),
@@ -89,6 +90,7 @@ const elements = {
   mobileMoveJoystick: document.getElementById("mobileMoveJoystick"),
   mobileJoystickThumb: document.getElementById("mobileJoystickThumb"),
   mobileInteractButton: document.getElementById("mobileInteractButton"),
+  mobileSwitchButton: document.getElementById("mobileSwitchButton"),
   banner: document.getElementById("banner"),
   bannerTitle: document.getElementById("bannerTitle"),
   bannerText: document.getElementById("bannerText"),
@@ -138,7 +140,8 @@ const LEVEL_OPTIONS = [
   { id: "hardpoint-gallery", title: "Hardpoint Gallery", file: "level/hardpoint-gallery.json" },
   { id: "terminal-breach", title: "Terminal Breach", file: "level/terminal-breach.json" },
   { id: "house-blueprint", title: "House Blueprint", file: "level/house-blueprint.json" },
-  { id: "camera-house", title: "Camera House", file: "level/camera-house.json" }
+  { id: "camera-house", title: "Camera House", file: "level/camera-house.json" },
+  { id: "passage-boat-blueprint", title: "Passage Boat Blueprint", file: "level/passage-boat-blueprint.json" }
 ];
 
 const TUTORIAL_OPTIONS = [
@@ -192,7 +195,7 @@ const MOBILE_OBJECT_SCALE_CONFIG = {
   baseWidth: 1920,
   baseHeight: 1080,
   minObjectScale: 0.65,
-  scaleHitboxes: true
+  scaleHitboxes: false
 };
 
 const runtime = {
@@ -772,6 +775,7 @@ function initializeSystems() {
     interaction,
     objectScale,
     selectedOperator,
+    cycleOperator,
     updateHud
   });
   mobileControls.bindEvents();

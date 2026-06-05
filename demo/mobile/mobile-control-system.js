@@ -33,6 +33,9 @@
         elements.mobileInteractButton.addEventListener("pointerdown", handleMobileInteract);
         elements.mobileInteractButton.addEventListener("click", () => deps.interaction.interactNearest());
       }
+      if (elements.mobileSwitchButton) {
+        elements.mobileSwitchButton.addEventListener("pointerdown", handleMobileSwitch);
+      }
 
       /*
       The old right-side mobile shooting buttons were disabled for this pass:
@@ -137,6 +140,12 @@
     function handleMobileInteract(event) {
       event.preventDefault();
       deps.interaction.interactNearest();
+    }
+
+    // Cycles the selected operator from touch/pointer input.
+    function handleMobileSwitch(event) {
+      event.preventDefault();
+      deps.cycleOperator();
     }
 
     // Prevents accidental long-press and page gestures during mobile play.
