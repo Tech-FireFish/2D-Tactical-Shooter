@@ -228,17 +228,32 @@
       elements.weaponSelect.addEventListener("change", () => {
         const op = deps.selectedOperator();
         if (!op) return;
-        deps.equipment.applyOperatorWeapon(op, elements.weaponSelect.value);
+        const opId = op.id;
+        const value = elements.weaponSelect.value;
+        deps.settings.requestSettingChange(() => {
+          const target = runtime.state.level.operators.find((unit) => unit.id === opId);
+          if (target) deps.equipment.applyOperatorWeapon(target, value);
+        });
       });
       elements.armorSelect.addEventListener("change", () => {
         const op = deps.selectedOperator();
         if (!op) return;
-        deps.equipment.applyOperatorArmor(op, elements.armorSelect.value);
+        const opId = op.id;
+        const value = elements.armorSelect.value;
+        deps.settings.requestSettingChange(() => {
+          const target = runtime.state.level.operators.find((unit) => unit.id === opId);
+          if (target) deps.equipment.applyOperatorArmor(target, value);
+        });
       });
       elements.backpackSelect.addEventListener("change", () => {
         const op = deps.selectedOperator();
         if (!op) return;
-        deps.equipment.applyOperatorBackpack(op, elements.backpackSelect.value);
+        const opId = op.id;
+        const value = elements.backpackSelect.value;
+        deps.settings.requestSettingChange(() => {
+          const target = runtime.state.level.operators.find((unit) => unit.id === opId);
+          if (target) deps.equipment.applyOperatorBackpack(target, value);
+        });
       });
       window.addEventListener("keydown", handleKey);
       window.addEventListener("keyup", handleKeyUp);
@@ -253,6 +268,8 @@
       elements.nextLevelButton.addEventListener("click", () => {
         if (runtime.activeMode === "tutorial" && runtime.state && runtime.state.result === "success") {
           deps.level.loadNextTutorial();
+        } else if (runtime.activeMode === "temp") {
+          deps.level.loadFirstLevel();
         } else {
           deps.level.loadNextLevel();
         }
@@ -279,6 +296,12 @@
       }
       if (elements.mainMenuCloseButton) elements.mainMenuCloseButton.addEventListener("click", () => deps.menu.closePause() || deps.menu.enterGame());
       if (elements.pauseResumeButton) elements.pauseResumeButton.addEventListener("click", deps.menu.closePause);
+      if (elements.pauseRestartButton) {
+        elements.pauseRestartButton.addEventListener("click", () => {
+          deps.menu.closePause();
+          deps.level.restart();
+        });
+      }
       if (elements.pauseLevelButton) elements.pauseLevelButton.addEventListener("click", deps.menu.showLevelMenu);
       if (elements.pauseTutorialButton) elements.pauseTutorialButton.addEventListener("click", deps.menu.showTutorialMenu);
       if (elements.pauseSettingButton) elements.pauseSettingButton.addEventListener("click", deps.menu.openSettingsFromPause);
@@ -295,6 +318,15 @@
         elements.menuShootingModeSelect.addEventListener("change", () => {
           if (!runtime.state) return;
           runtime.state.shootingMode = elements.menuShootingModeSelect.value === "manual" ? "manual" : "automatic";
+          deps.updateHud();
+        });
+      }
+      if (elements.startPngRenderingCheckbox) {
+        elements.startPngRenderingCheckbox.addEventListener("change", () => {
+          runtime.usePngRendering = elements.startPngRenderingCheckbox.checked;
+          if (runtime.state) {
+            runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
+          }
           deps.updateHud();
         });
       }
@@ -330,6 +362,12 @@
       if (elements.resetSettingsButton) {
         elements.resetSettingsButton.addEventListener("click", deps.settings.resetDefaults);
       }
+      if (elements.confirmSettingsChangeButton) {
+        elements.confirmSettingsChangeButton.addEventListener("click", deps.settings.confirmPendingSettingChange);
+      }
+      if (elements.cancelSettingsChangeButton) {
+        elements.cancelSettingsChangeButton.addEventListener("click", deps.settings.cancelPendingSettingChange);
+      }
       elements.inventoryButton.addEventListener("click", deps.inventory.openInventory);
       elements.closeInventoryButton.addEventListener("click", deps.inventory.closeInventory);
       elements.inventoryOverlay.addEventListener("click", (event) => {
@@ -362,22 +400,48 @@
         elements.debugButton.classList.toggle("active", state.debug);
       });
       elements.difficultySelect.addEventListener("change", () => {
-        deps.setDifficulty(elements.difficultySelect.value);
+        const value = elements.difficultySelect.value;
+        deps.settings.requestSettingChange(() => deps.setDifficulty(value));
       });
       elements.shootingModeSelect.addEventListener("change", () => {
-        runtime.state.shootingMode = elements.shootingModeSelect.value === "manual" ? "manual" : "automatic";
-        stopManualFire();
-        runtime.state.message = runtime.state.shootingMode === "manual" ? "Manual shooting enabled" : "Automatic shooting enabled";
-        deps.updateHud();
+        const value = elements.shootingModeSelect.value;
+        deps.settings.requestSettingChange(() => {
+          runtime.state.shootingMode = value === "manual" ? "manual" : "automatic";
+          stopManualFire();
+          runtime.state.message = runtime.state.shootingMode === "manual" ? "Manual shooting enabled" : "Automatic shooting enabled";
+        });
       });
       elements.enemyTraceSelect.addEventListener("change", () => {
-        runtime.enemyTraceMode = elements.enemyTraceSelect.value === "chase" ? "chase" : "current";
-        if (runtime.state) runtime.state.message = runtime.enemyTraceMode === "chase" ? "Enemies chase last known contacts" : "Enemies use current behavior";
-        deps.updateHud();
+        const value = elements.enemyTraceSelect.value;
+        deps.settings.requestSettingChange(() => {
+          runtime.enemyTraceMode = value === "chase" ? "chase" : "current";
+          if (runtime.state) runtime.state.message = runtime.enemyTraceMode === "chase" ? "Enemies chase last known contacts" : "Enemies use current behavior";
+        });
       });
       if (elements.hintOpacityRange) {
-        elements.hintOpacityRange.addEventListener("input", () => {
-          runtime.hintOpacity = Number(elements.hintOpacityRange.value) || 0.42;
+        elements.hintOpacityRange.addEventListener("change", () => {
+          const value = Number(elements.hintOpacityRange.value) || 0.42;
+          deps.settings.requestSettingChange(() => {
+            runtime.hintOpacity = value;
+          });
+        });
+      }
+      if (elements.viewRange) {
+        elements.viewRange.addEventListener("change", () => {
+          const next = Number(elements.viewRange.value);
+          const value = Number.isFinite(next) ? next : 50;
+          deps.settings.requestSettingChange(() => {
+            runtime.viewValue = value;
+            if (deps.camera && deps.camera.setViewValue) deps.camera.setViewValue(runtime.viewValue);
+          });
+        });
+      }
+      if (elements.pngRenderingCheckbox) {
+        elements.pngRenderingCheckbox.addEventListener("change", () => {
+          runtime.usePngRendering = elements.pngRenderingCheckbox.checked;
+          if (runtime.state) {
+            runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
+          }
           deps.updateHud();
         });
       }
@@ -391,9 +455,13 @@
         const weaponSelectEl = event.target.closest("[data-enemy-weapon-id]");
         const armorSelectEl = event.target.closest("[data-enemy-armor-id]");
         if (weaponSelectEl) {
-          deps.equipment.applyEnemyWeapon(weaponSelectEl.dataset.enemyWeaponId, weaponSelectEl.value);
+          const id = weaponSelectEl.dataset.enemyWeaponId;
+          const value = weaponSelectEl.value;
+          deps.settings.requestSettingChange(() => deps.equipment.applyEnemyWeapon(id, value));
         } else if (armorSelectEl) {
-          deps.equipment.applyEnemyArmor(armorSelectEl.dataset.enemyArmorId, armorSelectEl.value);
+          const id = armorSelectEl.dataset.enemyArmorId;
+          const value = armorSelectEl.value;
+          deps.settings.requestSettingChange(() => deps.equipment.applyEnemyArmor(id, value));
         }
       });
       elements.unlockDigitalDoorButton.addEventListener("click", deps.digitalLock.submitDigitalLock);
@@ -424,19 +492,31 @@
       });
       elements.levelSelect.addEventListener("change", () => {
         deps.settings.setResumeRunning(false);
-        loadWithTutorialWarning(elements.levelSelect.value);
+        const value = elements.levelSelect.value;
+        deps.settings.requestSettingChange(() => loadWithTutorialWarning(value), { restartAfter: false });
       });
       if (elements.tutorialSelect) {
         elements.tutorialSelect.addEventListener("change", () => {
           if (!elements.tutorialSelect.value) return;
           deps.settings.setResumeRunning(false);
-          loadWithTutorialWarning(elements.tutorialSelect.value);
+          const value = elements.tutorialSelect.value;
+          deps.settings.requestSettingChange(() => loadWithTutorialWarning(value), { restartAfter: false });
+        });
+      }
+      if (elements.tempLevelSelect) {
+        elements.tempLevelSelect.addEventListener("change", () => {
+          if (!elements.tempLevelSelect.value) return;
+          deps.settings.setResumeRunning(false);
+          const value = elements.tempLevelSelect.value;
+          deps.settings.requestSettingChange(() => loadWithTutorialWarning(value), { restartAfter: false });
         });
       }
       elements.operatorCountSelect.addEventListener("change", () => {
         deps.settings.setResumeRunning(false);
-        runtime.activeOperatorCount = Number(elements.operatorCountSelect.value);
-        deps.level.restart();
+        const value = Number(elements.operatorCountSelect.value);
+        deps.settings.requestSettingChange(() => {
+          runtime.activeOperatorCount = value;
+        }, { restartWhenClean: true });
       });
       window.addEventListener("beforeunload", (event) => {
         if (!runtime.state || runtime.state.gameOver) return;

@@ -7,6 +7,7 @@ const elements = {
   onboardingQuestion: document.getElementById("onboardingQuestion"),
   playedYesButton: document.getElementById("playedYesButton"),
   playedNoButton: document.getElementById("playedNoButton"),
+  startPngRenderingCheckbox: document.getElementById("startPngRenderingCheckbox"),
   mainMenuOverlay: document.getElementById("mainMenuOverlay"),
   mainMenuCloseButton: document.getElementById("mainMenuCloseButton"),
   privilegeBoard: document.getElementById("privilegeBoard"),
@@ -54,6 +55,7 @@ const elements = {
   enemyTraceSelect: document.getElementById("enemyTraceSelect"),
   hintOpacityRange: document.getElementById("hintOpacityRange"),
   viewRange: document.getElementById("viewRange"),
+  pngRenderingCheckbox: document.getElementById("pngRenderingCheckbox"),
   keyBindingList: document.getElementById("keyBindingList"),
   enemyLoadoutList: document.getElementById("enemyLoadoutList"),
   digitalLockOverlay: document.getElementById("digitalLockOverlay"),
@@ -234,6 +236,7 @@ const runtime = {
   mobileMode: false,
   hintOpacity: 0.42,
   viewValue: 50,
+  usePngRendering: true,
   showAllHealth: false,
   activeSettingsTab: "keys",
   capturingKeyAction: null,
@@ -364,6 +367,7 @@ function update(dt) {
 // Refreshes labels, loadout controls, health cards, and mission status.
 function updateHud() {
   const state = runtime.state;
+  document.body.classList.toggle("png-art-disabled", runtime.usePngRendering === false);
   if (!state) {
     elements.modeLabel.textContent = "Loading";
     elements.objectiveLabel.textContent = "Loading";
@@ -411,6 +415,12 @@ function updateHud() {
   }
   if (elements.viewRange && Number(elements.viewRange.value) !== runtime.viewValue) {
     elements.viewRange.value = String(runtime.viewValue);
+  }
+  if (elements.pngRenderingCheckbox && elements.pngRenderingCheckbox.checked !== (runtime.usePngRendering !== false)) {
+    elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+  }
+  if (elements.startPngRenderingCheckbox && elements.startPngRenderingCheckbox.checked !== (runtime.usePngRendering !== false)) {
+    elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
   }
   if (runtime.inventoryOpen) inventory.renderInventory();
   if (runtime.laptopOpen && cameraHack) cameraHack.render();

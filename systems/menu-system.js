@@ -107,9 +107,12 @@
     // Renders story level number blocks.
     function renderLevelBlocks() {
       if (!elements.menuLevelBlocks) return;
+      const progress = deps.progression.snapshot();
       elements.menuLevelBlocks.innerHTML = deps.levelOptions.map((level, index) => {
         const unlocked = deps.progression.isLevelUnlocked(index);
-        return `<button type="button" data-menu-level="${level.id}" class="${unlocked ? "" : "locked"}" ${unlocked ? "" : "disabled"} title="${level.title}">${index + 1}</button>`;
+        const completed = progress.completedLevels.includes(level.id);
+        const className = [unlocked ? "" : "locked", completed ? "completed" : ""].filter(Boolean).join(" ");
+        return `<button type="button" data-menu-level="${level.id}" class="${className}" ${unlocked ? "" : "disabled"} title="${level.title}">${index + 1}</button>`;
       }).join("");
     }
 

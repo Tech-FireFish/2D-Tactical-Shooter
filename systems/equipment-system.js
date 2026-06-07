@@ -15,87 +15,22 @@
     const elements = deps.elements;
     let lastHealthBoardHtml = "";
     let lastEnemyLoadoutHtml = "";
-    const weaponPixelArt = {
-      "no-weapon": [
-        "....................",
-        "....................",
-        "......aaaaaaaa......",
-        ".....a........a.....",
-        "....a..........a....",
-        ".....a........a.....",
-        "......aaaaaaaa......",
-        "...................."
-      ],
-      rifle: [
-        "....................",
-        "...............aa...",
-        "...bbbccccccccccaa..",
-        "..bbccccddddddddaaa.",
-        ".bbbccccccccccccaa..",
-        ".....cc..ee.........",
-        ".....cc...ee........",
-        "......c....ee......."
-      ],
-      smg: [
-        "....................",
-        ".........aaa........",
-        "...bbbccccccaaa.....",
-        "..bbbccccddddaaa....",
-        "...bbccccccaaa......",
-        "......cc.ee.........",
-        "......cc..ee........",
-        "...........ee......."
-      ],
-      pistol: [
-        "....................",
-        "....................",
-        "......bbbccaaa......",
-        ".....bbbccccaaa.....",
-        ".......ccccaa.......",
-        "........cc..........",
-        "........cee.........",
-        ".........ee........."
-      ],
-      "advanced-carbine": [
-        "....................",
-        "...............aa...",
-        "..eeebbbcccccccaaa..",
-        ".eeebbbccddddddaaa..",
-        "..eeebbbcccccccaaa..",
-        ".....cc..ee.........",
-        ".....cc...ee........",
-        "......c....ee......."
-      ],
-      "compact-pdw": [
-        "....................",
-        ".........aaa........",
-        "..eeebbbccccaaa.....",
-        ".eeebbbccddddaaa....",
-        "..eeebbbccccaaa.....",
-        "......cc.ee.........",
-        "......cc..ee........",
-        "...........ee......."
-      ],
-      "marksman-pistol": [
-        "....................",
-        "....................",
-        "....eeebbbccaaa.....",
-        "...eeebbbccccaaa....",
-        "......eeccccaa......",
-        "........cc..........",
-        "........cee.........",
-        ".........ee........."
-      ],
-      melee: [
-        "....................",
-        "..........aa........",
-        ".........aaa........",
-        "........aaa.........",
-        ".......aaa..........",
-        "......aaa...........",
-        ".....bbb.............",
-        "....bbb............."
-      ]
+    const equipmentImages = {
+      "no-weapon": "pixel-art-no-weapon-001.png",
+      rifle: "pixel-art-rifle-001.png",
+      smg: "pixel-art-smg-001.png",
+      pistol: "pixel-art-pistol-001.png",
+      melee: "pixel-art-melee-001.png",
+      "advanced-carbine": "pixel-art-advanced-carbine-001.png",
+      "compact-pdw": "pixel-art-compact-pdw-001.png",
+      "marksman-pistol": "pixel-art-pistol-001.png",
+      "no-armor": "pixel-art-no-armor-001.png",
+      "light-armor": "pixel-art-light-armor-001.png",
+      "medium-armor": "pixel-art-medium-armor-001.png",
+      "heavy-armor": "pixel-art-heavy-armor-001.png",
+      "small-backpack": "pixel-art-small-backpack-001.png",
+      "medium-backpack": "pixel-art-medium-backpack-001.png",
+      "large-backpack": "pixel-art-large-backpack-001.png"
     };
 
     // Resolves a weapon definition, falling back to rifle.
@@ -170,6 +105,23 @@
         const selected = backpack.id === selectedId ? " selected" : "";
         return `<option value="${backpack.id}"${selected}>${backpack.name}</option>`;
       }).join("");
+    }
+
+    // Resolves the static pixel-art image for any equipment id.
+    function equipmentImagePath(id) {
+      const file = equipmentImages[id];
+      return file ? `docs/images/equipments/${file}` : "";
+    }
+
+    // Renders a compact static equipment image with a text fallback.
+    function equipmentIconHtml(id, label, className = "") {
+      const src = equipmentImagePath(id);
+      const safeLabel = escapeAttr(label || id || "Equipment");
+      const classes = ["equipment-icon", className].filter(Boolean).join(" ");
+      if (!src) {
+        return `<span class="${classes} equipment-icon-fallback" aria-label="${safeLabel}">${fallbackInitial(label || id)}</span>`;
+      }
+      return `<img class="${classes}" src="${src}" alt="${safeLabel}" loading="lazy" draggable="false" onerror="this.replaceWith(document.createTextNode('${fallbackInitial(label || id)}'))">`;
     }
 
     // Loads all weapon and armor JSON definitions from the equipment folder.
@@ -261,15 +213,23 @@
       const html = state.level.enemies.map((enemy) => {
         const selectedWeaponId = validWeaponId(savedWeapons[enemy.id] || enemy.weaponId || "rifle");
         const selectedArmorId = validArmorId(savedArmors[enemy.id] || enemy.armorId || "light-armor");
+        const weapon = weaponById(selectedWeaponId);
+        const armor = armorById(selectedArmorId);
         return `
           <div class="enemy-loadout-row">
             <strong>${enemy.id}</strong>
-            <select data-enemy-weapon-id="${enemy.id}" aria-label="${enemy.id} weapon">
-              ${weaponOptionsHtml(selectedWeaponId)}
-            </select>
-            <select data-enemy-armor-id="${enemy.id}" aria-label="${enemy.id} armor">
-              ${armorOptionsHtml(selectedArmorId)}
-            </select>
+            <label class="icon-select-row">
+              ${equipmentIconHtml(selectedWeaponId, weapon ? weapon.name : selectedWeaponId, "equipment-icon-small")}
+              <select data-enemy-weapon-id="${enemy.id}" aria-label="${enemy.id} weapon">
+                ${weaponOptionsHtml(selectedWeaponId)}
+              </select>
+            </label>
+            <label class="icon-select-row">
+              ${equipmentIconHtml(selectedArmorId, armor ? armor.name : selectedArmorId, "equipment-icon-small")}
+              <select data-enemy-armor-id="${enemy.id}" aria-label="${enemy.id} armor">
+                ${armorOptionsHtml(selectedArmorId)}
+              </select>
+            </label>
           </div>
         `;
       }).join("");
@@ -425,6 +385,11 @@
       renderWeaponTooltip(op, weapon, armor, backpack);
       renderAmmoBoard(op);
       elements.weaponStats.innerHTML = `
+        <div class="loadout-icon-strip" aria-label="Selected equipment">
+          ${equipmentIconHtml(weapon.id, weapon.name, "equipment-icon-small")}
+          ${equipmentIconHtml(armor.id, armor.name, "equipment-icon-small")}
+          ${equipmentIconHtml(backpack.id, backpack.name, "equipment-icon-small")}
+        </div>
         <div>${weapon.role}</div>
         <div class="empty-note">Hover weapon art for equipment details.</div>
       `;
@@ -472,23 +437,19 @@
       `;
     }
 
-    // Renders the selected weapon as compact CSS pixel art.
+    // Renders the selected weapon with static pixel-art image assets.
     function renderWeaponPixelPreview(weaponId) {
-      const selectedWeaponId = weaponId && weaponPixelArt[weaponId] ? weaponId : null;
-      const pattern = selectedWeaponId ? weaponPixelArt[selectedWeaponId] : null;
-      if (!pattern || !elements.weaponPixelPreview) {
+      if (!weaponId || !elements.weaponPixelPreview) {
         elements.weaponPixelPreview.innerHTML = "<span class=\"weapon-pixel-empty\">No Weapon</span>";
         elements.weaponPixelPreview.classList.add("empty");
         return;
       }
-      const pixels = pattern.flatMap((row) => row.split("")).map((cell) => {
-        const className = cell === "." ? "px empty-pixel" : `px tone-${cell}`;
-        return `<span class="${className}" aria-hidden="true"></span>`;
-      }).join("");
+      const weapon = weaponById(weaponId);
+      const image = equipmentIconHtml(weaponId, weapon ? weapon.name : weaponId, "equipment-icon-preview");
       elements.weaponPixelPreview.classList.remove("empty");
       elements.weaponPixelPreview.innerHTML = `
-        <div class="weapon-pixel-grid weapon-pixel-${selectedWeaponId}" role="img" aria-label="${weaponById(selectedWeaponId).name} pixel preview">
-          ${pixels}
+        <div class="weapon-image-frame" role="img" aria-label="${weapon ? weapon.name : weaponId} pixel preview">
+          ${image}
         </div>
       `;
     }
@@ -527,14 +488,14 @@
               <span class="armor-fill" style="width: ${armorPercent}%"></span>
             </span>
             <span class="operator-row">
-              <span>${armorById(op.armorId).name}</span>
+              <span class="operator-equipment-label">${equipmentIconHtml(op.armorId, armorById(op.armorId).name, "equipment-icon-tiny")}${armorById(op.armorId).name}</span>
               <span>${op.armor.toFixed(0)} AR</span>
             </span>
             <span class="health-meter" aria-hidden="true">
               <span class="health-fill" style="width: ${health}%"></span>
             </span>
             <span class="operator-row">
-              <span>${weapon ? weapon.name : "Rifle"}</span>
+              <span class="operator-equipment-label">${equipmentIconHtml(op.weaponId, weapon ? weapon.name : "Rifle", "equipment-icon-tiny")}${weapon ? weapon.name : "Rifle"}</span>
               <span>${health.toFixed(0)} HP</span>
             </span>
           </button>
@@ -559,6 +520,8 @@
       validBackpackId,
       currentLevelWeaponLoadouts,
       currentLevelArmorLoadouts,
+      equipmentImagePath,
+      equipmentIconHtml,
       weaponOptionsHtml,
       armorOptionsHtml,
       backpackOptionsHtml,
@@ -572,10 +535,24 @@
       applyOperatorBackpack,
       renderLoadoutPanel,
       renderHealthBoard,
-        renderWeaponPixelPreview,
+      renderWeaponPixelPreview,
       renderWeaponTooltip,
       renderAmmoBoard
     };
+  }
+
+  // Escapes text for safe use inside HTML attributes.
+  function escapeAttr(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  // Returns a compact fallback character for missing image assets.
+  function fallbackInitial(value) {
+    return escapeAttr(String(value || "?").trim().slice(0, 1).toUpperCase() || "?");
   }
 
   window.EquipmentSystem = { create };

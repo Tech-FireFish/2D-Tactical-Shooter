@@ -8,7 +8,7 @@
 
     // Opens settings, pauses execution, and remembers whether to resume.
     function openSettings() {
-      if (runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen || runtime.laptopOpen) return;
+      if (runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen || runtime.laptopOpen || runtime.settingChangeOpen) return;
       runtime.settingsResumeRunning = Boolean(runtime.state && runtime.state.running);
       if (runtime.state) runtime.state.running = false;
       deps.keysDown.clear();
@@ -22,6 +22,7 @@
     // Closes settings and restores execution when it was previously running.
     function closeSettings() {
       if (!runtime.settingsOpen) return;
+      cancelPendingSettingChange();
       runtime.settingsOpen = false;
       elements.settingsOverlay.classList.add("hidden");
       if (runtime.state && !runtime.state.gameOver && runtime.settingsResumeRunning) {
@@ -42,7 +43,7 @@
 
     // Reports whether any modal overlay should freeze gameplay updates.
     function gameplayPausedByOverlay() {
-      return runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen || runtime.laptopOpen || runtime.pauseOpen;
+      return runtime.settingsOpen || runtime.digitalLockOpen || runtime.inventoryOpen || runtime.equipmentTableOpen || runtime.laptopOpen || runtime.pauseOpen || runtime.settingChangeOpen;
     }
 
     // Overrides the stored resume state for setup changes.
@@ -66,6 +67,84 @@
       }
     }
 
+    // Applies a setup change immediately or asks for restart confirmation after units move.
+    function requestSettingChange(applyChange, options = {}) {
+      if (runtime.activeMode === "tutorial") {
+        applyChange();
+        deps.updateHud();
+        return true;
+      }
+      if (!unitsMovedFromOrigin()) {
+        applyChange();
+        if (options.restartWhenClean && deps.level && deps.level.restart) deps.level.restart();
+        deps.updateHud();
+        return true;
+      }
+      runtime.settingChangeOpen = true;
+      runtime.pendingSettingChange = {
+        applyChange,
+        restartAfter: options.restartAfter !== false
+      };
+      if (elements.settingsChangeOverlay) elements.settingsChangeOverlay.classList.remove("hidden");
+      deps.keysDown.clear();
+      return false;
+    }
+
+    // Confirms the pending settings change and restarts the current mission when required.
+    function confirmPendingSettingChange() {
+      const pending = runtime.pendingSettingChange;
+      hideSettingChangeOverlay();
+      if (!pending || typeof pending.applyChange !== "function") {
+        deps.updateHud();
+        return;
+      }
+      pending.applyChange();
+      if (pending.restartAfter && deps.level && deps.level.restart) deps.level.restart();
+      deps.updateHud();
+    }
+
+    // Cancels the pending settings change and restores visible controls.
+    function cancelPendingSettingChange() {
+      hideSettingChangeOverlay();
+      restoreSetupControls();
+      if (deps.renderEnemyLoadouts) deps.renderEnemyLoadouts();
+      deps.updateHud();
+    }
+
+    // Hides the settings-change warning overlay.
+    function hideSettingChangeOverlay() {
+      runtime.settingChangeOpen = false;
+      runtime.pendingSettingChange = null;
+      if (elements.settingsChangeOverlay) elements.settingsChangeOverlay.classList.add("hidden");
+    }
+
+    // Detects whether any operator or enemy has left its authored spawn position.
+    function unitsMovedFromOrigin() {
+      const state = runtime.state;
+      if (!state || state.gameOver) return false;
+      return [...state.level.operators, ...state.level.enemies].some((unit) => {
+        const spawn = unit.spawn;
+        if (!spawn) return false;
+        return Math.hypot(unit.x - spawn.x, unit.y - spawn.y) > 1;
+      });
+    }
+
+    // Restores selector values after a rejected settings change.
+    function restoreSetupControls() {
+      const meta = runtime.currentLevelMeta;
+      if (elements.levelSelect) elements.levelSelect.value = runtime.activeMode === "level" && meta ? meta.id : "";
+      if (elements.tutorialSelect) elements.tutorialSelect.value = runtime.activeMode === "tutorial" && meta ? meta.id : "";
+      if (elements.tempLevelSelect) elements.tempLevelSelect.value = runtime.activeMode === "temp" && meta ? meta.id : "";
+      if (elements.operatorCountSelect) elements.operatorCountSelect.value = String(runtime.activeOperatorCount || 2);
+      if (elements.difficultySelect) elements.difficultySelect.value = runtime.currentDifficulty || "normal";
+      if (elements.shootingModeSelect && runtime.state) elements.shootingModeSelect.value = runtime.state.shootingMode || "automatic";
+      if (elements.enemyTraceSelect) elements.enemyTraceSelect.value = runtime.enemyTraceMode || "current";
+      if (elements.hintOpacityRange) elements.hintOpacityRange.value = String(runtime.hintOpacity || 0.42);
+      if (elements.viewRange) elements.viewRange.value = String(runtime.viewValue || 50);
+      if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+      if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+    }
+
     // Restores controls, setup options, and saved loadout selections to defaults.
     function resetDefaults() {
       deps.keysDown.clear();
@@ -75,6 +154,8 @@
       runtime.activeOperatorCount = 2;
       runtime.showAllHealth = false;
       runtime.hintOpacity = 0.42;
+      runtime.viewValue = 50;
+      runtime.usePngRendering = true;
       if (runtime.state) {
         runtime.state.shootingMode = "automatic";
         runtime.state.message = "Settings reset to defaults";
@@ -90,7 +171,11 @@
       if (elements.shootingModeSelect) elements.shootingModeSelect.value = "automatic";
       if (elements.enemyTraceSelect) elements.enemyTraceSelect.value = "current";
       if (elements.hintOpacityRange) elements.hintOpacityRange.value = "0.42";
-      if (deps.level && deps.level.restart) deps.level.restart();
+      if (elements.viewRange) elements.viewRange.value = "50";
+      if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = true;
+      if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = true;
+      if (deps.camera && deps.camera.setViewValue) deps.camera.setViewValue(50);
+      if (runtime.activeMode !== "tutorial" && deps.level && deps.level.restart) deps.level.restart();
       deps.renderEnemyLoadouts();
       deps.updateHud();
     }
@@ -109,6 +194,9 @@
       setResumeRunning,
       setActiveTab,
       resetDefaults,
+      requestSettingChange,
+      confirmPendingSettingChange,
+      cancelPendingSettingChange,
       isOpen
     };
   }

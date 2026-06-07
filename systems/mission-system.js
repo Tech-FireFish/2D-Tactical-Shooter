@@ -51,7 +51,8 @@
       state.result = result;
       deps.audio.play(result === "success" ? "mission-success" : "mission-failed");
       const tutorialSuccess = runtime.activeMode === "tutorial" && result === "success";
-      const storySuccess = runtime.activeMode !== "tutorial" && result === "success";
+      const storySuccess = runtime.activeMode === "level" && result === "success";
+      const tempSuccess = runtime.activeMode === "temp" && result === "success";
       const progress = storySuccess && deps.progression
         ? deps.progression.recordMission(runtime.currentLevelMeta, state.level)
         : { privilegeEarned: 0, rewardsUnlocked: [], complexity: deps.progression ? deps.progression.complexity(state.level) : 0 };
@@ -63,6 +64,9 @@
         const nextTutorial = deps.tutorialOptions[nextIndex];
         elements.bannerText.textContent = `${text} Continue to ${nextTutorial.title}, exit to the main page, or restart this tutorial.`;
         elements.nextLevelButton.textContent = nextIndex === 0 ? "First Tutorial" : "Next Tutorial";
+      } else if (tempSuccess) {
+        elements.bannerText.textContent = `${text} Temporary test level complete. Choose another destination, return to the main page, or restart.`;
+        elements.nextLevelButton.textContent = "First Level";
       } else {
         const nextIndex = (deps.currentLevelIndex() + 1) % deps.levelOptions.length;
         const nextLevel = deps.levelOptions[nextIndex];
@@ -95,7 +99,9 @@
     // Populates the result-level picker with tutorial or story destinations.
     function populateResultSelector() {
       if (!elements.resultLevelSelect) return;
-      const options = runtime.activeMode === "tutorial" ? deps.tutorialOptions : deps.levelOptions;
+      const options = runtime.activeMode === "tutorial"
+        ? deps.tutorialOptions
+        : (runtime.activeMode === "temp" ? (deps.tempLevelOptions || []) : deps.levelOptions);
       elements.resultLevelSelect.innerHTML = options.map((option, index) => {
         const current = option.id === runtime.currentLevelMeta.id ? " selected" : "";
         return `<option value="${option.id}"${current}>${index + 1}. ${option.title}</option>`;

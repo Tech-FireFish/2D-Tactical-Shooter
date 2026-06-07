@@ -39,6 +39,7 @@
       return {
         id: level.id,
         title: level.title,
+        sceneSource: level.sceneSource ? clonePlain(level.sceneSource) : null,
         requireObjective: Boolean(level.requireObjective),
         width: level.width || deps.defaultWorld.w,
         height: level.height || deps.defaultWorld.h,
@@ -72,6 +73,7 @@
             backpackId,
             baseSpeed,
             speed: baseSpeed * armor.speedMultiplier * (backpack.speedMultiplier || 1),
+            spawn: { x: op.x, y: op.y, angle: op.angle || 0 },
             weaponId: deps.equipment.validWeaponId((useSavedLoadout && deps.operatorLoadouts[op.id]) || op.weaponId || "rifle"),
             fireTimer: 0,
             path: [],
@@ -142,6 +144,7 @@
         if (door.lockType === "digital") passwords[door.id] = password;
         return {
           ...door,
+          state: door.state || "closed",
           password,
           locked: door.lockType === "digital" ? door.locked !== false : Boolean(door.locked)
         };
@@ -155,6 +158,11 @@
       const baseItems = (level.items || []).map((item) => ({ ...item, picked: false }));
       const digitalDoors = level.doors.filter((door) => door.lockType === "digital");
       return baseItems.map((item) => ({ ...item }));
+    }
+
+    // Clones nested plain JSON metadata without carrying object references across restarts.
+    function clonePlain(value) {
+      return JSON.parse(JSON.stringify(value));
     }
 
     // Applies generated passwords to paper notes after door generation.
@@ -249,19 +257,30 @@
         option.textContent = tutorial.title;
         elements.tutorialSelect.append(option);
       }
+      if (!elements.tempLevelSelect) return;
+      elements.tempLevelSelect.innerHTML = "<option value=\"\">Choose Temporary Level</option>";
+      for (const tempLevel of deps.tempLevelOptions || []) {
+        const option = document.createElement("option");
+        option.value = tempLevel.id;
+        option.textContent = tempLevel.title;
+        elements.tempLevelSelect.append(option);
+      }
     }
 
     // Fetches a level JSON file and starts it when loading succeeds.
     async function loadLevel(levelId) {
       const storyMeta = deps.levelOptions.find((level) => level.id === levelId);
       const tutorialMeta = (deps.tutorialOptions || []).find((level) => level.id === levelId);
-      const meta = storyMeta || tutorialMeta || deps.levelOptions[0];
+      const tempMeta = (deps.tempLevelOptions || []).find((level) => level.id === levelId);
+      const meta = storyMeta || tutorialMeta || tempMeta || deps.levelOptions[0];
       runtime.currentLevelMeta = meta;
-      runtime.activeMode = tutorialMeta ? "tutorial" : "level";
+      runtime.activeMode = tutorialMeta ? "tutorial" : (tempMeta ? "temp" : "level");
       elements.levelSelect.value = storyMeta ? meta.id : "";
       if (elements.tutorialSelect) elements.tutorialSelect.value = tutorialMeta ? meta.id : "";
+      if (elements.tempLevelSelect) elements.tempLevelSelect.value = tempMeta ? meta.id : "";
       elements.levelSelect.disabled = true;
       if (elements.tutorialSelect) elements.tutorialSelect.disabled = true;
+      if (elements.tempLevelSelect) elements.tempLevelSelect.disabled = true;
       elements.levelTitle.textContent = "Loading...";
 
       try {
@@ -283,6 +302,7 @@
       } finally {
         elements.levelSelect.disabled = false;
         if (elements.tutorialSelect) elements.tutorialSelect.disabled = false;
+        if (elements.tempLevelSelect) elements.tempLevelSelect.disabled = false;
       }
     }
 

@@ -12,7 +12,7 @@
       if (!state || !op || op.down || state.gameOver) return false;
       const item = nearest(op, state.level.items || [], (target) => !target.picked);
       if (item) return deps.inventory.pickItem(op, item);
-      const table = nearest(op, state.level.equipmentTables || []);
+      const table = nearestOverlapping(op, state.level.equipmentTables || []);
       if (table) {
         deps.inventory.openEquipmentTable(table);
         return true;
@@ -117,7 +117,7 @@
       if (!state || !op) return "";
       const item = nearest(op, state.level.items || [], (target) => !target.picked);
       if (item) return `Press E to pick up ${item.name || item.id}`;
-      const table = nearest(op, state.level.equipmentTables || []);
+      const table = nearestOverlapping(op, state.level.equipmentTables || []);
       if (table) return "Press E to use equipment table";
       const laptop = nearest(op, state.level.laptops || []);
       if (laptop) return "Press E to use camera laptop";
@@ -143,6 +143,22 @@
         if (!filter(target)) continue;
         const dist = deps.geometry.scaledPointRectDistance(op, target);
         if (dist <= range && dist < bestDist) {
+          best = target;
+          bestDist = dist;
+        }
+      }
+      return best;
+    }
+
+    // Finds the nearest object whose authored collision area overlaps the operator body.
+    function nearestOverlapping(op, list, filter = () => true) {
+      let best = null;
+      let bestDist = Infinity;
+      for (const target of list) {
+        if (!filter(target)) continue;
+        if (!deps.geometry.circleRectCollides(op, target)) continue;
+        const dist = deps.geometry.pointRectDistance(op, target);
+        if (dist < bestDist) {
           best = target;
           bestDist = dist;
         }
@@ -178,6 +194,7 @@
       interactStair,
       nearestHint,
       nearest,
+      nearestOverlapping,
       nearestDoor,
       doorBlockedByUnit
     };

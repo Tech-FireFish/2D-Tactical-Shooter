@@ -53,9 +53,9 @@
       deps.elements.inventoryTitle.textContent = `${op.id} Inventory`;
       deps.elements.inventoryDetails.innerHTML = `
         <div class="inventory-grid">
-          <div><span>Weapon</span><strong>${weapon.name}</strong></div>
-          <div><span>Armor</span><strong>${armor.name}</strong></div>
-          <div><span>Backpack</span><strong>${backpack.name}</strong></div>
+          <div><span>Weapon</span><strong>${deps.equipment.equipmentIconHtml(weapon.id, weapon.name, "equipment-icon-small")}${weapon.name}</strong></div>
+          <div><span>Armor</span><strong>${deps.equipment.equipmentIconHtml(armor.id, armor.name, "equipment-icon-small")}${armor.name}</strong></div>
+          <div><span>Backpack</span><strong>${deps.equipment.equipmentIconHtml(backpack.id, backpack.name, "equipment-icon-small")}${backpack.name}</strong></div>
           <div><span>Ammo</span><strong>${op.ammo.magazine}/${weapon.magSize} + ${op.ammo.reserve}</strong></div>
           <div><span>Slots</span><strong>${occupiedSlots(op)}/${op.inventory.slots}</strong></div>
         </div>
@@ -81,7 +81,7 @@
         .filter((item) => item.type === "paper")
         .reduce((count, item) => count + item.quantity, 0);
       deps.elements.inventorySummary.innerHTML = `
-        <div class="summary-row"><span>Backpack</span><strong>${backpack.name}</strong></div>
+        <div class="summary-row"><span>Backpack</span><strong>${deps.equipment.equipmentIconHtml(backpack.id, backpack.name, "equipment-icon-tiny")}${backpack.name}</strong></div>
         <div class="summary-row"><span>Items</span><strong>${occupiedSlots(op)}/${op.inventory.slots}</strong></div>
         <div class="summary-row"><span>Papers</span><strong>${papers}</strong></div>
       `;
@@ -137,13 +137,22 @@
     // Renders buttons for equipment available at a table.
     function renderEquipmentTable(table) {
       const weaponButtons = deps.weaponOptions.map((meta) => deps.equipment.weaponById(meta.id)).map((weapon) => `
-        <button type="button" data-table-equip="weapon" data-equip-id="${weapon.id}">${weapon.name}</button>
+        <button class="equipment-table-button" type="button" data-table-equip="weapon" data-equip-id="${weapon.id}">
+          ${deps.equipment.equipmentIconHtml(weapon.id, weapon.name, "equipment-icon-small")}
+          <span>${weapon.name}</span>
+        </button>
       `).join("");
       const armorButtons = deps.armorOptions.map((meta) => deps.equipment.armorById(meta.id)).map((armor) => `
-        <button type="button" data-table-equip="armor" data-equip-id="${armor.id}">${armor.name}</button>
+        <button class="equipment-table-button" type="button" data-table-equip="armor" data-equip-id="${armor.id}">
+          ${deps.equipment.equipmentIconHtml(armor.id, armor.name, "equipment-icon-small")}
+          <span>${armor.name}</span>
+        </button>
       `).join("");
       const backpackButtons = deps.backpackOptions.map((meta) => deps.equipment.backpackById(meta.id)).map((pack) => `
-        <button type="button" data-table-equip="backpack" data-equip-id="${pack.id}">${pack.name}</button>
+        <button class="equipment-table-button" type="button" data-table-equip="backpack" data-equip-id="${pack.id}">
+          ${deps.equipment.equipmentIconHtml(pack.id, pack.name, "equipment-icon-small")}
+          <span>${pack.name}</span>
+        </button>
       `).join("");
       deps.elements.equipmentTableOptions.innerHTML = `
         <section><h3>Weapons</h3>${weaponButtons}</section>

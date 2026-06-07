@@ -7,7 +7,9 @@
       x: deps.defaultWorld.w / 2,
       y: deps.defaultWorld.h / 2,
       zoom: 1.38,
-      targetZoom: 1.38
+      targetZoom: 1.38,
+      defaultZoom: 1.38,
+      viewValue: 50
     };
     const viewport = {
       w: deps.defaultWorld.w,
@@ -32,6 +34,7 @@
       viewport.pixelRatio = ratio;
       if (deps.canvas.width !== nextW) deps.canvas.width = nextW;
       if (deps.canvas.height !== nextH) deps.canvas.height = nextH;
+      updateTargetZoom();
       clampToWorld();
     }
 
@@ -52,6 +55,36 @@
       const viewH = viewport.h / camera.zoom;
       camera.x = deps.clamp(camera.x, -padding.x + viewW / 2, Math.max(-padding.x + viewW / 2, deps.world.w + padding.x - viewW / 2));
       camera.y = deps.clamp(camera.y, -padding.y + viewH / 2, Math.max(-padding.y + viewH / 2, deps.world.h + padding.y - viewH / 2));
+    }
+
+    // Sets the player-facing view slider and recalculates the camera zoom target.
+    function setViewValue(value) {
+      const next = Number(value);
+      camera.viewValue = deps.clamp(Number.isFinite(next) ? next : 50, 0, 100);
+      updateTargetZoom();
+      clampToWorld();
+    }
+
+    // Recomputes the target zoom from the current viewport, world, and slider value.
+    function updateTargetZoom() {
+      const defaultZoom = camera.defaultZoom;
+      const fitZoom = Math.min(
+        defaultZoom,
+        viewport.w / Math.max(1, deps.world.w),
+        viewport.h / Math.max(1, deps.world.h)
+      );
+      const maxZoom = defaultZoom * 4;
+      if (camera.viewValue <= 50) {
+        camera.targetZoom = lerp(fitZoom, defaultZoom, camera.viewValue / 50);
+      } else {
+        camera.targetZoom = lerp(defaultZoom, maxZoom, (camera.viewValue - 50) / 50);
+      }
+      if (!Number.isFinite(camera.zoom) || camera.zoom <= 0) camera.zoom = camera.targetZoom;
+    }
+
+    // Blends between two zoom endpoints.
+    function lerp(start, end, t) {
+      return start + (end - start) * deps.clamp(t, 0, 1);
     }
 
     // Applies the world transform before map rendering.
@@ -91,6 +124,7 @@
     return {
       resizeCanvas,
       update,
+      setViewValue,
       apply,
       reset,
       screenToWorld,

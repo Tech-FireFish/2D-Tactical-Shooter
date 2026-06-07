@@ -168,6 +168,7 @@
       const complete = index === -1;
       const step = complete ? steps[steps.length - 1] : steps[index];
       const attention = performance.now() < (state.tutorial.attentionUntil || 0);
+      document.body.classList.toggle("tutorial-overlay-follow", overlayOpen());
       elements.tutorialCard.classList.remove("hidden");
       elements.tutorialCard.classList.toggle("attention", attention);
       if (elements.hintCard) elements.hintCard.classList.toggle("attention", attention);
@@ -180,9 +181,20 @@
 
     // Hides tutorial UI when the active level has no tutorial data.
     function hide() {
+      document.body.classList.remove("tutorial-overlay-follow");
       if (elements.tutorialCard) elements.tutorialCard.classList.add("hidden");
       if (elements.tutorialCard) elements.tutorialCard.classList.remove("attention");
       if (elements.hintCard) elements.hintCard.classList.remove("attention");
+    }
+
+    // Reports whether tutorial text should float above another active overlay.
+    function overlayOpen() {
+      return runtime.settingsOpen
+        || runtime.digitalLockOpen
+        || runtime.inventoryOpen
+        || runtime.equipmentTableOpen
+        || runtime.laptopOpen
+        || runtime.settingChangeOpen;
     }
 
     return {

@@ -8,24 +8,29 @@ const TWO_PI = Math.PI * 2;
 const DT = 1 / 30;
 const CELL = 10;
 const WEAPON_FILES = [
+  "no-weapon.json",
   "rifle.json",
   "smg.json",
   "pistol.json"
 ];
 const ARMOR_FILES = [
+  "no-armor.json",
   "light-armor.json",
   "medium-armor.json",
   "heavy-armor.json"
 ];
 const LEVEL_FILES = [
-  "tutorial-digital-lock.json",
   "ridge-house-entry.json",
   "warehouse-pinch.json",
   "hardpoint-gallery.json",
   "terminal-breach.json",
   "house-blueprint.json",
-  "camera-house.json"
+  "camera-house.json",
+  "passage-boat-blueprint.json"
 ];
+const TUTORIAL_FILES = fs.existsSync("tutorials")
+  ? fs.readdirSync("tutorials").filter((file) => file.endsWith(".json")).sort()
+  : [];
 const weapons = new Map(WEAPON_FILES.map((file) => {
   const weapon = JSON.parse(fs.readFileSync(path.join("equipment", file), "utf8"));
   return [weapon.id, weapon];
@@ -66,6 +71,7 @@ function cloneLevel(level) {
   return {
     id: level.id,
     title: level.title,
+    requireObjective: Boolean(level.requireObjective),
     width: level.width || 960,
     height: level.height || 640,
     walls: level.walls.map((wall) => ({ ...wall })),
@@ -74,6 +80,7 @@ function cloneLevel(level) {
     laptops: (level.laptops || []).map((laptop) => ({ ...laptop })),
     stairs: (level.stairs || []).map((stair) => ({ ...stair, target: stair.target ? { ...stair.target } : null })),
     items,
+    equipmentTables: (level.equipmentTables || []).map((table) => ({ ...table })),
     doors,
     operators: level.operators.map((op) => {
       const armor = armorById(op.armorId || "light-armor");
@@ -101,6 +108,7 @@ function cloneLevel(level) {
     enemies: level.enemies.map((enemy) => {
       const armor = armorById(enemy.armorId || "light-armor");
       const baseSpeed = enemy.speed || 34;
+      const weapon = weaponById(enemy.weaponId || "rifle");
       return {
         ...enemy,
         watch: enemy.watch ? { ...enemy.watch } : null,
@@ -111,13 +119,16 @@ function cloneLevel(level) {
         maxArmor: armor.armor,
         baseSpeed,
         speed: baseSpeed * armor.speedMultiplier,
-        weaponId: weaponById(enemy.weaponId || "rifle").id,
+        weaponId: weapon.id,
+        spawn: { x: enemy.x, y: enemy.y, angle: enemy.angle || 0 },
         fireTimer: 0,
-        sightRange: enemy.sightRange || Math.max(190, weaponById(enemy.weaponId || "rifle").range),
+        sightRange: enemy.sightRange || Math.max(190, weapon.range),
         fov: Math.PI * 0.78,
         reaction: 0,
         targetId: null,
         down: false,
+        respawnDelay: enemy.respawnDelay || 0,
+        respawnTimer: 0,
         patrolIndex: 0
       };
     }),
@@ -127,23 +138,102 @@ function cloneLevel(level) {
 }
 
 function validateTutorial(levelRaw) {
-  if (levelRaw.id !== "tutorial-digital-lock") return { valid: true };
   const level = cloneLevel(levelRaw);
-  const door = level.doors.find((item) => item.lockType === "digital");
-  const paper = level.items.find((item) => item.type === "paper" && item.passwordFor === door.id);
   const op = level.operators[0];
-  const paperReachable = Boolean(findPath(level, op, rectCenter(paper)));
-  const doorReachable = Boolean(findPath(level, op, rectCenter(door)));
-  const paperMatches = paper && door && paper.text.includes(door.password);
-  const route = buildMissionRoute(level, op);
+  const route = op ? buildMissionRoute(level, op) : null;
+  const guard = validateTutorialObjectiveGuard(levelRaw);
+  const base = {
+    valid: Boolean(op && route && guard.valid),
+    route: Boolean(route),
+    objectiveReachable: Boolean(route),
+    objectiveGated: guard.valid,
+    objectiveStepLast: guard.objectiveStepLast,
+    checkpointsBeforeObjective: guard.checkpointsBeforeObjective
+  };
+
+  if (levelRaw.id === "tutorial-digital-lock") {
+    const door = level.doors.find((item) => item.lockType === "digital");
+    const paper = door ? level.items.find((item) => item.type === "paper" && item.passwordFor === door.id) : null;
+    const paperReachable = Boolean(op && paper && findPath(level, op, rectCenter(paper)));
+    const doorReachable = Boolean(op && door && findPath(level, op, rectCenter(door)));
+    const paperMatches = paper && door && paper.text.includes(door.password);
+    return {
+      ...base,
+      valid: Boolean(base.valid && door && paper && paperReachable && doorReachable && paperMatches),
+      door: Boolean(door),
+      paper: Boolean(paper),
+      paperReachable,
+      doorReachable,
+      paperMatches
+    };
+  }
+
+  if (levelRaw.id === "tutorial-shooting-modes") {
+    const respawner = level.enemies.find((enemy) => enemy.respawnDelay === 3);
+    if (respawner) {
+      damageEnemy(respawner, 200);
+      for (let t = 0; t < 3.2; t += DT) updateEnemy(level, respawner, DT);
+    }
+    return {
+      ...base,
+      valid: Boolean(base.valid && respawner && !respawner.down),
+      respawnEnemy: Boolean(respawner),
+      respawned: Boolean(respawner && !respawner.down)
+    };
+  }
+
+  if (levelRaw.id === "tutorial-equipment-table") {
+    const table = level.equipmentTables[0];
+    return {
+      ...base,
+      valid: Boolean(base.valid && table && op.weaponId === "no-weapon" && op.armorId === "no-armor" && findPath(level, op, rectCenter(table))),
+      startsUnarmed: op.weaponId === "no-weapon",
+      startsUnarmored: op.armorId === "no-armor",
+      tableReachable: Boolean(table && findPath(level, op, rectCenter(table)))
+    };
+  }
+
+  if (levelRaw.id === "tutorial-windows") {
+    return {
+      ...base,
+      valid: Boolean(base.valid && level.windows.length >= 2 && windowShotThroughTest(level)),
+      windows: level.windows.length,
+      windowShotThrough: windowShotThroughTest(level)
+    };
+  }
+
+  if (levelRaw.id === "tutorial-operators-stairs") {
+    const stair = level.stairs.find((item) => item.target);
+    const secondOp = level.operators[1];
+    return {
+      ...base,
+      valid: Boolean(base.valid && stair && secondOp && findPath(level, level.operators[0], rectCenter(stair)) && findPath(level, secondOp, level.objective)),
+      stairReachable: Boolean(stair && findPath(level, level.operators[0], rectCenter(stair))),
+      secondOperatorObjectiveReachable: Boolean(secondOp && findPath(level, secondOp, level.objective))
+    };
+  }
+
+  return base;
+}
+
+function validateTutorialObjectiveGuard(levelRaw) {
+  const steps = levelRaw.tutorialSteps || [];
+  if (!steps.length) {
+    return {
+      valid: true,
+      objectiveStepLast: true,
+      checkpointsBeforeObjective: true
+    };
+  }
+  const objectiveIndex = steps.findIndex((step) => step.completeWhen === "objectiveSecured");
+  const objectiveStepLast = objectiveIndex === steps.length - 1;
+  const checkpointsBeforeObjective = objectiveIndex > 0;
+  const earlyVipBlocked = checkpointsBeforeObjective
+    && steps.slice(0, objectiveIndex).every((step) => step.completeWhen !== "objectiveSecured");
   return {
-    valid: Boolean(door && paper && paperReachable && doorReachable && paperMatches && route),
-    door: Boolean(door),
-    paper: Boolean(paper),
-    paperReachable,
-    doorReachable,
-    paperMatches,
-    route: Boolean(route)
+    valid: objectiveStepLast && checkpointsBeforeObjective && earlyVipBlocked,
+    objectiveStepLast,
+    checkpointsBeforeObjective
   };
 }
 
@@ -372,6 +462,25 @@ function tryUseStairs(level, op) {
   return false;
 }
 
+function tryUseWindows(level, op) {
+  const next = op.path[0];
+  if (!next) return false;
+  for (const win of level.windows || []) {
+    const center = rectCenter(win);
+    const near = pointRectDistance(op, win) < 28;
+    const crossing = win.orientation === "vertical"
+      ? (op.x < center.x && next.x > center.x) || (op.x > center.x && next.x < center.x)
+      : (op.y < center.y && next.y > center.y) || (op.y > center.y && next.y < center.y);
+    if (near && crossing) {
+      win.state = win.state === "closed" ? "open" : win.state;
+      op.x = win.orientation === "vertical" ? (op.x < center.x ? center.x + 34 : center.x - 34) : center.x;
+      op.y = win.orientation === "vertical" ? center.y : (op.y < center.y ? center.y + 34 : center.y - 34);
+      return true;
+    }
+  }
+  return false;
+}
+
 function applyDamage(unit, amount) {
   let remaining = amount;
   if (unit.armor > 0) {
@@ -389,6 +498,7 @@ function damageEnemy(enemy, amount) {
   if (enemy.health <= 0) {
     enemy.health = 0;
     enemy.down = true;
+    enemy.respawnTimer = enemy.respawnDelay || 0;
     enemy.targetId = null;
     enemy.fireTimer = 0;
   }
@@ -406,6 +516,7 @@ function damageOperator(op, amount) {
 }
 
 function fireAutomatic(shooter, target, weapon, dt, damageTarget) {
+  if (weapon.canFire === false) return;
   if (shooter.targetId !== target.id) {
     shooter.targetId = target.id;
     shooter.reaction = 0;
@@ -424,6 +535,7 @@ function updateOperator(level, op, dt) {
   if (op.down) return;
   tryPickupItems(level, op);
   if (tryUseStairs(level, op)) return;
+  if (tryUseWindows(level, op)) return;
   if (op.action) {
     op.action.timer -= dt;
     if (op.action.timer <= 0) {
@@ -464,6 +576,7 @@ function updateOperator(level, op, dt) {
 function updateOperatorCombat(level, op, dt) {
   if (op.down) return;
   const weapon = weaponById(op.weaponId);
+  if (weapon.canFire === false) return;
   const visible = level.enemies
     .filter((enemy) => !enemy.down)
     .filter((enemy) => pointDistance(op, enemy) <= weapon.range)
@@ -483,7 +596,22 @@ function updateOperatorCombat(level, op, dt) {
 }
 
 function updateEnemy(level, enemy, dt) {
-  if (enemy.down) return;
+  if (enemy.down) {
+    if (!enemy.respawnDelay) return;
+    enemy.respawnTimer = Math.max(0, (enemy.respawnTimer || enemy.respawnDelay) - dt);
+    if (enemy.respawnTimer <= 0) {
+      enemy.x = enemy.spawn.x;
+      enemy.y = enemy.spawn.y;
+      enemy.angle = enemy.spawn.angle;
+      enemy.health = 100;
+      enemy.armor = enemy.maxArmor;
+      enemy.down = false;
+      enemy.targetId = null;
+      enemy.fireTimer = 0;
+      enemy.reaction = 0;
+    }
+    return;
+  }
   const weapon = weaponById(enemy.weaponId);
   const liveOps = level.operators.filter((op) => !op.down);
   const seen = liveOps
@@ -647,6 +775,19 @@ function buildRouteToTarget(level, op, target, includePaper = false) {
       }
     }
   }
+  if (!findPath(level, cursor, target) && (level.windows || []).length) {
+    const win = level.windows[0];
+    const center = rectCenter(win);
+    const near = win.orientation === "vertical"
+      ? { x: cursor.x < center.x ? center.x - 34 : center.x + 34, y: center.y }
+      : { x: center.x, y: cursor.y < center.y ? center.y - 34 : center.y + 34 };
+    const far = win.orientation === "vertical"
+      ? { x: cursor.x < center.x ? center.x + 34 : center.x - 34, y: center.y }
+      : { x: center.x, y: cursor.y < center.y ? center.y + 34 : center.y - 34 };
+    if (appendPath(level, out, cursor, near)) {
+      cursor = far;
+    }
+  }
   if (!appendPath(level, out, cursor, target)) return null;
   return out;
 }
@@ -654,6 +795,7 @@ function buildRouteToTarget(level, op, target, includePaper = false) {
 function assessDoorFacing(level) {
   const openLevel = cloneLevel(level);
   for (const door of openLevel.doors) door.state = "open";
+  if (!openLevel.doors.length) return [];
 
   return openLevel.enemies.map((enemy) => {
     const best = openLevel.doors
@@ -730,7 +872,10 @@ function simulate(levelRaw) {
     updateObjective(level);
 
     const liveOps = level.operators.some((op) => !op.down);
-    const allEnemiesDown = level.enemies.length > 0 && level.enemies.every((enemy) => enemy.down);
+    const allEnemiesDown = level.enemies.length > 0
+      && !level.requireObjective
+      && level.enemies.every((enemy) => !enemy.respawnDelay)
+      && level.enemies.every((enemy) => enemy.down);
     if (level.objective.secured || allEnemiesDown) {
       result = "success";
       break;
@@ -772,14 +917,18 @@ function simulate(levelRaw) {
 }
 
 let failed = false;
-for (const file of LEVEL_FILES) {
-  const level = JSON.parse(fs.readFileSync(path.join("level", file), "utf8"));
+for (const entry of [
+  ...LEVEL_FILES.map((file) => ({ file, dir: "level" })),
+  ...TUTORIAL_FILES.map((file) => ({ file, dir: "tutorials" }))
+]) {
+  const level = JSON.parse(fs.readFileSync(path.join(entry.dir, entry.file), "utf8"));
   const result = simulate(level);
   console.log(JSON.stringify(result, null, 2));
+  const isTutorial = entry.dir === "tutorials";
   if (
     result.result !== "success"
-    || result.watchCoverage.some((watch) => !watch.covered)
-    || result.doorFacing.some((door) => !door.facing)
+    || (!isTutorial && result.watchCoverage.some((watch) => !watch.covered))
+    || (!isTutorial && result.doorFacing.some((door) => !door.facing))
     || result.enemyReachability.some((enemy) => !enemy.reachable)
     || !result.laptopReachable
     || !result.windowShotThrough
