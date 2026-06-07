@@ -2,5 +2,5 @@
   "baseWidth": 1920,
   "baseHeight": 1080,
   "minObjectScale": 0.65,
-  "scaleHitboxes": true
+  "scaleHitboxes": false
 }

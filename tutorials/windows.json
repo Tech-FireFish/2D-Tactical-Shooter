@@ -29,7 +29,8 @@
     { "x": 780, "y": 90, "w": 20, "h": 380 },
     { "x": 410, "y": 90, "w": 20, "h": 130 },
     { "x": 410, "y": 300, "w": 20, "h": 170 },
-    { "x": 410, "y": 220, "w": 20, "h": 80 }
+    { "x": 410, "y": 220, "w": 20, "h": 80 },
+    { "x": 430, "y": 300, "w": 170, "h": 20 }
   ],
   "doors": [],
   "windows": [
@@ -45,7 +46,7 @@
   "enemies": [
     { "id": "WINDOW-TARGET", "x": 585, "y": 354, "angle": 3.141592653589793, "watch": { "x": 430, "y": 354 }, "weaponId": "no-weapon", "armorId": "no-armor" }
   ],
-  "objective": { "x": 705, "y": 248, "radius": 16, "secured": false, "harmed": false },
+  "objective": { "x": 705, "y": 408, "radius": 16, "secured": false, "harmed": false },
   "tutorialSteps": [
     { "id": "open-window", "title": "Open By Hand", "text": "Move near the upper window and press E. Opening by hand causes no damage.", "completeWhen": "windowOpened", "windowId": "hand-window" },
     { "id": "vault-window", "title": "Vault Through", "text": "Press E again at the open window to climb through safely.", "completeWhen": "windowVaulted", "windowId": "hand-window" },

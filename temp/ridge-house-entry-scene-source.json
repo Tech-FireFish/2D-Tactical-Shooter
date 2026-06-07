@@ -2,26 +2,46 @@
   "id": "temp-ridge-scene-source",
   "title": "Temp: Ridge Scene Source",
   "sceneSource": {
-    "background": "docs/scene-source/background-001.png",
+    "background": {
+      "fallback": "docs/images/background-001.png",
+      "pdf": null,
+      "fit": "stretch"
+    },
     "walls": {
-      "horizontal": "docs/scene-source/wall-002.png",
-      "vertical": "docs/scene-source/wall-001.png",
-      "shortVertical": "docs/scene-source/wall-003.png"
+      "horizontal": { "fallback": "docs/images/wall-002.png", "pdf": null, "fit": "stretch" },
+      "vertical": { "fallback": "docs/images/wall-001.png", "pdf": null, "fit": "stretch" },
+      "shortVertical": { "fallback": "docs/images/wall-003.png", "pdf": null, "fit": "stretch" }
     },
     "doors": {
-      "vertical": "docs/scene-source/door-001.png",
-      "horizontal": "docs/scene-source/door-002.png"
+      "vertical": {
+        "fallback": "docs/images/door-001.png",
+        "pdf": null,
+        "fit": "stretch",
+        "hinge": "start",
+        "openAngle": -0.72,
+        "flipOpenX": false,
+        "flipOpenY": false
+      },
+      "horizontal": {
+        "fallback": "docs/images/door-002.png",
+        "pdf": null,
+        "fit": "stretch",
+        "hinge": "start",
+        "openAngle": -0.72,
+        "flipOpenX": false,
+        "flipOpenY": false
+      }
     },
     "operators": [
-      "docs/scene-source/operator-001.png",
-      "docs/scene-source/operator-002.png"
+      "docs/images/operator-001.png",
+      "docs/images/operator-002.png"
     ],
     "enemies": [
-      "docs/scene-source/enemy-001.png",
-      "docs/scene-source/enemy-002.png",
-      "docs/scene-source/enemy-003.png"
+      "docs/images/enemy-001.png",
+      "docs/images/enemy-002.png",
+      "docs/images/enemy-003.png"
     ],
-    "objective": "docs/scene-source/vip-001.png"
+    "objective": "docs/images/vip-001.png"
   },
   "walls": [
     { "x": 0, "y": 0, "w": 960, "h": 20 },
@@ -100,3 +120,4 @@
   ],
   "objective": { "x": 720, "y": 452, "radius": 16, "secured": false, "harmed": false }
 }
+

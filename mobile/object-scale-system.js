@@ -1,63 +1,51 @@
 "use strict";
 
 (function () {
-  // Builds low-resolution object scaling for non-wall gameplay objects.
+  // Builds mobile text density scaling while leaving gameplay geometry authored.
   function create(deps) {
     const config = deps.config || {};
     const baseWidth = Number(config.baseWidth) || 1920;
     const baseHeight = Number(config.baseHeight) || 1080;
     const minObjectScale = Number(config.minObjectScale) || 0.65;
-    const scaleHitboxes = config.scaleHitboxes !== false;
     let scale = 1;
 
-    // Recomputes scale from the current viewport.
+    // Recomputes text/UI scale from the current viewport.
     function update() {
       const viewport = deps.camera && deps.camera.getViewport
         ? deps.camera.getViewport()
         : { w: window.innerWidth || baseWidth, h: window.innerHeight || baseHeight };
       const next = Math.min(viewport.w / baseWidth, viewport.h / baseHeight);
       scale = Math.max(minObjectScale, Math.min(1, next || 1));
+      document.documentElement.style.setProperty("--mobile-ui-scale", scale.toFixed(3));
       return scale;
     }
 
-    // Returns the current object scale.
+    // Returns the current mobile text/UI scale.
     function objectScale() {
       return scale;
     }
 
-    // Scales a radius when hitbox scaling is enabled.
+    // Keeps gameplay radii at authored size.
     function scaledRadius(obj) {
-      const radius = Number(obj && obj.radius) || 0;
-      return scaleHitboxes ? radius * scale : radius;
+      return Number(obj && obj.radius) || 0;
     }
 
-    // Scales a rectangle around its center.
+    // Keeps gameplay rectangles at authored size.
     function scaledRect(rect) {
-      if (!rect || !scaleHitboxes) return rect;
-      return scaledRectVisual(rect);
+      return rect;
     }
 
-    // Scales a rectangle visually around its center.
+    // Keeps gameplay rectangles visually at authored size.
     function scaledRectVisual(rect) {
-      if (!rect) return rect;
-      const w = rect.w * scale;
-      const h = rect.h * scale;
-      return {
-        ...rect,
-        x: rect.x + (rect.w - w) / 2,
-        y: rect.y + (rect.h - h) / 2,
-        w,
-        h
-      };
+      return rect;
     }
 
-    // Scales a circle-like unit around its center.
+    // Keeps gameplay circles at authored size.
     function scaledCircle(circle) {
-      if (!circle || !scaleHitboxes) return circle;
-      return { ...circle, radius: scaledRadius(circle) };
+      return circle;
     }
 
-    // Measures point-to-scaled-rectangle distance.
+    // Measures point-to-authored-rectangle distance.
     function scaledPointRectDistance(point, rect) {
       return deps.pointRectDistance(point, scaledRect(rect));
     }
@@ -72,7 +60,7 @@
       scaledRectVisual,
       scaledCircle,
       scaledPointRectDistance,
-      scaleHitboxes: () => scaleHitboxes
+      scaleHitboxes: () => false
     };
   }
 
