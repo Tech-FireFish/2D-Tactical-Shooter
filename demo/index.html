@@ -103,11 +103,18 @@
   --ui-inventory-open-pressed: url("docs/images/user-interface/pixel-art-inventory-open-button-pressed-001.png");
   --ui-inventory-overlay-frame: url("docs/images/user-interface/pixel-art-inventory-overlay-frame-001.png");
   --ui-inventory-overlay-center: url("docs/images/user-interface/pixel-art-inventory-overlay-center-001.png");
+  --ui-inventory-close-normal: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-normal-001.png");
+  --ui-inventory-close-hover: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-hover-001.png");
+  --ui-inventory-close-pressed: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-pressed-001.png");
+  --ui-inventory-close-icon: url("docs/images/user-interface/pixel-art-inventory-close-icon-001.png");
   --ui-inventory-slot-empty: url("docs/images/user-interface/pixel-art-inventory-slot-empty-001.png");
   --ui-inventory-slot-filled: url("docs/images/user-interface/pixel-art-inventory-slot-filled-001.png");
   --ui-inventory-slot-hover: url("docs/images/user-interface/pixel-art-inventory-slot-hover-001.png");
   --ui-inventory-slot-selected: url("docs/images/user-interface/pixel-art-inventory-slot-selected-001.png");
   --ui-item-detail-frame: url("docs/images/user-interface/pixel-art-item-detail-frame-001.png");
+  --ui-item-detail-center: url("docs/images/user-interface/pixel-art-item-detail-center-001.png");
+  --ui-item-detail-text: url("docs/images/user-interface/pixel-art-item-detail-text-box-001.png");
+  --ui-item-detail-divider: url("docs/images/user-interface/pixel-art-item-detail-divider-001.png");
   --ui-paper-clue-tooltip: url("docs/images/user-interface/pixel-art-paper-clue-hover-tooltip-001.png");
   --ui-mission-frame: url("docs/images/user-interface/pixel-art-mission-status-card-frame-001.png");
   --ui-mission-center: url("docs/images/user-interface/pixel-art-mission-status-card-center-001.png");
@@ -540,6 +547,66 @@ h2 {
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.level-picker.checkbox-row {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.level-picker.checkbox-row input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--green);
+}
+
+.start-menu-setting {
+  position: absolute;
+  left: 28px;
+  bottom: 24px;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 172px;
+  padding: 12px 14px;
+  border: 18px solid transparent;
+  border-image: var(--ui-main-card-frame) 64 fill / 18px / 0 stretch;
+  background:
+    linear-gradient(180deg, rgba(8, 13, 16, 0.7), rgba(8, 13, 16, 0.9)),
+    var(--ui-main-card-center) 0 0 / 32px 32px repeat,
+    rgba(12, 16, 18, 0.78);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  image-rendering: pixelated;
+}
+
+.start-menu-setting input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  accent-color: var(--green);
+}
+
+body.png-art-disabled * {
+  border-image-source: none !important;
+  background-image: none !important;
+}
+
+body.png-art-disabled .equipment-icon {
+  display: none;
+}
+
+body.png-art-disabled .weapon-image-frame::after {
+  content: "PNG OFF";
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
 }
 
 .selected-loadout-label {
@@ -1086,7 +1153,10 @@ h2 {
 }
 
 .inventory-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   width: min(620px, 100%);
+  min-height: min(420px, calc(100vh - 80px));
   max-height: min(760px, calc(100vh - 48px));
   border: 32px solid transparent;
   border-image: var(--ui-inventory-overlay-frame) 80 fill / 32px / 0 stretch;
@@ -1099,6 +1169,12 @@ h2 {
     #121619;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
   image-rendering: pixelated;
+}
+
+.inventory-details {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
 }
 
 .lock-panel {
@@ -1164,6 +1240,36 @@ h2 {
   align-items: start;
   gap: 16px;
   margin-bottom: 14px;
+}
+
+#closeInventoryButton {
+  position: relative;
+  min-width: 118px;
+  border: 0;
+  border-radius: 0;
+  padding-left: 34px;
+  background: var(--ui-inventory-close-normal) center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+}
+
+#closeInventoryButton::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  background: var(--ui-inventory-close-icon) center / contain no-repeat;
+  image-rendering: pixelated;
+  transform: translateY(-50%);
+}
+
+#closeInventoryButton:hover {
+  background-image: var(--ui-inventory-close-hover);
+}
+
+#closeInventoryButton:active {
+  background-image: var(--ui-inventory-close-pressed);
 }
 
 .settings-actions {
@@ -1500,13 +1606,37 @@ h2 {
 
 .inventory-item-detail {
   margin: 12px 0 0;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 10px;
-  background: var(--panel);
+  border: 18px solid transparent;
+  border-image: var(--ui-item-detail-frame) 64 fill / 18px / 0 stretch;
+  border-radius: 0;
+  padding: 8px 10px;
+  background:
+    var(--ui-item-detail-text) center / 100% 100% no-repeat,
+    var(--ui-item-detail-center) 0 0 / 28px 28px repeat,
+    var(--panel);
   color: var(--muted);
   font-size: 12px;
   line-height: 1.35;
+  image-rendering: pixelated;
+}
+
+.inventory-item-detail strong {
+  display: block;
+  position: relative;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  color: var(--text);
+}
+
+.inventory-item-detail strong::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: var(--ui-item-detail-divider) center / 100% 100% no-repeat;
+  image-rendering: pixelated;
 }
 
 .equipment-table-options {
@@ -1726,12 +1856,10 @@ canvas {
   padding: 36px;
   background:
     radial-gradient(circle at center, rgba(5, 7, 8, 0.12), rgba(5, 7, 8, 0.62) 62%, rgba(5, 7, 8, 0.9)),
-    linear-gradient(180deg, rgba(5, 7, 8, 0.08), rgba(5, 7, 8, 0.64)),
-    var(--ui-start-background) center / cover no-repeat;
+    linear-gradient(180deg, rgba(5, 7, 8, 0.08), rgba(5, 7, 8, 0.64));
   backdrop-filter: none;
 }
 
-#startMenuOverlay::before,
 #mainMenuOverlay::before {
   content: "";
   position: absolute;
@@ -1741,6 +1869,18 @@ canvas {
   background: var(--ui-scanline) 0 0 / 256px 256px repeat;
   opacity: 0.11;
   image-rendering: pixelated;
+}
+
+#startMenuOverlay::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--ui-start-background) center / cover no-repeat;
+  image-rendering: pixelated;
+  transform: scale(1.2);
+  transform-origin: center;
 }
 
 #startMenuOverlay::after {
@@ -2420,30 +2560,36 @@ body.game-expanded #hintCard {
   top: 70px;
   z-index: 7;
   display: block;
-  width: min(340px, calc(100vw - 32px));
+  width: min(320px, calc(50vw - 28px));
+  max-height: calc(100vh - 96px);
+  overflow: hidden;
   background: rgba(23, 27, 30, var(--hint-card-alpha, 0.42));
   pointer-events: none;
 }
 
 body.game-expanded #tutorialCard:not(.hidden) {
   position: fixed;
-  left: 16px;
-  top: 196px;
+  right: 16px;
+  top: 70px;
   z-index: 7;
   display: block;
-  width: min(340px, calc(100vw - 32px));
+  width: min(360px, calc(50vw - 28px));
+  max-height: calc(100vh - 96px);
+  overflow: hidden;
   background: rgba(23, 27, 30, var(--hint-card-alpha, 0.42));
   pointer-events: none;
 }
 
 body.tutorial-overlay-follow #tutorialCard:not(.hidden) {
   position: fixed;
-  right: 20px;
-  top: 20px;
+  right: 24px;
+  top: 76px;
   left: auto;
   z-index: 45;
   display: block;
-  width: min(360px, calc(100vw - 40px));
+  width: min(380px, calc(100vw - 48px));
+  max-height: min(420px, calc(100vh - 112px));
+  overflow: auto;
   background: rgba(23, 27, 30, 0.94);
   pointer-events: none;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
@@ -2647,6 +2793,9 @@ body.game-expanded.expanded-paused .pause-overlay {
 }
 
 .result-level-picker select {
+  min-height: 48px;
+  padding: 0 44px 0 16px;
+  font-weight: 900;
   border: 0;
   border-radius: 0;
   background:
@@ -2763,6 +2912,23 @@ body.game-expanded.expanded-paused .right-panel {
 
   .banner-actions {
     flex-direction: column;
+  }
+
+  body.game-expanded #hintCard,
+  body.game-expanded #tutorialCard:not(.hidden) {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: 38vh;
+  }
+
+  body.game-expanded #hintCard {
+    top: 66px;
+  }
+
+  body.game-expanded #tutorialCard:not(.hidden) {
+    top: auto;
+    bottom: 18px;
   }
 
   .menu-overlay,
@@ -3101,6 +3267,10 @@ body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
           </div>
         </div>
       </div>
+      <label class="start-menu-setting checkbox-row" for="startPngRenderingCheckbox">
+        <span>Use PNGs</span>
+        <input id="startPngRenderingCheckbox" type="checkbox" checked>
+      </label>
     </section>
 
     <section id="mainMenuOverlay" class="menu-overlay hidden" aria-label="Main menu" aria-modal="true" role="dialog">
@@ -3349,6 +3519,10 @@ body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
               <label class="level-picker" for="viewRange">
                 <span>View</span>
                 <input id="viewRange" type="range" min="0" max="100" step="1" value="50">
+              </label>
+              <label class="level-picker checkbox-row" for="pngRenderingCheckbox">
+                <span>Use PNGs</span>
+                <input id="pngRenderingCheckbox" type="checkbox" checked>
               </label>
             </section>
 
@@ -6991,6 +7165,11 @@ function demoResponse(data) {
 
     // Applies a setup change immediately or asks for restart confirmation after units move.
     function requestSettingChange(applyChange, options = {}) {
+      if (runtime.activeMode === "tutorial") {
+        applyChange();
+        deps.updateHud();
+        return true;
+      }
       if (!unitsMovedFromOrigin()) {
         applyChange();
         if (options.restartWhenClean && deps.level && deps.level.restart) deps.level.restart();
@@ -7058,6 +7237,8 @@ function demoResponse(data) {
       if (elements.enemyTraceSelect) elements.enemyTraceSelect.value = runtime.enemyTraceMode || "current";
       if (elements.hintOpacityRange) elements.hintOpacityRange.value = String(runtime.hintOpacity || 0.42);
       if (elements.viewRange) elements.viewRange.value = String(runtime.viewValue || 50);
+      if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+      if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
     }
 
     // Restores controls, setup options, and saved loadout selections to defaults.
@@ -7070,6 +7251,7 @@ function demoResponse(data) {
       runtime.showAllHealth = false;
       runtime.hintOpacity = 0.42;
       runtime.viewValue = 50;
+      runtime.usePngRendering = true;
       if (runtime.state) {
         runtime.state.shootingMode = "automatic";
         runtime.state.message = "Settings reset to defaults";
@@ -7086,8 +7268,10 @@ function demoResponse(data) {
       if (elements.enemyTraceSelect) elements.enemyTraceSelect.value = "current";
       if (elements.hintOpacityRange) elements.hintOpacityRange.value = "0.42";
       if (elements.viewRange) elements.viewRange.value = "50";
+      if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = true;
+      if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = true;
       if (deps.camera && deps.camera.setViewValue) deps.camera.setViewValue(50);
-      if (deps.level && deps.level.restart) deps.level.restart();
+      if (runtime.activeMode !== "tutorial" && deps.level && deps.level.restart) deps.level.restart();
       deps.renderEnemyLoadouts();
       deps.updateHud();
     }
@@ -7706,16 +7890,12 @@ function demoResponse(data) {
       enemyDown: `${objectPath}pixel-art-enemy-downed-001.png`,
       objective: `${objectPath}pixel-art-vip-objective-idle-001.png`,
       objectiveSecured: `${objectPath}pixel-art-vip-secured-001.png`,
-      sightWide: `${objectPath}pixel-art-sight-cone-wide-transparent-sprite-001.png`,
-      sightNarrow: `${objectPath}pixel-art-sight-cone-narrow-transparent-sprite-001.png`,
       routeDash: `${objectPath}pixel-art-planned-path-dash-001.png`,
       waypoint: `${objectPath}pixel-art-waypoint-dot-001.png`,
       waypointActive: `${objectPath}pixel-art-active-waypoint-dot-001.png`,
       bullet: `${objectPath}pixel-art-bullet-tracer-segment-001.png`,
       muzzleFlash: `${objectPath}pixel-art-muzzle-flash-001.png`,
-      hitSpark: `${objectPath}pixel-art-hit-spark-001.png`,
-      debugCircle: `${objectPath}pixel-art-debug-collision-circle-001.png`,
-      debugRay: `${objectPath}pixel-art-debug-line-of-sight-ray-001.png`
+      hitSpark: `${objectPath}pixel-art-hit-spark-001.png`
     };
     const spriteCrops = {
       wallShort: { x: 176, y: 166, w: 362, h: 142 },
@@ -8136,18 +8316,6 @@ function demoResponse(data) {
 
     // Draws a filled radial vision cone.
     function drawCone(origin, angle, length, fov, fill) {
-      const source = fov < Math.PI * 0.38 ? sprites.sightNarrow : sprites.sightWide;
-      const image = loadImage(source);
-      if (image && image.complete && image.naturalWidth) {
-        ctx.save();
-        ctx.globalAlpha = 0.34;
-        ctx.translate(origin.x, origin.y);
-        ctx.rotate(angle);
-        const width = Math.max(40, Math.tan(fov / 2) * length * 2);
-        drawImageInRect(source, 0, -width / 2, length, width);
-        ctx.restore();
-        return;
-      }
       ctx.fillStyle = fill;
       ctx.beginPath();
       ctx.moveTo(origin.x, origin.y);
@@ -8234,8 +8402,14 @@ function demoResponse(data) {
       return runtime.state && runtime.state.level ? runtime.state.level.sceneSource : null;
     }
 
+    // Allows Mission Setup to switch canvas PNG art off while preserving geometry fallbacks.
+    function pngRenderingEnabled() {
+      return runtime.usePngRendering !== false;
+    }
+
     // Retrieves and begins loading an image, returning null until it is drawable.
     function loadImage(src) {
+      if (!pngRenderingEnabled()) return null;
       if (!src) return null;
       if (!imageCache.has(src)) {
         const image = new Image();
@@ -8331,6 +8505,11 @@ function demoResponse(data) {
       ctx.drawImage(image, -w / 2, -h / 2, w, h);
       ctx.restore();
       return true;
+    }
+
+    // Converts gameplay direction angles to source art authored facing upward.
+    function facingUpSpriteAngle(angle) {
+      return (angle || 0) + Math.PI / 2;
     }
 
     // Draws a generic gameplay wall sprite based on authored orientation.
@@ -8465,7 +8644,7 @@ function demoResponse(data) {
       const source = isOperator
         ? (unit.down ? sprites.operatorDown : (moving ? sprites.operatorMoving : sprites.operator))
         : enemySprite(unit);
-      const drawn = drawImageCentered(source, unit, radius * 3.5, radius * 3.5, isOperator ? unit.aim : unit.angle);
+      const drawn = drawImageCentered(source, unit, radius * 3.5, radius * 3.5, facingUpSpriteAngle(isOperator ? unit.aim : unit.angle));
       if (!drawn) return false;
       ctx.fillStyle = colors.text;
       ctx.font = "800 10px system-ui";
@@ -8525,14 +8704,12 @@ function demoResponse(data) {
 
     // Draws debug rectangles with a pixel-art collision circle fallback.
     function drawDebugRect(rect) {
-      const size = Math.max(rect.w, rect.h);
-      if (size > 42) return false;
-      return drawImageCentered(sprites.debugCircle, deps.geometry.rectCenter(rect), size + 8, size + 8, 0);
+      return false;
     }
 
     // Draws large debug sight/collision circles from the debug sprite sheet.
     function drawDebugCircle(x, y, radius, crop) {
-      return drawImageCentered(sprites.debugCircle, { x, y }, radius * 2, radius * 2, 0);
+      return false;
     }
 
     // Replaces wall rectangles with scene-source wall images when configured.
@@ -9058,6 +9235,15 @@ function demoResponse(data) {
           deps.updateHud();
         });
       }
+      if (elements.startPngRenderingCheckbox) {
+        elements.startPngRenderingCheckbox.addEventListener("change", () => {
+          runtime.usePngRendering = elements.startPngRenderingCheckbox.checked;
+          if (runtime.state) {
+            runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
+          }
+          deps.updateHud();
+        });
+      }
       if (elements.menuLevelBlocks) {
         elements.menuLevelBlocks.addEventListener("click", (event) => {
           const button = event.target.closest("[data-menu-level]");
@@ -9162,6 +9348,15 @@ function demoResponse(data) {
             runtime.viewValue = value;
             if (deps.camera && deps.camera.setViewValue) deps.camera.setViewValue(runtime.viewValue);
           });
+        });
+      }
+      if (elements.pngRenderingCheckbox) {
+        elements.pngRenderingCheckbox.addEventListener("change", () => {
+          runtime.usePngRendering = elements.pngRenderingCheckbox.checked;
+          if (runtime.state) {
+            runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
+          }
+          deps.updateHud();
         });
       }
       elements.keyBindingList.addEventListener("click", (event) => {
@@ -9588,6 +9783,7 @@ const elements = {
   onboardingQuestion: document.getElementById("onboardingQuestion"),
   playedYesButton: document.getElementById("playedYesButton"),
   playedNoButton: document.getElementById("playedNoButton"),
+  startPngRenderingCheckbox: document.getElementById("startPngRenderingCheckbox"),
   mainMenuOverlay: document.getElementById("mainMenuOverlay"),
   mainMenuCloseButton: document.getElementById("mainMenuCloseButton"),
   privilegeBoard: document.getElementById("privilegeBoard"),
@@ -9635,6 +9831,7 @@ const elements = {
   enemyTraceSelect: document.getElementById("enemyTraceSelect"),
   hintOpacityRange: document.getElementById("hintOpacityRange"),
   viewRange: document.getElementById("viewRange"),
+  pngRenderingCheckbox: document.getElementById("pngRenderingCheckbox"),
   keyBindingList: document.getElementById("keyBindingList"),
   enemyLoadoutList: document.getElementById("enemyLoadoutList"),
   digitalLockOverlay: document.getElementById("digitalLockOverlay"),
@@ -9815,6 +10012,7 @@ const runtime = {
   mobileMode: false,
   hintOpacity: 0.42,
   viewValue: 50,
+  usePngRendering: true,
   showAllHealth: false,
   activeSettingsTab: "keys",
   capturingKeyAction: null,
@@ -9945,6 +10143,7 @@ function update(dt) {
 // Refreshes labels, loadout controls, health cards, and mission status.
 function updateHud() {
   const state = runtime.state;
+  document.body.classList.toggle("png-art-disabled", runtime.usePngRendering === false);
   if (!state) {
     elements.modeLabel.textContent = "Loading";
     elements.objectiveLabel.textContent = "Loading";
@@ -9992,6 +10191,12 @@ function updateHud() {
   }
   if (elements.viewRange && Number(elements.viewRange.value) !== runtime.viewValue) {
     elements.viewRange.value = String(runtime.viewValue);
+  }
+  if (elements.pngRenderingCheckbox && elements.pngRenderingCheckbox.checked !== (runtime.usePngRendering !== false)) {
+    elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+  }
+  if (elements.startPngRenderingCheckbox && elements.startPngRenderingCheckbox.checked !== (runtime.usePngRendering !== false)) {
+    elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
   }
   if (runtime.inventoryOpen) inventory.renderInventory();
   if (runtime.laptopOpen && cameraHack) cameraHack.render();
