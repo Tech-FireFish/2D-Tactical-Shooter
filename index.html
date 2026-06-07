@@ -38,11 +38,11 @@
           <button id="mainMenuCloseButton" type="button">Enter Game</button>
         </header>
         <div class="main-menu-grid">
-          <section class="control-card">
+          <section class="control-card selected-loadout-card">
             <p class="panel-label">Privilege And Access</p>
             <div id="privilegeBoard" class="privilege-board"></div>
           </section>
-          <section class="control-card">
+          <section class="control-card inventory-card">
             <p class="panel-label">Quick Setup</p>
             <label class="level-picker" for="menuDifficultySelect">
               <span>Difficulty</span>
@@ -165,7 +165,7 @@
             <div id="hintText" class="hint-text">Move near doors, windows, stairs, papers, laptops, or tables.</div>
           </section>
 
-          <section class="control-card">
+          <section class="control-card actions-card">
             <p class="panel-label">Actions</p>
             <div class="actions" aria-label="Game actions">
               <button id="runButton" type="button" title="Toggle pause and execute">Execute</button>
@@ -175,7 +175,7 @@
             </div>
           </section>
 
-          <section class="control-card">
+          <section class="control-card operator-health-card">
             <div class="panel-heading-row">
               <p class="panel-label">Operator Health</p>
               <button id="showAllHealthButton" type="button">Show All</button>
@@ -299,6 +299,18 @@
                 <div id="enemyLoadoutList" class="enemy-loadout-list"></div>
               </div>
             </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="settingsChangeOverlay" class="settings-change-overlay hidden" aria-label="Settings change warning" aria-modal="true" role="dialog">
+        <div class="settings-change-card">
+          <p class="eyebrow">Restart Required</p>
+          <h2>Change settings?</h2>
+          <p>Operators or enemies have already moved. Changing this setting will restart the current mission.</p>
+          <div class="settings-change-actions">
+            <button id="confirmSettingsChangeButton" type="button">Yes</button>
+            <button id="cancelSettingsChangeButton" type="button">No</button>
           </div>
         </div>
       </section>
