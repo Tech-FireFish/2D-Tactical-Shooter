@@ -321,15 +321,15 @@
           deps.updateHud();
         });
       }
-      if (elements.startPngRenderingCheckbox) {
-        elements.startPngRenderingCheckbox.addEventListener("change", () => {
-          runtime.usePngRendering = elements.startPngRenderingCheckbox.checked;
-          if (runtime.state) {
-            runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
-          }
-          deps.updateHud();
-        });
-      }
+      // if (elements.startPngRenderingCheckbox) {
+      //   elements.startPngRenderingCheckbox.addEventListener("change", () => {
+      //     runtime.usePngRendering = elements.startPngRenderingCheckbox.checked;
+      //     if (runtime.state) {
+      //       runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
+      //     }
+      //     deps.updateHud();
+      //   });
+      // }
       if (elements.menuLevelBlocks) {
         elements.menuLevelBlocks.addEventListener("click", (event) => {
           const button = event.target.closest("[data-menu-level]");
@@ -436,15 +436,27 @@
           });
         });
       }
-      if (elements.pngRenderingCheckbox) {
-        elements.pngRenderingCheckbox.addEventListener("change", () => {
-          runtime.usePngRendering = elements.pngRenderingCheckbox.checked;
-          if (runtime.state) {
-            runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
-          }
-          deps.updateHud();
-        });
-      }
+      // if (elements.pixelArtStyleSelect) {
+      //   elements.pixelArtStyleSelect.addEventListener("change", () => {
+      //     const value = elements.pixelArtStyleSelect.value;
+      //     runtime.pixelArtStyle = value === "geometry" || value === "v2" ? value : "v1";
+      //     if (runtime.state) {
+      //       runtime.state.message = runtime.pixelArtStyle === "geometry"
+      //         ? "Geometry-only style enabled"
+      //         : (runtime.pixelArtStyle === "v2" ? "Pixel Art V2 enabled" : "Pixel Art V1 enabled");
+      //     }
+      //     deps.updateHud();
+      //   });
+      // }
+      // if (elements.pngRenderingCheckbox) {
+      //   elements.pngRenderingCheckbox.addEventListener("change", () => {
+      //     runtime.usePngRendering = elements.pngRenderingCheckbox.checked;
+      //     if (runtime.state) {
+      //       runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
+      //     }
+      //     deps.updateHud();
+      //   });
+      // }
       elements.keyBindingList.addEventListener("click", (event) => {
         const button = event.target.closest("[data-keybinding-action]");
         if (!button) return;

@@ -8,64 +8,124 @@
     const world = deps.world;
     const colors = deps.colors;
     const twoPi = deps.twoPi;
-    const imageCache = new Map();
-    const objectPath = "docs/images/gameplay-objects/";
-    const sprites = {
-      floor: `${objectPath}pixel-art-floor-tile-001.png`,
-      floorBackground: `${objectPath}pixel-art-floor-background-001.png`,
-      grid: `${objectPath}pixel-art-grid-overlay-tile-001.png`,
-      zone: `${objectPath}pixel-art-room-zone-fill-tile-001.png`,
-      labelFrame: `${objectPath}pixel-art-room-label-plaque-001.png`,
-      labelSmallFrame: `${objectPath}pixel-art-room-label-small-plaque-001.png`,
-      wallHorizontal: `${objectPath}pixel-art-horizontal-wall-segment-001.png`,
-      wallVertical: `${objectPath}pixel-art-vertical-wall-segment-001.png`,
-      wallCorner: `${objectPath}pixel-art-wall-corner-001.png`,
-      wallEndCap: `${objectPath}pixel-art-wall-end-cap-001.png`,
-      doorClosedHorizontal: `${objectPath}pixel-art-normal-door-closed-horizontal-001.png`,
-      doorClosedVertical: `${objectPath}pixel-art-normal-door-closed-vertical-001.png`,
-      doorOpenHorizontal: `${objectPath}pixel-art-normal-door-open-horizontal-001.png`,
-      doorOpenVertical: `${objectPath}pixel-art-normal-door-open-vertical-001.png`,
-      digitalDoorClosedHorizontal: `${objectPath}pixel-art-digital-lock-door-closed-horizontal-001.png`,
-      digitalDoorClosedVertical: `${objectPath}pixel-art-digital-lock-door-closed-vertical-001.png`,
-      lockedMarker: `${objectPath}pixel-art-locked-marker-001.png`,
-      unlockedMarker: `${objectPath}pixel-art-unlocked-marker-001.png`,
-      windowClosedHorizontal: `${objectPath}pixel-art-closed-horizontal-window-001.png`,
-      windowClosedVertical: `${objectPath}pixel-art-closed-vertical-window-001.png`,
-      windowOpenHorizontal: `${objectPath}pixel-art-open-horizontal-window-001.png`,
-      windowOpenVertical: `${objectPath}pixel-art-open-vertical-window-001.png`,
-      windowBrokenHorizontal: `${objectPath}pixel-art-broken-horizontal-window-001.png`,
-      windowBrokenVertical: `${objectPath}pixel-art-broken-vertical-window-001.png`,
-      glassBreak: `${objectPath}pixel-art-glass-break-effect-001.png`,
-      paper: `${objectPath}pixel-art-paper-clue-on-floor-001.png`,
-      paperHighlighted: `${objectPath}pixel-art-paper-clue-highlighted-001.png`,
-      genericPickup: `${objectPath}pixel-art-generic-pickup-item-001.png`,
-      stairs: `${objectPath}pixel-art-stair-up-marker-001.png`,
-      stairsDown: `${objectPath}pixel-art-stair-down-marker-001.png`,
-      stairGlow: `${objectPath}pixel-art-stair-interaction-glow-001.png`,
-      gearTable: `${objectPath}pixel-art-gear-table-top-down-001.png`,
-      gearTableActive: `${objectPath}pixel-art-gear-table-active-highlighted-001.png`,
-      laptopClosed: `${objectPath}pixel-art-laptop-closed-001.png`,
-      laptopOpen: `${objectPath}pixel-art-laptop-open-001.png`,
-      laptopUsed: `${objectPath}pixel-art-laptop-hacked-used-001.png`,
-      camera: `${objectPath}pixel-art-camera-body-001.png`,
-      cameraActive: `${objectPath}pixel-art-camera-active-001.png`,
-      cameraLabel: `${objectPath}pixel-art-camera-label-badge-c1-c2-base-001.png`,
-      operator: `${objectPath}pixel-art-operator-idle-top-down-001.png`,
-      operatorMoving: `${objectPath}pixel-art-operator-moving-top-down-001.png`,
-      operatorDown: `${objectPath}pixel-art-operator-downed-001.png`,
-      enemy: `${objectPath}pixel-art-enemy-calm-001.png`,
-      enemySuspicious: `${objectPath}pixel-art-enemy-suspicious-001.png`,
-      enemyAlert: `${objectPath}pixel-art-enemy-alert-001.png`,
-      enemyDown: `${objectPath}pixel-art-enemy-downed-001.png`,
-      objective: `${objectPath}pixel-art-vip-objective-idle-001.png`,
-      objectiveSecured: `${objectPath}pixel-art-vip-secured-001.png`,
-      routeDash: `${objectPath}pixel-art-planned-path-dash-001.png`,
-      waypoint: `${objectPath}pixel-art-waypoint-dot-001.png`,
-      waypointActive: `${objectPath}pixel-art-active-waypoint-dot-001.png`,
-      bullet: `${objectPath}pixel-art-bullet-tracer-segment-001.png`,
-      muzzleFlash: `${objectPath}pixel-art-muzzle-flash-001.png`,
-      hitSpark: `${objectPath}pixel-art-hit-spark-001.png`
+    // const imageCache = new Map();
+    /*
+    const v1ObjectPath = "docs/images/gameplay-objects/";
+    const v2ObjectPath = "docs/images/pixel-art-v2/";
+    const v1Sprites = {
+      floor: `${v1ObjectPath}pixel-art-floor-tile-001.png`,
+      floorBackground: `${v1ObjectPath}pixel-art-floor-background-001.png`,
+      grid: `${v1ObjectPath}pixel-art-grid-overlay-tile-001.png`,
+      zone: `${v1ObjectPath}pixel-art-room-zone-fill-tile-001.png`,
+      labelFrame: `${v1ObjectPath}pixel-art-room-label-plaque-001.png`,
+      labelSmallFrame: `${v1ObjectPath}pixel-art-room-label-small-plaque-001.png`,
+      wallHorizontal: `${v1ObjectPath}pixel-art-horizontal-wall-segment-001.png`,
+      wallVertical: `${v1ObjectPath}pixel-art-vertical-wall-segment-001.png`,
+      wallCorner: `${v1ObjectPath}pixel-art-wall-corner-001.png`,
+      wallEndCap: `${v1ObjectPath}pixel-art-wall-end-cap-001.png`,
+      doorClosedHorizontal: `${v1ObjectPath}pixel-art-normal-door-closed-horizontal-001.png`,
+      doorClosedVertical: `${v1ObjectPath}pixel-art-normal-door-closed-vertical-001.png`,
+      doorOpenHorizontal: `${v1ObjectPath}pixel-art-normal-door-open-horizontal-001.png`,
+      doorOpenVertical: `${v1ObjectPath}pixel-art-normal-door-open-vertical-001.png`,
+      digitalDoorClosedHorizontal: `${v1ObjectPath}pixel-art-digital-lock-door-closed-horizontal-001.png`,
+      digitalDoorClosedVertical: `${v1ObjectPath}pixel-art-digital-lock-door-closed-vertical-001.png`,
+      lockedMarker: `${v1ObjectPath}pixel-art-locked-marker-001.png`,
+      unlockedMarker: `${v1ObjectPath}pixel-art-unlocked-marker-001.png`,
+      windowClosedHorizontal: `${v1ObjectPath}pixel-art-closed-horizontal-window-001.png`,
+      windowClosedVertical: `${v1ObjectPath}pixel-art-closed-vertical-window-001.png`,
+      windowOpenHorizontal: `${v1ObjectPath}pixel-art-open-horizontal-window-001.png`,
+      windowOpenVertical: `${v1ObjectPath}pixel-art-open-vertical-window-001.png`,
+      windowBrokenHorizontal: `${v1ObjectPath}pixel-art-broken-horizontal-window-001.png`,
+      windowBrokenVertical: `${v1ObjectPath}pixel-art-broken-vertical-window-001.png`,
+      glassBreak: `${v1ObjectPath}pixel-art-glass-break-effect-001.png`,
+      paper: `${v1ObjectPath}pixel-art-paper-clue-on-floor-001.png`,
+      paperHighlighted: `${v1ObjectPath}pixel-art-paper-clue-highlighted-001.png`,
+      genericPickup: `${v1ObjectPath}pixel-art-generic-pickup-item-001.png`,
+      stairs: `${v1ObjectPath}pixel-art-stair-up-marker-001.png`,
+      stairsDown: `${v1ObjectPath}pixel-art-stair-down-marker-001.png`,
+      stairGlow: `${v1ObjectPath}pixel-art-stair-interaction-glow-001.png`,
+      gearTable: `${v1ObjectPath}pixel-art-gear-table-top-down-001.png`,
+      gearTableActive: `${v1ObjectPath}pixel-art-gear-table-active-highlighted-001.png`,
+      laptopClosed: `${v1ObjectPath}pixel-art-laptop-closed-001.png`,
+      laptopOpen: `${v1ObjectPath}pixel-art-laptop-open-001.png`,
+      laptopUsed: `${v1ObjectPath}pixel-art-laptop-hacked-used-001.png`,
+      camera: `${v1ObjectPath}pixel-art-camera-body-001.png`,
+      cameraActive: `${v1ObjectPath}pixel-art-camera-active-001.png`,
+      cameraLabel: `${v1ObjectPath}pixel-art-camera-label-badge-c1-c2-base-001.png`,
+      operator: `${v1ObjectPath}pixel-art-operator-idle-top-down-001.png`,
+      operatorMoving: `${v1ObjectPath}pixel-art-operator-moving-top-down-001.png`,
+      operatorDown: `${v1ObjectPath}pixel-art-operator-downed-001.png`,
+      enemy: `${v1ObjectPath}pixel-art-enemy-calm-001.png`,
+      enemySuspicious: `${v1ObjectPath}pixel-art-enemy-suspicious-001.png`,
+      enemyAlert: `${v1ObjectPath}pixel-art-enemy-alert-001.png`,
+      enemyDown: `${v1ObjectPath}pixel-art-enemy-downed-001.png`,
+      objective: `${v1ObjectPath}pixel-art-vip-objective-idle-001.png`,
+      objectiveSecured: `${v1ObjectPath}pixel-art-vip-secured-001.png`,
+      routeDash: `${v1ObjectPath}pixel-art-planned-path-dash-001.png`,
+      waypoint: `${v1ObjectPath}pixel-art-waypoint-dot-001.png`,
+      waypointActive: `${v1ObjectPath}pixel-art-active-waypoint-dot-001.png`,
+      bullet: `${v1ObjectPath}pixel-art-bullet-tracer-segment-001.png`,
+      muzzleFlash: `${v1ObjectPath}pixel-art-muzzle-flash-001.png`,
+      hitSpark: `${v1ObjectPath}pixel-art-hit-spark-001.png`
     };
+    const v2Sprites = {
+      floor: `${v2ObjectPath}pixel-art-floor-tile-001.png`,
+      floorBackground: `${v2ObjectPath}pixel-art-floor-tile-001.png`,
+      grid: `${v2ObjectPath}pixel-art-grid-tile-overlay-001.png`,
+      zone: `${v2ObjectPath}pixel-art-room-zone-fill-tile-001.png`,
+      labelFrame: `${v2ObjectPath}pixel-art-room-label-plaque-001.png`,
+      labelSmallFrame: `${v2ObjectPath}pixel-art-room-label-plaque-001.png`,
+      wallHorizontal: `${v2ObjectPath}pixel-art-horizontal-wall-segment-001.png`,
+      wallVertical: `${v2ObjectPath}pixel-art-vertical-wall-segment-001.png`,
+      wallCorner: `${v2ObjectPath}pixel-art-wall-corner-001.png`,
+      wallEndCap: `${v2ObjectPath}pixel-art-wall-end-cap-001.png`,
+      lockedMarker: `${v2ObjectPath}pixel-art-locked-door-marker-001.png`,
+      unlockedMarker: `${v2ObjectPath}pixel-art-unlocked-door-marker-001.png`,
+      windowClosedHorizontal: `${v2ObjectPath}pixel-art-closed-horizontal-window-001.png`,
+      windowClosedVertical: `${v2ObjectPath}pixel-art-closed-vertical-window-001.png`,
+      windowOpenHorizontal: `${v2ObjectPath}pixel-art-open-horizontal-window-001.png`,
+      windowOpenVertical: `${v2ObjectPath}pixel-art-open-vertical-window-001.png`,
+      windowBrokenHorizontal: `${v2ObjectPath}pixel-art-broken-horizontal-window-001.png`,
+      windowBrokenVertical: `${v2ObjectPath}pixel-art-broken-vertical-window-001.png`,
+      paper: `${v2ObjectPath}pixel-art-paper-clue-item-001.png`,
+      paperHighlighted: `${v2ObjectPath}pixel-art-paper-clue-item-001.png`,
+      genericPickup: `${v2ObjectPath}pixel-art-generic-pickup-item-001.png`,
+      stairs: `${v2ObjectPath}pixel-art-stairs-up-marker-001.png`,
+      stairsDown: `${v2ObjectPath}pixel-art-stairs-down-marker-001.png`,
+      gearTable: `${v2ObjectPath}pixel-art-gear-equipment-table-001.png`,
+      gearTableActive: `${v2ObjectPath}pixel-art-gear-equipment-table-001.png`,
+      laptopClosed: `${v2ObjectPath}pixel-art-laptop-closed-001.png`,
+      laptopOpen: `${v2ObjectPath}pixel-art-laptop-open-001.png`,
+      laptopUsed: `${v2ObjectPath}pixel-art-laptop-used-001.png`,
+      camera: `${v2ObjectPath}pixel-art-camera-body-001.png`,
+      cameraActive: `${v2ObjectPath}pixel-art-camera-active-marker-001.png`,
+      cameraLabel: `${v2ObjectPath}pixel-art-camera-label-badge-001.png`,
+      operator: `${v2ObjectPath}pixel-art-operator-top-down-001.png`,
+      operatorMoving: `${v2ObjectPath}pixel-art-operator-top-down-001.png`,
+      operatorDown: `${v2ObjectPath}pixel-art-operator-top-down-001.png`,
+      enemy: `${v2ObjectPath}pixel-art-enemy-top-down-001.png`,
+      enemySuspicious: `${v2ObjectPath}pixel-art-enemy-top-down-001.png`,
+      enemyAlert: `${v2ObjectPath}pixel-art-enemy-top-down-001.png`,
+      enemyDown: `${v2ObjectPath}pixel-art-enemy-top-down-001.png`,
+      objective: `${v2ObjectPath}pixel-art-vip-top-down-001.png`,
+      objectiveSecured: `${v2ObjectPath}pixel-art-vip-top-down-001.png`,
+      routeDash: `${v2ObjectPath}pixel-art-path-dash-001.png`,
+      waypoint: `${v2ObjectPath}pixel-art-waypoint-dot-001.png`,
+      waypointActive: `${v2ObjectPath}pixel-art-waypoint-dot-001.png`,
+      bullet: `${v2ObjectPath}pixel-art-bullet-tracer-001.png`,
+      muzzleFlash: `${v2ObjectPath}pixel-art-muzzle-flash-001.png`,
+      hitSpark: `${v2ObjectPath}pixel-art-hit-spark-001.png`
+    };
+    const sprites = new Proxy({}, {
+      get(target, key) {
+        if (typeof key !== "string") return target[key];
+        return spriteSource(key);
+      }
+    });
+    */
+    const v1Sprites = {};
+    const v2Sprites = {};
+    const sprites = {};
     const spriteCrops = {
       wallShort: { x: 176, y: 166, w: 362, h: 142 },
       wallLong: { x: 622, y: 166, w: 758, h: 142 },
@@ -568,24 +628,36 @@
 
     // Returns optional scene-source image metadata for image-backed temporary levels.
     function sceneSource() {
-      return runtime.state && runtime.state.level ? runtime.state.level.sceneSource : null;
+      // return runtime.state && runtime.state.level ? runtime.state.level.sceneSource : null;
+      return null;
     }
 
-    // Allows Mission Setup to switch canvas PNG art off while preserving geometry fallbacks.
-    function pngRenderingEnabled() {
-      return runtime.usePngRendering !== false;
+    // Returns the currently selected pixel-art style.
+    function pixelArtStyle() {
+      // return runtime.pixelArtStyle === "geometry" || runtime.pixelArtStyle === "v2" ? runtime.pixelArtStyle : "v1";
+      return "geometry";
+    }
+
+    // Resolves a gameplay sprite key for the selected pixel-art style.
+    function spriteSource(key) {
+      // const style = pixelArtStyle();
+      // if (style === "geometry") return "";
+      // if (style === "v2") return Object.prototype.hasOwnProperty.call(v2Sprites, key) ? v2Sprites[key] : "";
+      // return v1Sprites[key] || "";
+      return "";
     }
 
     // Retrieves and begins loading an image, returning null until it is drawable.
     function loadImage(src) {
-      if (!pngRenderingEnabled()) return null;
-      if (!src) return null;
-      if (!imageCache.has(src)) {
-        const image = new Image();
-        image.src = src;
-        imageCache.set(src, image);
-      }
-      return imageCache.get(src);
+      // if (pixelArtStyle() === "geometry") return null;
+      // if (!src) return null;
+      // if (!imageCache.has(src)) {
+      //   const image = new Image();
+      //   image.src = src;
+      //   imageCache.set(src, image);
+      // }
+      // return imageCache.get(src);
+      return null;
     }
 
     // Resolves PDF-capable visual descriptors to the drawable browser image fallback.

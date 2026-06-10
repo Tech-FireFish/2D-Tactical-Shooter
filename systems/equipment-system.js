@@ -15,6 +15,7 @@
     const elements = deps.elements;
     let lastHealthBoardHtml = "";
     let lastEnemyLoadoutHtml = "";
+    /*
     const equipmentImages = {
       "no-weapon": "pixel-art-no-weapon-001.png",
       rifle: "pixel-art-rifle-001.png",
@@ -32,6 +33,8 @@
       "medium-backpack": "pixel-art-medium-backpack-001.png",
       "large-backpack": "pixel-art-large-backpack-001.png"
     };
+    */
+    const equipmentImages = {};
 
     // Resolves a weapon definition, falling back to rifle.
     function weaponById(id) {
@@ -109,8 +112,12 @@
 
     // Resolves the static pixel-art image for any equipment id.
     function equipmentImagePath(id) {
-      const file = equipmentImages[id];
-      return file ? `docs/images/equipments/${file}` : "";
+      // if (runtime.pixelArtStyle === "geometry") return "";
+      // const file = equipmentImages[id];
+      // if (!file) return "";
+      // const base = runtime.pixelArtStyle === "v2" ? "docs/images/pixel-art-v2" : "docs/images/equipments";
+      // return `${base}/${file}`;
+      return "";
     }
 
     // Renders a compact static equipment image with a text fallback.
@@ -118,10 +125,12 @@
       const src = equipmentImagePath(id);
       const safeLabel = escapeAttr(label || id || "Equipment");
       const classes = ["equipment-icon", className].filter(Boolean).join(" ");
-      if (!src) {
-        return `<span class="${classes} equipment-icon-fallback" aria-label="${safeLabel}">${fallbackInitial(label || id)}</span>`;
+      /*
+      if (src) {
+        return `<img class="${classes}" src="${src}" alt="${safeLabel}" loading="lazy" draggable="false" onerror="this.replaceWith(document.createTextNode('${fallbackInitial(label || id)}'))">`;
       }
-      return `<img class="${classes}" src="${src}" alt="${safeLabel}" loading="lazy" draggable="false" onerror="this.replaceWith(document.createTextNode('${fallbackInitial(label || id)}'))">`;
+      */
+      return `<span class="${classes} equipment-icon-fallback" aria-label="${safeLabel}">${fallbackInitial(label || id)}</span>`;
     }
 
     // Loads all weapon and armor JSON definitions from the equipment folder.

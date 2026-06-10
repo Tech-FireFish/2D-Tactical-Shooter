@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: dark;
   --bg: #101214;
   --panel: #171b1e;
@@ -10,208 +10,322 @@
   --amber: #e3b456;
   --red: #e25f5f;
   --cyan: #72b7ce;
-  --ui-start-background: url("docs/images/user-interface/pixel-art-background-001.png");
-  --ui-start-title: url("docs/images/user-interface/pixel-art-start-title-logo-001.png");
-  --ui-start-title-small: url("docs/images/user-interface/pixel-art-start-title-logo-small-001.png");
-  --ui-start-title-glow: url("docs/images/user-interface/pixel-art-start-title-glow-001.png");
-  --ui-start-subtitle: url("docs/images/user-interface/pixel-art-start-subtitle-panel-001.png");
-  --ui-start-card-frame: url("docs/images/user-interface/pixel-art-start-card-frame-001.png");
-  --ui-start-card-center: url("docs/images/user-interface/pixel-art-start-card-center-001.png");
-  --ui-start-card-corner-tl: url("docs/images/user-interface/pixel-art-start-card-corner-tl-001.png");
-  --ui-start-card-corner-tr: url("docs/images/user-interface/pixel-art-start-card-corner-tr-001.png");
-  --ui-start-card-corner-bl: url("docs/images/user-interface/pixel-art-start-card-corner-bl-001.png");
-  --ui-start-card-corner-br: url("docs/images/user-interface/pixel-art-start-card-corner-br-001.png");
-  --ui-start-card-edge-top: url("docs/images/user-interface/pixel-art-start-card-edge-top-001.png");
-  --ui-start-card-edge-bottom: url("docs/images/user-interface/pixel-art-start-card-edge-bottom-001.png");
-  --ui-start-card-edge-left: url("docs/images/user-interface/pixel-art-start-card-edge-left-001.png");
-  --ui-start-card-edge-right: url("docs/images/user-interface/pixel-art-start-card-edge-right-001.png");
-  --ui-primary-normal: url("docs/images/user-interface/pixel-art-button-primary-normal-001.png");
-  --ui-primary-hover: url("docs/images/user-interface/pixel-art-button-primary-hover-001.png");
-  --ui-primary-pressed: url("docs/images/user-interface/pixel-art-button-primary-pressed-001.png");
-  --ui-primary-disabled: url("docs/images/user-interface/pixel-art-button-primary-disabled-001.png");
-  --ui-secondary-normal: url("docs/images/user-interface/pixel-art-button-secondary-normal-001.png");
-  --ui-secondary-hover: url("docs/images/user-interface/pixel-art-button-secondary-hover-001.png");
-  --ui-secondary-pressed: url("docs/images/user-interface/pixel-art-button-secondary-pressed-001.png");
-  --ui-secondary-disabled: url("docs/images/user-interface/pixel-art-button-secondary-disabled-001.png");
-  --ui-small-normal: url("docs/images/user-interface/pixel-art-button-small-normal-001.png");
-  --ui-small-hover: url("docs/images/user-interface/pixel-art-button-small-hover-001.png");
-  --ui-small-pressed: url("docs/images/user-interface/pixel-art-button-small-pressed-001.png");
-  --ui-small-disabled: url("docs/images/user-interface/pixel-art-button-small-disabled-001.png");
-  --ui-focus-ring: url("docs/images/user-interface/pixel-art-button-focus-ring-001.png");
-  --ui-credits-frame: url("docs/images/user-interface/pixel-art-credits-card-frame-001.png");
-  --ui-credits-center: url("docs/images/user-interface/pixel-art-credits-card-center-001.png");
-  --ui-credits-badge: url("docs/images/user-interface/pixel-art-credits-label-badge-001.png");
-  --ui-onboarding-frame: url("docs/images/user-interface/pixel-art-onboarding-card-frame-001.png");
-  --ui-onboarding-center: url("docs/images/user-interface/pixel-art-onboarding-card-center-001.png");
-  --ui-onboarding-question: url("docs/images/user-interface/pixel-art-onboarding-question-strip-001.png");
-  --ui-onboarding-divider: url("docs/images/user-interface/pixel-art-onboarding-divider-001.png");
-  --ui-onboarding-yes: url("docs/images/user-interface/pixel-art-onboarding-choice-yes-normal-001.png");
-  --ui-onboarding-yes-hover: url("docs/images/user-interface/pixel-art-onboarding-choice-yes-hover-001.png");
-  --ui-onboarding-no: url("docs/images/user-interface/pixel-art-onboarding-choice-no-normal-001.png");
-  --ui-onboarding-no-hover: url("docs/images/user-interface/pixel-art-onboarding-choice-no-hover-001.png");
-  --ui-main-card-frame: url("docs/images/user-interface/pixel-art-main-menu-card-frame-001.png");
-  --ui-main-card-center: url("docs/images/user-interface/pixel-art-main-menu-card-center-001.png");
-  --ui-main-card-header: url("docs/images/user-interface/pixel-art-main-menu-card-header-001.png");
-  --ui-main-card-divider: url("docs/images/user-interface/pixel-art-main-menu-card-divider-001.png");
-  --ui-level-normal: url("docs/images/user-interface/pixel-art-level-block-normal-001.png");
-  --ui-level-hover: url("docs/images/user-interface/pixel-art-level-block-hover-001.png");
-  --ui-level-locked: url("docs/images/user-interface/pixel-art-level-block-locked-001.png");
-  --ui-level-completed: url("docs/images/user-interface/pixel-art-level-block-completed-001.png");
-  --ui-tutorial-normal: url("docs/images/user-interface/pixel-art-tutorial-block-normal-001.png");
-  --ui-tutorial-hover: url("docs/images/user-interface/pixel-art-tutorial-block-hover-001.png");
-  --ui-tutorial-completed: url("docs/images/user-interface/pixel-art-tutorial-block-completed-001.png");
-  --ui-locked-icon: url("docs/images/user-interface/pixel-art-locked-icon-001.png");
-  --ui-completed-icon: url("docs/images/user-interface/pixel-art-completed-check-icon-001.png");
-  --ui-selection-arrow: url("docs/images/user-interface/pixel-art-selection-arrow-001.png");
-  --ui-scanline: url("docs/images/user-interface/pixel-art-menu-scanline-overlay-001.png");
-  --ui-corner-light: url("docs/images/user-interface/pixel-art-menu-corner-light-001.png");
-  --ui-glow-cyan: url("docs/images/user-interface/pixel-art-menu-panel-glow-cyan-001.png");
-  --ui-glow-amber: url("docs/images/user-interface/pixel-art-menu-panel-glow-amber-001.png");
-  --ui-side-left-frame: url("docs/images/user-interface/pixel-art-side-panel-left-frame-001.png");
-  --ui-side-right-frame: url("docs/images/user-interface/pixel-art-side-panel-right-frame-001.png");
-  --ui-side-center: url("docs/images/user-interface/pixel-art-side-panel-center-tile-001.png");
-  --ui-card-frame-small: url("docs/images/user-interface/pixel-art-card-frame-small-001.png");
-  --ui-card-frame-medium: url("docs/images/user-interface/pixel-art-card-frame-medium-001.png");
-  --ui-card-frame-large: url("docs/images/user-interface/pixel-art-card-frame-large-001.png");
-  --ui-card-center: url("docs/images/user-interface/pixel-art-card-center-tile-001.png");
-  --ui-card-header: url("docs/images/user-interface/pixel-art-card-header-strip-001.png");
-  --ui-card-divider: url("docs/images/user-interface/pixel-art-card-divider-001.png");
-  --ui-loadout-frame: url("docs/images/user-interface/pixel-art-loadout-card-frame-001.png");
-  --ui-loadout-center: url("docs/images/user-interface/pixel-art-loadout-card-center-001.png");
-  --ui-loadout-header: url("docs/images/user-interface/pixel-art-loadout-card-header-001.png");
-  --ui-loadout-preview: url("docs/images/user-interface/pixel-art-weapon-preview-frame-001.png");
-  --ui-loadout-preview-hover: url("docs/images/user-interface/pixel-art-weapon-preview-frame-hover-001.png");
-  --ui-loadout-preview-empty: url("docs/images/user-interface/pixel-art-weapon-preview-frame-empty-001.png");
-  --ui-loadout-preview-grid: url("docs/images/user-interface/pixel-art-weapon-preview-background-grid-001.png");
-  --ui-loadout-tooltip-frame: url("docs/images/user-interface/pixel-art-loadout-tooltip-frame-001.png");
-  --ui-loadout-tooltip-center: url("docs/images/user-interface/pixel-art-loadout-tooltip-center-001.png");
-  --ui-loadout-slot-weapon: url("docs/images/user-interface/pixel-art-loadout-slot-weapon-001.png");
-  --ui-loadout-slot-armor: url("docs/images/user-interface/pixel-art-loadout-slot-armor-001.png");
-  --ui-loadout-slot-backpack: url("docs/images/user-interface/pixel-art-loadout-slot-backpack-001.png");
-  --ui-inventory-card-frame: url("docs/images/user-interface/pixel-art-inventory-card-frame-001.png");
-  --ui-inventory-card-center: url("docs/images/user-interface/pixel-art-inventory-card-center-001.png");
-  --ui-inventory-card-header: url("docs/images/user-interface/pixel-art-inventory-card-header-001.png");
-  --ui-inventory-open-normal: url("docs/images/user-interface/pixel-art-inventory-open-button-normal-001.png");
-  --ui-inventory-open-hover: url("docs/images/user-interface/pixel-art-inventory-open-button-hover-001.png");
-  --ui-inventory-open-pressed: url("docs/images/user-interface/pixel-art-inventory-open-button-pressed-001.png");
-  --ui-inventory-overlay-frame: url("docs/images/user-interface/pixel-art-inventory-overlay-frame-001.png");
-  --ui-inventory-overlay-center: url("docs/images/user-interface/pixel-art-inventory-overlay-center-001.png");
-  --ui-inventory-close-normal: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-normal-001.png");
-  --ui-inventory-close-hover: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-hover-001.png");
-  --ui-inventory-close-pressed: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-pressed-001.png");
-  --ui-inventory-close-icon: url("docs/images/user-interface/pixel-art-inventory-close-icon-001.png");
-  --ui-inventory-slot-empty: url("docs/images/user-interface/pixel-art-inventory-slot-empty-001.png");
-  --ui-inventory-slot-filled: url("docs/images/user-interface/pixel-art-inventory-slot-filled-001.png");
-  --ui-inventory-slot-hover: url("docs/images/user-interface/pixel-art-inventory-slot-hover-001.png");
-  --ui-inventory-slot-selected: url("docs/images/user-interface/pixel-art-inventory-slot-selected-001.png");
-  --ui-item-detail-frame: url("docs/images/user-interface/pixel-art-item-detail-frame-001.png");
-  --ui-item-detail-center: url("docs/images/user-interface/pixel-art-item-detail-center-001.png");
-  --ui-item-detail-text: url("docs/images/user-interface/pixel-art-item-detail-text-box-001.png");
-  --ui-item-detail-divider: url("docs/images/user-interface/pixel-art-item-detail-divider-001.png");
-  --ui-paper-clue-tooltip: url("docs/images/user-interface/pixel-art-paper-clue-hover-tooltip-001.png");
-  --ui-mission-frame: url("docs/images/user-interface/pixel-art-mission-status-card-frame-001.png");
-  --ui-mission-center: url("docs/images/user-interface/pixel-art-mission-status-card-center-001.png");
-  --ui-mission-header: url("docs/images/user-interface/pixel-art-mission-status-card-header-001.png");
-  --ui-status-wide: url("docs/images/user-interface/pixel-art-status-tile-wide-001.png");
-  --ui-status-wide-active: url("docs/images/user-interface/pixel-art-status-tile-wide-active-001.png");
-  --ui-status-small: url("docs/images/user-interface/pixel-art-status-tile-small-001.png");
-  --ui-status-small-active: url("docs/images/user-interface/pixel-art-status-tile-small-active-001.png");
-  --ui-tutorial-card-frame: url("docs/images/user-interface/pixel-art-tutorial-card-frame-002.png");
-  --ui-tutorial-card-center: url("docs/images/user-interface/pixel-art-tutorial-card-center-001.png");
-  --ui-tutorial-card-header: url("docs/images/user-interface/pixel-art-tutorial-card-header-001.png");
-  --ui-tutorial-step: url("docs/images/user-interface/pixel-art-tutorial-step-row-001.png");
-  --ui-tutorial-step-active: url("docs/images/user-interface/pixel-art-tutorial-step-row-active-001.png");
-  --ui-tutorial-progress-track: url("docs/images/user-interface/pixel-art-tutorial-progress-track-001.png");
-  --ui-tutorial-progress-fill: url("docs/images/user-interface/pixel-art-tutorial-progress-fill-001.png");
-  --ui-tutorial-arrow: url("docs/images/user-interface/pixel-art-tutorial-arrow-large-002.png");
-  --ui-hint-frame: url("docs/images/user-interface/pixel-art-hint-card-frame-001.png");
-  --ui-hint-center: url("docs/images/user-interface/pixel-art-hint-card-center-001.png");
-  --ui-hint-header: url("docs/images/user-interface/pixel-art-hint-card-header-001.png");
-  --ui-hint-message: url("docs/images/user-interface/pixel-art-hint-message-frame-001.png");
-  --ui-hint-warning: url("docs/images/user-interface/pixel-art-hint-message-frame-warning-001.png");
-  --ui-actions-frame: url("docs/images/user-interface/pixel-art-actions-card-frame-001.png");
-  --ui-actions-center: url("docs/images/user-interface/pixel-art-actions-card-center-001.png");
-  --ui-actions-header: url("docs/images/user-interface/pixel-art-actions-card-header-001.png");
-  --ui-action-normal: url("docs/images/user-interface/pixel-art-action-button-normal-001.png");
-  --ui-action-hover: url("docs/images/user-interface/pixel-art-action-button-hover-001.png");
-  --ui-action-pressed: url("docs/images/user-interface/pixel-art-action-button-pressed-001.png");
-  --ui-action-active: url("docs/images/user-interface/pixel-art-action-button-active-001.png");
-  --ui-action-disabled: url("docs/images/user-interface/pixel-art-action-button-disabled-001.png");
-  --ui-action-execute-wide: url("docs/images/user-interface/pixel-art-execute-button-normal-001.png");
-  --ui-action-execute-hover: url("docs/images/user-interface/pixel-art-execute-button-hover-001.png");
-  --ui-health-frame: url("docs/images/user-interface/pixel-art-operator-health-card-frame-001.png");
-  --ui-health-center: url("docs/images/user-interface/pixel-art-operator-health-card-center-001.png");
-  --ui-health-header: url("docs/images/user-interface/pixel-art-operator-health-card-header-001.png");
-  --ui-health-row: url("docs/images/user-interface/pixel-art-operator-health-row-001.png");
-  --ui-health-row-selected: url("docs/images/user-interface/pixel-art-operator-health-row-selected-001.png");
-  --ui-health-row-downed: url("docs/images/user-interface/pixel-art-operator-health-row-downed-001.png");
-  --ui-health-bar-track: url("docs/images/user-interface/pixel-art-health-bar-track-001.png");
-  --ui-health-bar-fill: url("docs/images/user-interface/pixel-art-health-bar-fill-green-001.png");
-  --ui-health-bar-red: url("docs/images/user-interface/pixel-art-health-bar-fill-red-001.png");
-  --ui-armor-bar-track: url("docs/images/user-interface/pixel-art-armor-bar-track-001.png");
-  --ui-armor-bar-fill: url("docs/images/user-interface/pixel-art-armor-bar-fill-white-001.png");
-  --ui-show-all-normal: url("docs/images/user-interface/pixel-art-show-all-button-normal-001.png");
-  --ui-show-all-hover: url("docs/images/user-interface/pixel-art-show-all-button-hover-001.png");
-  --ui-settings-frame: url("docs/images/user-interface/pixel-art-settings-overlay-frame-001.png");
-  --ui-settings-center: url("docs/images/user-interface/pixel-art-settings-overlay-center-001.png");
-  --ui-settings-section: url("docs/images/user-interface/pixel-art-settings-section-frame-001.png");
-  --ui-settings-section-center: url("docs/images/user-interface/pixel-art-settings-section-center-001.png");
-  --ui-settings-tab: url("docs/images/user-interface/pixel-art-settings-tab-normal-001.png");
-  --ui-settings-tab-hover: url("docs/images/user-interface/pixel-art-settings-tab-hover-001.png");
-  --ui-settings-tab-active: url("docs/images/user-interface/pixel-art-settings-tab-active-001.png");
-  --ui-selector-frame: url("docs/images/user-interface/pixel-art-selector-frame-001.png");
-  --ui-selector-hover: url("docs/images/user-interface/pixel-art-selector-frame-hover-001.png");
-  --ui-selector-arrow: url("docs/images/user-interface/pixel-art-selector-arrow-001.png");
-  --ui-slider-track: url("docs/images/user-interface/pixel-art-slider-track-001.png");
-  --ui-slider-fill: url("docs/images/user-interface/pixel-art-slider-fill-001.png");
-  --ui-slider-thumb: url("docs/images/user-interface/pixel-art-slider-thumb-001.png");
-  --ui-keybinding-row: url("docs/images/user-interface/pixel-art-keybinding-row-001.png");
-  --ui-keybinding-row-hover: url("docs/images/user-interface/pixel-art-keybinding-row-hover-001.png");
-  --ui-keycap: url("docs/images/user-interface/pixel-art-keycap-medium-001.png");
-  --ui-keycap-hover: url("docs/images/user-interface/pixel-art-keycap-hover-001.png");
-  --ui-equipment-table-frame: url("docs/images/user-interface/pixel-art-equipment-table-overlay-frame-001.png");
-  --ui-equipment-table-center: url("docs/images/user-interface/pixel-art-equipment-table-overlay-center-001.png");
-  --ui-equipment-table-section: url("docs/images/user-interface/pixel-art-equipment-table-section-frame-001.png");
-  --ui-equipment-table-item: url("docs/images/user-interface/pixel-art-equipment-table-item-button-normal-001.png");
-  --ui-equipment-table-item-hover: url("docs/images/user-interface/pixel-art-equipment-table-item-button-hover-001.png");
-  --ui-equipment-table-close: url("docs/images/user-interface/pixel-art-equipment-table-close-button-normal-001.png");
-  --ui-equipment-table-close-hover: url("docs/images/user-interface/pixel-art-equipment-table-close-button-hover-001.png");
-  --ui-laptop-frame: url("docs/images/user-interface/pixel-art-laptop-overlay-frame-001.png");
-  --ui-laptop-screen-frame: url("docs/images/user-interface/pixel-art-laptop-screen-frame-001.png");
-  --ui-laptop-screen-center: url("docs/images/user-interface/pixel-art-laptop-screen-center-001.png");
-  --ui-camera-button: url("docs/images/user-interface/pixel-art-camera-button-normal-001.png");
-  --ui-camera-button-hover: url("docs/images/user-interface/pixel-art-camera-button-hover-001.png");
-  --ui-camera-button-revealed: url("docs/images/user-interface/pixel-art-camera-button-revealed-001.png");
-  --ui-start-hack-button: url("docs/images/user-interface/pixel-art-start-hack-button-normal-001.png");
-  --ui-start-hack-button-hover: url("docs/images/user-interface/pixel-art-start-hack-button-hover-001.png");
-  --ui-laptop-close: url("docs/images/user-interface/pixel-art-laptop-close-button-normal-001.png");
-  --ui-laptop-close-hover: url("docs/images/user-interface/pixel-art-laptop-close-button-hover-001.png");
-  --ui-pause-frame: url("docs/images/user-interface/pixel-art-pause-overlay-frame-001.png");
-  --ui-pause-center: url("docs/images/user-interface/pixel-art-pause-overlay-center-001.png");
-  --ui-pause-title: url("docs/images/user-interface/pixel-art-pause-title-strip-001.png");
-  --ui-pause-button: url("docs/images/user-interface/pixel-art-pause-nav-button-normal-001.png");
-  --ui-pause-button-hover: url("docs/images/user-interface/pixel-art-pause-nav-button-hover-001.png");
-  --ui-pause-button-pressed: url("docs/images/user-interface/pixel-art-pause-nav-button-pressed-001.png");
-  --ui-pause-button-disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-disabled-001.png");
-  --ui-report-frame: url("docs/images/user-interface/pixel-art-mission-report-frame-001.png");
-  --ui-report-center: url("docs/images/user-interface/pixel-art-mission-report-center-001.png");
-  --ui-report-success: url("docs/images/user-interface/pixel-art-mission-report-header-success-001.png");
-  --ui-report-failed: url("docs/images/user-interface/pixel-art-mission-report-header-failed-001.png");
-  --ui-report-stat-row: url("docs/images/user-interface/pixel-art-mission-report-stat-row-001.png");
-  --ui-report-button: url("docs/images/user-interface/pixel-art-mission-report-button-normal-001.png");
-  --ui-report-button-hover: url("docs/images/user-interface/pixel-art-mission-report-button-hover-001.png");
-  --ui-report-selector: url("docs/images/user-interface/pixel-art-mission-report-selector-frame-001.png");
-  --ui-expanded-pause-sign: url("docs/images/user-interface/pixel-art-expanded-pause-sign-normal-001.png");
-  --ui-expanded-pause-sign-hover: url("docs/images/user-interface/pixel-art-expanded-pause-sign-hover-001.png");
-  --ui-expanded-pause-sign-pressed: url("docs/images/user-interface/pixel-art-expanded-pause-sign-pressed-001.png");
-  --ui-expanded-pause-card-frame: url("docs/images/user-interface/pixel-art-expanded-pause-card-frame-001.png");
-  --ui-expanded-pause-card-center: url("docs/images/user-interface/pixel-art-expanded-pause-card-center-001.png");
-  --ui-expanded-panel-tab: url("docs/images/user-interface/pixel-art-expanded-panel-tab-normal-001.png");
-  --ui-expanded-panel-tab-hover: url("docs/images/user-interface/pixel-art-expanded-panel-tab-hover-001.png");
-  --ui-overlay-dim-safe: url("docs/images/user-interface/pixel-art-overlay-dim-safe-001.png");
-  --ui-overlay-divider: url("docs/images/user-interface/pixel-art-overlay-divider-001.png");
-  --ui-overlay-focus-ring: url("docs/images/user-interface/pixel-art-overlay-focus-ring-001.png");
-  --ui-overlay-close-icon: url("docs/images/user-interface/pixel-art-overlay-close-icon-001.png");
+  --ui-start-background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-background-001.png") */;
+  --ui-start-title: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-logo-001.png") */;
+  --ui-start-title-small: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-logo-small-001.png") */;
+  --ui-start-title-glow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-glow-001.png") */;
+  --ui-start-subtitle: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-subtitle-panel-001.png") */;
+  --ui-start-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-frame-001.png") */;
+  --ui-start-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-center-001.png") */;
+  --ui-start-card-corner-tl: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-corner-tl-001.png") */;
+  --ui-start-card-corner-tr: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-corner-tr-001.png") */;
+  --ui-start-card-corner-bl: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-corner-bl-001.png") */;
+  --ui-start-card-corner-br: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-corner-br-001.png") */;
+  --ui-start-card-edge-top: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-edge-top-001.png") */;
+  --ui-start-card-edge-bottom: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-edge-bottom-001.png") */;
+  --ui-start-card-edge-left: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-edge-left-001.png") */;
+  --ui-start-card-edge-right: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-edge-right-001.png") */;
+  --ui-primary-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-primary-normal-001.png") */;
+  --ui-primary-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-primary-hover-001.png") */;
+  --ui-primary-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-primary-pressed-001.png") */;
+  --ui-primary-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-primary-disabled-001.png") */;
+  --ui-secondary-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-secondary-normal-001.png") */;
+  --ui-secondary-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-secondary-hover-001.png") */;
+  --ui-secondary-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-secondary-pressed-001.png") */;
+  --ui-secondary-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-secondary-disabled-001.png") */;
+  --ui-small-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-small-normal-001.png") */;
+  --ui-small-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-small-hover-001.png") */;
+  --ui-small-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-small-pressed-001.png") */;
+  --ui-small-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-small-disabled-001.png") */;
+  --ui-focus-ring: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-focus-ring-001.png") */;
+  --ui-credits-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-credits-card-frame-001.png") */;
+  --ui-credits-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-credits-card-center-001.png") */;
+  --ui-credits-badge: none /* PNG disabled: url("docs/images/user-interface/pixel-art-credits-label-badge-001.png") */;
+  --ui-onboarding-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-card-frame-001.png") */;
+  --ui-onboarding-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-card-center-001.png") */;
+  --ui-onboarding-question: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-question-strip-001.png") */;
+  --ui-onboarding-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-divider-001.png") */;
+  --ui-onboarding-yes: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-choice-yes-normal-001.png") */;
+  --ui-onboarding-yes-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-choice-yes-hover-001.png") */;
+  --ui-onboarding-no: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-choice-no-normal-001.png") */;
+  --ui-onboarding-no-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-choice-no-hover-001.png") */;
+  --ui-main-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-main-menu-card-frame-001.png") */;
+  --ui-main-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-main-menu-card-center-001.png") */;
+  --ui-main-card-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-main-menu-card-header-001.png") */;
+  --ui-main-card-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-main-menu-card-divider-001.png") */;
+  --ui-level-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-level-block-normal-001.png") */;
+  --ui-level-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-level-block-hover-001.png") */;
+  --ui-level-locked: none /* PNG disabled: url("docs/images/user-interface/pixel-art-level-block-locked-001.png") */;
+  --ui-level-completed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-level-block-completed-001.png") */;
+  --ui-tutorial-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-block-normal-001.png") */;
+  --ui-tutorial-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-block-hover-001.png") */;
+  --ui-tutorial-completed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-block-completed-001.png") */;
+  --ui-locked-icon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-locked-icon-001.png") */;
+  --ui-completed-icon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-completed-check-icon-001.png") */;
+  --ui-selection-arrow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-selection-arrow-001.png") */;
+  --ui-scanline: none /* PNG disabled: url("docs/images/user-interface/pixel-art-menu-scanline-overlay-001.png") */;
+  --ui-corner-light: none /* PNG disabled: url("docs/images/user-interface/pixel-art-menu-corner-light-001.png") */;
+  --ui-glow-cyan: none /* PNG disabled: url("docs/images/user-interface/pixel-art-menu-panel-glow-cyan-001.png") */;
+  --ui-glow-amber: none /* PNG disabled: url("docs/images/user-interface/pixel-art-menu-panel-glow-amber-001.png") */;
+  --ui-side-left-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-side-panel-left-frame-001.png") */;
+  --ui-side-right-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-side-panel-right-frame-001.png") */;
+  --ui-side-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-side-panel-center-tile-001.png") */;
+  --ui-card-frame-small: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-frame-small-001.png") */;
+  --ui-card-frame-medium: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-frame-medium-001.png") */;
+  --ui-card-frame-large: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-frame-large-001.png") */;
+  --ui-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-center-tile-001.png") */;
+  --ui-card-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-header-strip-001.png") */;
+  --ui-card-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-divider-001.png") */;
+  --ui-loadout-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-card-frame-001.png") */;
+  --ui-loadout-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-card-center-001.png") */;
+  --ui-loadout-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-card-header-001.png") */;
+  --ui-loadout-preview: none /* PNG disabled: url("docs/images/user-interface/pixel-art-weapon-preview-frame-001.png") */;
+  --ui-loadout-preview-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-weapon-preview-frame-hover-001.png") */;
+  --ui-loadout-preview-empty: none /* PNG disabled: url("docs/images/user-interface/pixel-art-weapon-preview-frame-empty-001.png") */;
+  --ui-loadout-preview-grid: none /* PNG disabled: url("docs/images/user-interface/pixel-art-weapon-preview-background-grid-001.png") */;
+  --ui-loadout-tooltip-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-tooltip-frame-001.png") */;
+  --ui-loadout-tooltip-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-tooltip-center-001.png") */;
+  --ui-loadout-slot-weapon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-slot-weapon-001.png") */;
+  --ui-loadout-slot-armor: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-slot-armor-001.png") */;
+  --ui-loadout-slot-backpack: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-slot-backpack-001.png") */;
+  --ui-inventory-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-card-frame-001.png") */;
+  --ui-inventory-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-card-center-001.png") */;
+  --ui-inventory-card-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-card-header-001.png") */;
+  --ui-inventory-open-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-open-button-normal-001.png") */;
+  --ui-inventory-open-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-open-button-hover-001.png") */;
+  --ui-inventory-open-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-open-button-pressed-001.png") */;
+  --ui-inventory-overlay-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-frame-001.png") */;
+  --ui-inventory-overlay-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-center-001.png") */;
+  --ui-inventory-close-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-normal-001.png") */;
+  --ui-inventory-close-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-hover-001.png") */;
+  --ui-inventory-close-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-pressed-001.png") */;
+  --ui-inventory-close-icon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-close-icon-001.png") */;
+  --ui-inventory-slot-empty: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-slot-empty-001.png") */;
+  --ui-inventory-slot-filled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-slot-filled-001.png") */;
+  --ui-inventory-slot-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-slot-hover-001.png") */;
+  --ui-inventory-slot-selected: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-slot-selected-001.png") */;
+  --ui-item-detail-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-frame-001.png") */;
+  --ui-item-detail-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-center-001.png") */;
+  --ui-item-detail-text: none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-text-box-001.png") */;
+  --ui-item-detail-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-divider-001.png") */;
+  --ui-paper-clue-tooltip: none /* PNG disabled: url("docs/images/user-interface/pixel-art-paper-clue-hover-tooltip-001.png") */;
+  --ui-mission-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-status-card-frame-001.png") */;
+  --ui-mission-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-status-card-center-001.png") */;
+  --ui-mission-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-status-card-header-001.png") */;
+  --ui-status-wide: none /* PNG disabled: url("docs/images/user-interface/pixel-art-status-tile-wide-001.png") */;
+  --ui-status-wide-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-status-tile-wide-active-001.png") */;
+  --ui-status-small: none /* PNG disabled: url("docs/images/user-interface/pixel-art-status-tile-small-001.png") */;
+  --ui-status-small-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-status-tile-small-active-001.png") */;
+  --ui-tutorial-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-card-frame-002.png") */;
+  --ui-tutorial-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-card-center-001.png") */;
+  --ui-tutorial-card-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-card-header-001.png") */;
+  --ui-tutorial-step: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-step-row-001.png") */;
+  --ui-tutorial-step-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-step-row-active-001.png") */;
+  --ui-tutorial-progress-track: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-progress-track-001.png") */;
+  --ui-tutorial-progress-fill: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-progress-fill-001.png") */;
+  --ui-tutorial-arrow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-arrow-large-002.png") */;
+  --ui-hint-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-card-frame-001.png") */;
+  --ui-hint-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-card-center-001.png") */;
+  --ui-hint-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-card-header-001.png") */;
+  --ui-hint-message: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-message-frame-001.png") */;
+  --ui-hint-warning: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-message-frame-warning-001.png") */;
+  --ui-actions-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-actions-card-frame-001.png") */;
+  --ui-actions-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-actions-card-center-001.png") */;
+  --ui-actions-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-actions-card-header-001.png") */;
+  --ui-action-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-normal-001.png") */;
+  --ui-action-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-hover-001.png") */;
+  --ui-action-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-pressed-001.png") */;
+  --ui-action-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-active-001.png") */;
+  --ui-action-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-disabled-001.png") */;
+  --ui-action-execute-wide: none /* PNG disabled: url("docs/images/user-interface/pixel-art-execute-button-normal-001.png") */;
+  --ui-action-execute-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-execute-button-hover-001.png") */;
+  --ui-health-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-card-frame-001.png") */;
+  --ui-health-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-card-center-001.png") */;
+  --ui-health-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-card-header-001.png") */;
+  --ui-health-row: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-row-001.png") */;
+  --ui-health-row-selected: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-row-selected-001.png") */;
+  --ui-health-row-downed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-row-downed-001.png") */;
+  --ui-health-bar-track: none /* PNG disabled: url("docs/images/user-interface/pixel-art-health-bar-track-001.png") */;
+  --ui-health-bar-fill: none /* PNG disabled: url("docs/images/user-interface/pixel-art-health-bar-fill-green-001.png") */;
+  --ui-health-bar-red: none /* PNG disabled: url("docs/images/user-interface/pixel-art-health-bar-fill-red-001.png") */;
+  --ui-armor-bar-track: none /* PNG disabled: url("docs/images/user-interface/pixel-art-armor-bar-track-001.png") */;
+  --ui-armor-bar-fill: none /* PNG disabled: url("docs/images/user-interface/pixel-art-armor-bar-fill-white-001.png") */;
+  --ui-show-all-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-show-all-button-normal-001.png") */;
+  --ui-show-all-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-show-all-button-hover-001.png") */;
+  --ui-settings-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-overlay-frame-001.png") */;
+  --ui-settings-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-overlay-center-001.png") */;
+  --ui-settings-section: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-section-frame-001.png") */;
+  --ui-settings-section-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-section-center-001.png") */;
+  --ui-settings-tab: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-tab-normal-001.png") */;
+  --ui-settings-tab-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-tab-hover-001.png") */;
+  --ui-settings-tab-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-tab-active-001.png") */;
+  --ui-selector-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-selector-frame-001.png") */;
+  --ui-selector-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-selector-frame-hover-001.png") */;
+  --ui-selector-arrow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-selector-arrow-001.png") */;
+  --ui-slider-track: none /* PNG disabled: url("docs/images/user-interface/pixel-art-slider-track-001.png") */;
+  --ui-slider-fill: none /* PNG disabled: url("docs/images/user-interface/pixel-art-slider-fill-001.png") */;
+  --ui-slider-thumb: none /* PNG disabled: url("docs/images/user-interface/pixel-art-slider-thumb-001.png") */;
+  --ui-keybinding-row: none /* PNG disabled: url("docs/images/user-interface/pixel-art-keybinding-row-001.png") */;
+  --ui-keybinding-row-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-keybinding-row-hover-001.png") */;
+  --ui-keycap: none /* PNG disabled: url("docs/images/user-interface/pixel-art-keycap-medium-001.png") */;
+  --ui-keycap-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-keycap-hover-001.png") */;
+  --ui-equipment-table-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-overlay-frame-001.png") */;
+  --ui-equipment-table-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-overlay-center-001.png") */;
+  --ui-equipment-table-section: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-section-frame-001.png") */;
+  --ui-equipment-table-item: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-item-button-normal-001.png") */;
+  --ui-equipment-table-item-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-item-button-hover-001.png") */;
+  --ui-equipment-table-close: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-close-button-normal-001.png") */;
+  --ui-equipment-table-close-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-close-button-hover-001.png") */;
+  --ui-laptop-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-overlay-frame-001.png") */;
+  --ui-laptop-screen-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-screen-frame-001.png") */;
+  --ui-laptop-screen-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-screen-center-001.png") */;
+  --ui-camera-button: none /* PNG disabled: url("docs/images/user-interface/pixel-art-camera-button-normal-001.png") */;
+  --ui-camera-button-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-camera-button-hover-001.png") */;
+  --ui-camera-button-revealed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-camera-button-revealed-001.png") */;
+  --ui-start-hack-button: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-hack-button-normal-001.png") */;
+  --ui-start-hack-button-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-hack-button-hover-001.png") */;
+  --ui-laptop-close: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-close-button-normal-001.png") */;
+  --ui-laptop-close-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-close-button-hover-001.png") */;
+  --ui-pause-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-overlay-frame-001.png") */;
+  --ui-pause-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-overlay-center-001.png") */;
+  --ui-pause-title: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-title-strip-001.png") */;
+  --ui-pause-button: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-normal-001.png") */;
+  --ui-pause-button-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-hover-001.png") */;
+  --ui-pause-button-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-pressed-001.png") */;
+  --ui-pause-button-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-disabled-001.png") */;
+  --ui-report-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-frame-001.png") */;
+  --ui-report-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-center-001.png") */;
+  --ui-report-success: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-header-success-001.png") */;
+  --ui-report-failed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-header-failed-001.png") */;
+  --ui-report-stat-row: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-stat-row-001.png") */;
+  --ui-report-button: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-button-normal-001.png") */;
+  --ui-report-button-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-button-hover-001.png") */;
+  --ui-report-selector: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-selector-frame-001.png") */;
+  --ui-expanded-pause-sign: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-sign-normal-001.png") */;
+  --ui-expanded-pause-sign-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-sign-hover-001.png") */;
+  --ui-expanded-pause-sign-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-sign-pressed-001.png") */;
+  --ui-expanded-pause-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-card-frame-001.png") */;
+  --ui-expanded-pause-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-card-center-001.png") */;
+  --ui-expanded-panel-tab: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-panel-tab-normal-001.png") */;
+  --ui-expanded-panel-tab-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-panel-tab-hover-001.png") */;
+  --ui-overlay-dim-safe: none /* PNG disabled: url("docs/images/user-interface/pixel-art-overlay-dim-safe-001.png") */;
+  --ui-overlay-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-overlay-divider-001.png") */;
+  --ui-overlay-focus-ring: none /* PNG disabled: url("docs/images/user-interface/pixel-art-overlay-focus-ring-001.png") */;
+  --ui-overlay-close-icon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-overlay-close-icon-001.png") */;
+}
+
+body.pixel-style-v2 {
+  --ui-primary-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-start-menu-primary-button-001.png") */;
+  --ui-primary-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-start-menu-primary-button-001.png") */;
+  --ui-primary-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-start-menu-primary-button-001.png") */;
+  --ui-secondary-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-secondary-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-secondary-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-start-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-start-menu-panel-card-frame-001.png") */;
+  --ui-start-card-center: none;
+  --ui-onboarding-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-card-frame-001.png") */;
+  --ui-onboarding-center: none;
+  --ui-onboarding-yes: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-onboarding-yes-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-onboarding-no: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-onboarding-no-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-main-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-main-privilege-access-card-frame-001.png") */;
+  --ui-main-card-center: none;
+  --ui-level-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-level-numbered-block-001.png") */;
+  --ui-level-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-level-numbered-block-001.png") */;
+  --ui-level-locked: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-locked-numbered-block-001.png") */;
+  --ui-level-completed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-level-numbered-block-001.png") */;
+  --ui-tutorial-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-numbered-block-001.png") */;
+  --ui-tutorial-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-numbered-block-001.png") */;
+  --ui-tutorial-completed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-numbered-block-001.png") */;
+  --ui-locked-icon: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-privilege-badge-lock-icon-001.png") */;
+  --ui-side-left-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-left-side-panel-frame-001.png") */;
+  --ui-side-right-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-right-side-panel-frame-001.png") */;
+  --ui-side-center: none;
+  --ui-card-frame-medium: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-card-frame-001.png") */;
+  --ui-card-center: none;
+  --ui-loadout-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-card-frame-001.png") */;
+  --ui-loadout-center: none;
+  --ui-loadout-preview: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-item-slot-001.png") */;
+  --ui-loadout-preview-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-item-slot-001.png") */;
+  --ui-loadout-preview-empty: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-item-slot-001.png") */;
+  --ui-inventory-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-card-frame-001.png") */;
+  --ui-inventory-card-center: none;
+  --ui-inventory-overlay-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-overlay-frame-001.png") */;
+  --ui-inventory-overlay-center: none;
+  --ui-inventory-close-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-close-button-001.png") */;
+  --ui-inventory-close-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-close-button-001.png") */;
+  --ui-inventory-close-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-close-button-001.png") */;
+  --ui-inventory-slot-empty: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-slot-001.png") */;
+  --ui-inventory-slot-filled: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-slot-001.png") */;
+  --ui-inventory-slot-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-slot-001.png") */;
+  --ui-inventory-slot-selected: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-slot-001.png") */;
+  --ui-item-detail-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-item-detail-bar-001.png") */;
+  --ui-item-detail-center: none;
+  --ui-mission-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-card-frame-001.png") */;
+  --ui-mission-center: none;
+  --ui-status-wide: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-tile-001.png") */;
+  --ui-status-wide-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-tile-001.png") */;
+  --ui-status-small: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-tile-001.png") */;
+  --ui-status-small-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-tile-001.png") */;
+  --ui-tutorial-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-card-frame-001.png") */;
+  --ui-tutorial-card-center: none;
+  --ui-tutorial-step-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-active-step-marker-001.png") */;
+  --ui-hint-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-hint-card-frame-001.png") */;
+  --ui-hint-center: none;
+  --ui-actions-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-actions-card-frame-001.png") */;
+  --ui-actions-center: none;
+  --ui-action-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-disabled: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-execute-wide: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-execute-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-health-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-operator-health-card-frame-001.png") */;
+  --ui-health-center: none;
+  --ui-health-row: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-operator-health-row-001.png") */;
+  --ui-health-row-selected: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-operator-health-row-001.png") */;
+  --ui-health-row-downed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-operator-health-row-001.png") */;
+  --ui-health-bar-track: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-health-bar-frame-001.png") */;
+  --ui-armor-bar-track: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-armor-bar-frame-001.png") */;
+  --ui-settings-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-overlay-frame-001.png") */;
+  --ui-settings-center: none;
+  --ui-settings-section: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-overlay-frame-001.png") */;
+  --ui-settings-section-center: none;
+  --ui-settings-tab: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-tab-001.png") */;
+  --ui-settings-tab-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-tab-001.png") */;
+  --ui-settings-tab-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-tab-001.png") */;
+  --ui-selector-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selector-frame-001.png") */;
+  --ui-selector-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selector-frame-001.png") */;
+  --ui-slider-track: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-slider-track-001.png") */;
+  --ui-slider-thumb: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-slider-knob-001.png") */;
+  --ui-keybinding-row: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-keybinding-row-001.png") */;
+  --ui-keybinding-row-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-keybinding-row-001.png") */;
+  --ui-equipment-table-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-equipment-table-overlay-frame-001.png") */;
+  --ui-equipment-table-center: none;
+  --ui-equipment-table-item: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-equipment-table-item-button-001.png") */;
+  --ui-equipment-table-item-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-equipment-table-item-button-001.png") */;
+  --ui-laptop-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-laptop-camera-hack-overlay-frame-001.png") */;
+  --ui-laptop-screen-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-laptop-camera-hack-overlay-frame-001.png") */;
+  --ui-camera-button: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-camera-select-button-001.png") */;
+  --ui-camera-button-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-camera-select-button-001.png") */;
+  --ui-camera-button-revealed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-camera-select-button-001.png") */;
+  --ui-pause-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-pause-navigation-overlay-frame-001.png") */;
+  --ui-pause-center: none;
+  --ui-pause-button: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-pause-menu-button-001.png") */;
+  --ui-pause-button-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-pause-menu-button-001.png") */;
+  --ui-pause-button-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-pause-menu-button-001.png") */;
+  --ui-report-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-report-overlay-frame-001.png") */;
+  --ui-report-center: none;
+  --ui-report-stat-row: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-report-stat-tile-001.png") */;
+  --ui-report-button: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-report-button-001.png") */;
+  --ui-report-button-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-report-button-001.png") */;
+  --ui-expanded-pause-sign: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-expanded-pause-button-001.png") */;
+  --ui-expanded-pause-sign-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-expanded-pause-button-001.png") */;
+  --ui-expanded-pause-sign-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-expanded-pause-button-001.png") */;
+  --ui-expanded-pause-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-expanded-pause-panel-frame-001.png") */;
+  --ui-expanded-pause-card-center: none;
 }
 
 * {
@@ -585,17 +699,64 @@ h2 {
   accent-color: var(--green);
 }
 
-body.png-art-disabled * {
+body.pixel-style-geometry * {
   border-image-source: none !important;
   background-image: none !important;
 }
 
-body.png-art-disabled .equipment-icon {
+body.pixel-style-geometry .menu-panel,
+body.pixel-style-geometry .credits-card,
+body.pixel-style-geometry .control-card,
+body.pixel-style-geometry .settings-panel,
+body.pixel-style-geometry .settings-change-card,
+body.pixel-style-geometry .inventory-card,
+body.pixel-style-geometry .inventory-dialog,
+body.pixel-style-geometry .equipment-table-dialog,
+body.pixel-style-geometry .laptop-dialog,
+body.pixel-style-geometry .pause-card,
+body.pixel-style-geometry .mission-report,
+body.pixel-style-geometry .weapon-tooltip,
+body.pixel-style-geometry .item-detail,
+body.pixel-style-geometry .paper-tooltip {
+  border: 1px solid var(--line) !important;
+  background: rgba(18, 22, 25, 0.92) !important;
+}
+
+body.pixel-style-geometry button,
+body.pixel-style-geometry select,
+body.pixel-style-geometry input[type="range"],
+body.pixel-style-geometry .level-block,
+body.pixel-style-geometry .tutorial-block,
+body.pixel-style-geometry .inventory-slot,
+body.pixel-style-geometry .keybinding-row,
+body.pixel-style-geometry .equipment-table-option {
+  border: 1px solid var(--line) !important;
+  background: var(--panel-2) !important;
+}
+
+body.pixel-style-geometry button:hover,
+body.pixel-style-geometry .level-block:hover,
+body.pixel-style-geometry .tutorial-block:hover,
+body.pixel-style-geometry .inventory-slot:hover,
+body.pixel-style-geometry .equipment-table-option:hover {
+  background: #293238 !important;
+}
+
+body.pixel-style-geometry .bullet {
+  border: 1px solid var(--line);
+  background: #1d2326 !important;
+}
+
+body.pixel-style-geometry .bullet.filled {
+  background: var(--cyan) !important;
+}
+
+body.pixel-style-geometry .equipment-icon:not(.equipment-icon-fallback) {
   display: none;
 }
 
-body.png-art-disabled .weapon-image-frame::after {
-  content: "PNG OFF";
+body.pixel-style-geometry .weapon-image-frame::after {
+  content: "GEOMETRY";
   color: var(--muted);
   font-size: 12px;
   font-weight: 900;
@@ -714,12 +875,12 @@ body.png-art-disabled .weapon-image-frame::after {
   height: 18px;
   border: 0;
   border-radius: 0;
-  background: url("docs/images/user-interface/pixel-art-ammo-bullet-empty-001.png") center / contain no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-ammo-bullet-empty-001.png") */ center / contain no-repeat;
   image-rendering: pixelated;
 }
 
 .bullet.filled {
-  background-image: url("docs/images/user-interface/pixel-art-ammo-bullet-full-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-ammo-bullet-full-001.png") */;
 }
 
 .ammo-count,
@@ -983,20 +1144,20 @@ body.png-art-disabled .weapon-image-frame::after {
   height: 24px;
   margin-right: 6px;
   vertical-align: middle;
-  background: url("docs/images/user-interface/pixel-art-action-icon-execute-001.png") center / contain no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-icon-execute-001.png") */ center / contain no-repeat;
   image-rendering: pixelated;
 }
 
 #restartButton::before {
-  background-image: url("docs/images/user-interface/pixel-art-action-icon-restart-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-icon-restart-001.png") */;
 }
 
 #debugButton::before {
-  background-image: url("docs/images/user-interface/pixel-art-action-icon-debug-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-icon-debug-001.png") */;
 }
 
 #settingsButton::before {
-  background-image: url("docs/images/user-interface/pixel-art-action-icon-settings-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-icon-settings-001.png") */;
 }
 
 .hint-text {
@@ -1098,11 +1259,11 @@ body.png-art-disabled .weapon-image-frame::after {
 .settings-change-card {
   width: min(360px, calc(100vw - 48px));
   border: 24px solid transparent;
-  border-image: url("docs/images/user-interface/pixel-art-settings-warning-card-frame-001.png") 64 fill / 24px / 0 stretch;
+  border-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-warning-card-frame-001.png") */ 64 fill / 24px / 0 stretch;
   border-radius: 0;
   padding: 16px;
   background:
-    url("docs/images/user-interface/pixel-art-settings-warning-card-center-001.png") 0 0 / 32px 32px repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-warning-card-center-001.png") */ 0 0 / 32px 32px repeat,
     #121619;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
   image-rendering: pixelated;
@@ -1281,27 +1442,27 @@ body.png-art-disabled .weapon-image-frame::after {
 }
 
 #resetSettingsButton {
-  background: url("docs/images/user-interface/pixel-art-settings-reset-button-normal-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-reset-button-normal-001.png") */ center / 100% 100% no-repeat;
 }
 
 #resetSettingsButton:hover {
-  background-image: url("docs/images/user-interface/pixel-art-settings-reset-button-hover-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-reset-button-hover-001.png") */;
 }
 
 #resetSettingsButton:active {
-  background-image: url("docs/images/user-interface/pixel-art-settings-reset-button-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-reset-button-pressed-001.png") */;
 }
 
 #closeSettingsButton {
-  background: url("docs/images/user-interface/pixel-art-settings-close-button-normal-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-close-button-normal-001.png") */ center / 100% 100% no-repeat;
 }
 
 #closeSettingsButton:hover {
-  background-image: url("docs/images/user-interface/pixel-art-settings-close-button-hover-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-close-button-hover-001.png") */;
 }
 
 #closeSettingsButton:active {
-  background-image: url("docs/images/user-interface/pixel-art-settings-close-button-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-close-button-pressed-001.png") */;
 }
 
 .settings-grid {
@@ -1425,7 +1586,7 @@ body.png-art-disabled .weapon-image-frame::after {
   min-height: 64px;
   border-top: 0;
   padding: 8px 10px;
-  background: url("docs/images/user-interface/pixel-art-loadout-setting-row-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-setting-row-001.png") */ center / 100% 100% no-repeat;
   image-rendering: pixelated;
 }
 
@@ -1448,7 +1609,7 @@ body.png-art-disabled .weapon-image-frame::after {
   border-radius: 0;
   padding: 10px;
   background:
-    url("docs/images/user-interface/pixel-art-item-detail-center-001.png") 0 0 / 24px 24px repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-center-001.png") */ 0 0 / 24px 24px repeat,
     var(--panel);
   image-rendering: pixelated;
 }
@@ -2299,12 +2460,12 @@ canvas {
   min-height: 72px;
   align-items: center;
   padding: 10px 14px;
-  background: url("docs/images/user-interface/pixel-art-summary-tile-frame-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-summary-tile-frame-001.png") */ center / 100% 100% no-repeat;
   image-rendering: pixelated;
 }
 
 .privilege-board .summary-row:first-child {
-  background-image: url("docs/images/user-interface/pixel-art-summary-tile-highlight-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-summary-tile-highlight-001.png") */;
 }
 
 .reward-list {
@@ -2321,7 +2482,7 @@ canvas {
   border-radius: 6px;
   padding: 7px 8px 7px 42px;
   background:
-    url("docs/images/user-interface/pixel-art-access-row-locked-001.png") center / 100% 100% no-repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-access-row-locked-001.png") */ center / 100% 100% no-repeat,
     linear-gradient(180deg, rgba(12, 18, 20, 0.78), rgba(12, 18, 20, 0.92));
   color: var(--muted);
   font-size: 12px;
@@ -2343,7 +2504,7 @@ canvas {
 
 .reward-list span.unlocked {
   background:
-    url("docs/images/user-interface/pixel-art-access-row-unlocked-001.png") center / 100% 100% no-repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-access-row-unlocked-001.png") */ center / 100% 100% no-repeat,
     linear-gradient(180deg, rgba(31, 54, 38, 0.7), rgba(11, 22, 16, 0.92));
   color: var(--green);
 }
@@ -2436,7 +2597,7 @@ canvas {
 }
 
 .settings-tabs button:active {
-  background-image: url("docs/images/user-interface/pixel-art-settings-tab-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-tab-pressed-001.png") */;
 }
 
 .level-picker select:hover,

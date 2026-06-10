@@ -141,8 +141,9 @@
       if (elements.enemyTraceSelect) elements.enemyTraceSelect.value = runtime.enemyTraceMode || "current";
       if (elements.hintOpacityRange) elements.hintOpacityRange.value = String(runtime.hintOpacity || 0.42);
       if (elements.viewRange) elements.viewRange.value = String(runtime.viewValue || 50);
-      if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
-      if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+      // if (elements.pixelArtStyleSelect) elements.pixelArtStyleSelect.value = runtime.pixelArtStyle || "geometry";
+      // if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+      // if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
     }
 
     // Restores controls, setup options, and saved loadout selections to defaults.
@@ -155,7 +156,7 @@
       runtime.showAllHealth = false;
       runtime.hintOpacity = 0.42;
       runtime.viewValue = 50;
-      runtime.usePngRendering = true;
+      runtime.pixelArtStyle = "geometry";
       if (runtime.state) {
         runtime.state.shootingMode = "automatic";
         runtime.state.message = "Settings reset to defaults";
@@ -172,8 +173,9 @@
       if (elements.enemyTraceSelect) elements.enemyTraceSelect.value = "current";
       if (elements.hintOpacityRange) elements.hintOpacityRange.value = "0.42";
       if (elements.viewRange) elements.viewRange.value = "50";
-      if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = true;
-      if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = true;
+      // if (elements.pixelArtStyleSelect) elements.pixelArtStyleSelect.value = "geometry";
+      // if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = true;
+      // if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = true;
       if (deps.camera && deps.camera.setViewValue) deps.camera.setViewValue(50);
       if (runtime.activeMode !== "tutorial" && deps.level && deps.level.restart) deps.level.restart();
       deps.renderEnemyLoadouts();
