@@ -1,0 +1,52 @@
+{
+  "id": "tutorial-shooting-modes",
+  "title": "Tutorial: Shooting Modes",
+  "width": 860,
+  "height": 560,
+  "forceLoadouts": true,
+  "requireObjective": true,
+  "floorZones": [
+    { "x": 80, "y": 80, "w": 700, "h": 380 }
+  ],
+  "rooms": [
+    { "id": "range", "label": "Training Range", "x": 80, "y": 80, "w": 700, "h": 380 }
+  ],
+  "labels": [
+    { "text": "AUTO / MANUAL RANGE", "x": 220, "y": 120 },
+    { "text": "RESPAWN TARGET", "x": 585, "y": 250 },
+    { "text": "VIP FINISH", "x": 705, "y": 398 }
+  ],
+  "walls": [
+    { "x": 0, "y": 0, "w": 860, "h": 20 },
+    { "x": 0, "y": 540, "w": 860, "h": 20 },
+    { "x": 0, "y": 0, "w": 20, "h": 560 },
+    { "x": 840, "y": 0, "w": 20, "h": 560 },
+    { "x": 80, "y": 80, "w": 700, "h": 20 },
+    { "x": 80, "y": 460, "w": 700, "h": 20 },
+    { "x": 80, "y": 80, "w": 20, "h": 380 },
+    { "x": 780, "y": 80, "w": 20, "h": 380 },
+    { "x": 410, "y": 100, "w": 20, "h": 118 },
+    { "x": 410, "y": 322, "w": 20, "h": 138 }
+  ],
+  "doors": [
+    { "id": "range-gap", "x": 410, "y": 218, "w": 20, "h": 104, "orientation": "vertical", "state": "open" }
+  ],
+  "windows": [],
+  "stairs": [],
+  "items": [],
+  "equipmentTables": [],
+  "operators": [
+    { "id": "ALPHA", "x": 180, "y": 280, "color": "#67c98f", "weaponId": "rifle", "armorId": "no-armor", "floor": "Tutorial", "zone": "Training Range" }
+  ],
+  "enemies": [
+    { "id": "TARGET", "x": 610, "y": 280, "angle": 3.141592653589793, "watch": { "x": 420, "y": 270 }, "weaponId": "no-weapon", "armorId": "no-armor", "respawnDelay": 3 }
+  ],
+  "objective": { "x": 720, "y": 398, "radius": 16, "secured": false, "harmed": false },
+  "tutorialSteps": [
+    { "id": "auto", "title": "Automatic Shooting", "text": "Leave Shooting on Automatic and face the target. Operators fire when they have range and line of sight.", "completeWhen": "automaticShotFired" },
+    { "id": "down-target", "title": "Neutralize A Target", "text": "Down the target once. It will return every 3 seconds so you can practice.", "completeWhen": "enemyNeutralized", "enemyId": "TARGET" },
+    { "id": "manual-mode", "title": "Switch To Manual", "text": "Open Settings > Mission Setup > Shooting, choose Manual, then close Settings.", "completeWhen": "shootingMode", "mode": "manual" },
+    { "id": "manual-fire", "title": "Hold To Fire", "text": "Hold the left mouse button on the canvas to fire manually, then release to stop.", "completeWhen": "manualShotFired" },
+    { "id": "finish", "title": "Secure The VIP", "text": "Move to the VIP marker when you are done testing both modes.", "completeWhen": "objectiveSecured" }
+  ]
+}

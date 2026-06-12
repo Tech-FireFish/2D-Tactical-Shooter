@@ -3,8 +3,16 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Breachline 2D</title>
-    <style>
+    <title>Delta Geometry</title>
+  <style>
+@font-face {
+  font-family: "PressStart2P";
+  src: url("docs/PressStart2P-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
   --bg: #101214;
@@ -17,208 +25,322 @@
   --amber: #e3b456;
   --red: #e25f5f;
   --cyan: #72b7ce;
-  --ui-start-background: url("docs/images/user-interface/pixel-art-background-001.png");
-  --ui-start-title: url("docs/images/user-interface/pixel-art-start-title-logo-001.png");
-  --ui-start-title-small: url("docs/images/user-interface/pixel-art-start-title-logo-small-001.png");
-  --ui-start-title-glow: url("docs/images/user-interface/pixel-art-start-title-glow-001.png");
-  --ui-start-subtitle: url("docs/images/user-interface/pixel-art-start-subtitle-panel-001.png");
-  --ui-start-card-frame: url("docs/images/user-interface/pixel-art-start-card-frame-001.png");
-  --ui-start-card-center: url("docs/images/user-interface/pixel-art-start-card-center-001.png");
-  --ui-start-card-corner-tl: url("docs/images/user-interface/pixel-art-start-card-corner-tl-001.png");
-  --ui-start-card-corner-tr: url("docs/images/user-interface/pixel-art-start-card-corner-tr-001.png");
-  --ui-start-card-corner-bl: url("docs/images/user-interface/pixel-art-start-card-corner-bl-001.png");
-  --ui-start-card-corner-br: url("docs/images/user-interface/pixel-art-start-card-corner-br-001.png");
-  --ui-start-card-edge-top: url("docs/images/user-interface/pixel-art-start-card-edge-top-001.png");
-  --ui-start-card-edge-bottom: url("docs/images/user-interface/pixel-art-start-card-edge-bottom-001.png");
-  --ui-start-card-edge-left: url("docs/images/user-interface/pixel-art-start-card-edge-left-001.png");
-  --ui-start-card-edge-right: url("docs/images/user-interface/pixel-art-start-card-edge-right-001.png");
-  --ui-primary-normal: url("docs/images/user-interface/pixel-art-button-primary-normal-001.png");
-  --ui-primary-hover: url("docs/images/user-interface/pixel-art-button-primary-hover-001.png");
-  --ui-primary-pressed: url("docs/images/user-interface/pixel-art-button-primary-pressed-001.png");
-  --ui-primary-disabled: url("docs/images/user-interface/pixel-art-button-primary-disabled-001.png");
-  --ui-secondary-normal: url("docs/images/user-interface/pixel-art-button-secondary-normal-001.png");
-  --ui-secondary-hover: url("docs/images/user-interface/pixel-art-button-secondary-hover-001.png");
-  --ui-secondary-pressed: url("docs/images/user-interface/pixel-art-button-secondary-pressed-001.png");
-  --ui-secondary-disabled: url("docs/images/user-interface/pixel-art-button-secondary-disabled-001.png");
-  --ui-small-normal: url("docs/images/user-interface/pixel-art-button-small-normal-001.png");
-  --ui-small-hover: url("docs/images/user-interface/pixel-art-button-small-hover-001.png");
-  --ui-small-pressed: url("docs/images/user-interface/pixel-art-button-small-pressed-001.png");
-  --ui-small-disabled: url("docs/images/user-interface/pixel-art-button-small-disabled-001.png");
-  --ui-focus-ring: url("docs/images/user-interface/pixel-art-button-focus-ring-001.png");
-  --ui-credits-frame: url("docs/images/user-interface/pixel-art-credits-card-frame-001.png");
-  --ui-credits-center: url("docs/images/user-interface/pixel-art-credits-card-center-001.png");
-  --ui-credits-badge: url("docs/images/user-interface/pixel-art-credits-label-badge-001.png");
-  --ui-onboarding-frame: url("docs/images/user-interface/pixel-art-onboarding-card-frame-001.png");
-  --ui-onboarding-center: url("docs/images/user-interface/pixel-art-onboarding-card-center-001.png");
-  --ui-onboarding-question: url("docs/images/user-interface/pixel-art-onboarding-question-strip-001.png");
-  --ui-onboarding-divider: url("docs/images/user-interface/pixel-art-onboarding-divider-001.png");
-  --ui-onboarding-yes: url("docs/images/user-interface/pixel-art-onboarding-choice-yes-normal-001.png");
-  --ui-onboarding-yes-hover: url("docs/images/user-interface/pixel-art-onboarding-choice-yes-hover-001.png");
-  --ui-onboarding-no: url("docs/images/user-interface/pixel-art-onboarding-choice-no-normal-001.png");
-  --ui-onboarding-no-hover: url("docs/images/user-interface/pixel-art-onboarding-choice-no-hover-001.png");
-  --ui-main-card-frame: url("docs/images/user-interface/pixel-art-main-menu-card-frame-001.png");
-  --ui-main-card-center: url("docs/images/user-interface/pixel-art-main-menu-card-center-001.png");
-  --ui-main-card-header: url("docs/images/user-interface/pixel-art-main-menu-card-header-001.png");
-  --ui-main-card-divider: url("docs/images/user-interface/pixel-art-main-menu-card-divider-001.png");
-  --ui-level-normal: url("docs/images/user-interface/pixel-art-level-block-normal-001.png");
-  --ui-level-hover: url("docs/images/user-interface/pixel-art-level-block-hover-001.png");
-  --ui-level-locked: url("docs/images/user-interface/pixel-art-level-block-locked-001.png");
-  --ui-level-completed: url("docs/images/user-interface/pixel-art-level-block-completed-001.png");
-  --ui-tutorial-normal: url("docs/images/user-interface/pixel-art-tutorial-block-normal-001.png");
-  --ui-tutorial-hover: url("docs/images/user-interface/pixel-art-tutorial-block-hover-001.png");
-  --ui-tutorial-completed: url("docs/images/user-interface/pixel-art-tutorial-block-completed-001.png");
-  --ui-locked-icon: url("docs/images/user-interface/pixel-art-locked-icon-001.png");
-  --ui-completed-icon: url("docs/images/user-interface/pixel-art-completed-check-icon-001.png");
-  --ui-selection-arrow: url("docs/images/user-interface/pixel-art-selection-arrow-001.png");
-  --ui-scanline: url("docs/images/user-interface/pixel-art-menu-scanline-overlay-001.png");
-  --ui-corner-light: url("docs/images/user-interface/pixel-art-menu-corner-light-001.png");
-  --ui-glow-cyan: url("docs/images/user-interface/pixel-art-menu-panel-glow-cyan-001.png");
-  --ui-glow-amber: url("docs/images/user-interface/pixel-art-menu-panel-glow-amber-001.png");
-  --ui-side-left-frame: url("docs/images/user-interface/pixel-art-side-panel-left-frame-001.png");
-  --ui-side-right-frame: url("docs/images/user-interface/pixel-art-side-panel-right-frame-001.png");
-  --ui-side-center: url("docs/images/user-interface/pixel-art-side-panel-center-tile-001.png");
-  --ui-card-frame-small: url("docs/images/user-interface/pixel-art-card-frame-small-001.png");
-  --ui-card-frame-medium: url("docs/images/user-interface/pixel-art-card-frame-medium-001.png");
-  --ui-card-frame-large: url("docs/images/user-interface/pixel-art-card-frame-large-001.png");
-  --ui-card-center: url("docs/images/user-interface/pixel-art-card-center-tile-001.png");
-  --ui-card-header: url("docs/images/user-interface/pixel-art-card-header-strip-001.png");
-  --ui-card-divider: url("docs/images/user-interface/pixel-art-card-divider-001.png");
-  --ui-loadout-frame: url("docs/images/user-interface/pixel-art-loadout-card-frame-001.png");
-  --ui-loadout-center: url("docs/images/user-interface/pixel-art-loadout-card-center-001.png");
-  --ui-loadout-header: url("docs/images/user-interface/pixel-art-loadout-card-header-001.png");
-  --ui-loadout-preview: url("docs/images/user-interface/pixel-art-weapon-preview-frame-001.png");
-  --ui-loadout-preview-hover: url("docs/images/user-interface/pixel-art-weapon-preview-frame-hover-001.png");
-  --ui-loadout-preview-empty: url("docs/images/user-interface/pixel-art-weapon-preview-frame-empty-001.png");
-  --ui-loadout-preview-grid: url("docs/images/user-interface/pixel-art-weapon-preview-background-grid-001.png");
-  --ui-loadout-tooltip-frame: url("docs/images/user-interface/pixel-art-loadout-tooltip-frame-001.png");
-  --ui-loadout-tooltip-center: url("docs/images/user-interface/pixel-art-loadout-tooltip-center-001.png");
-  --ui-loadout-slot-weapon: url("docs/images/user-interface/pixel-art-loadout-slot-weapon-001.png");
-  --ui-loadout-slot-armor: url("docs/images/user-interface/pixel-art-loadout-slot-armor-001.png");
-  --ui-loadout-slot-backpack: url("docs/images/user-interface/pixel-art-loadout-slot-backpack-001.png");
-  --ui-inventory-card-frame: url("docs/images/user-interface/pixel-art-inventory-card-frame-001.png");
-  --ui-inventory-card-center: url("docs/images/user-interface/pixel-art-inventory-card-center-001.png");
-  --ui-inventory-card-header: url("docs/images/user-interface/pixel-art-inventory-card-header-001.png");
-  --ui-inventory-open-normal: url("docs/images/user-interface/pixel-art-inventory-open-button-normal-001.png");
-  --ui-inventory-open-hover: url("docs/images/user-interface/pixel-art-inventory-open-button-hover-001.png");
-  --ui-inventory-open-pressed: url("docs/images/user-interface/pixel-art-inventory-open-button-pressed-001.png");
-  --ui-inventory-overlay-frame: url("docs/images/user-interface/pixel-art-inventory-overlay-frame-001.png");
-  --ui-inventory-overlay-center: url("docs/images/user-interface/pixel-art-inventory-overlay-center-001.png");
-  --ui-inventory-close-normal: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-normal-001.png");
-  --ui-inventory-close-hover: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-hover-001.png");
-  --ui-inventory-close-pressed: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-pressed-001.png");
-  --ui-inventory-close-icon: url("docs/images/user-interface/pixel-art-inventory-close-icon-001.png");
-  --ui-inventory-slot-empty: url("docs/images/user-interface/pixel-art-inventory-slot-empty-001.png");
-  --ui-inventory-slot-filled: url("docs/images/user-interface/pixel-art-inventory-slot-filled-001.png");
-  --ui-inventory-slot-hover: url("docs/images/user-interface/pixel-art-inventory-slot-hover-001.png");
-  --ui-inventory-slot-selected: url("docs/images/user-interface/pixel-art-inventory-slot-selected-001.png");
-  --ui-item-detail-frame: url("docs/images/user-interface/pixel-art-item-detail-frame-001.png");
-  --ui-item-detail-center: url("docs/images/user-interface/pixel-art-item-detail-center-001.png");
-  --ui-item-detail-text: url("docs/images/user-interface/pixel-art-item-detail-text-box-001.png");
-  --ui-item-detail-divider: url("docs/images/user-interface/pixel-art-item-detail-divider-001.png");
-  --ui-paper-clue-tooltip: url("docs/images/user-interface/pixel-art-paper-clue-hover-tooltip-001.png");
-  --ui-mission-frame: url("docs/images/user-interface/pixel-art-mission-status-card-frame-001.png");
-  --ui-mission-center: url("docs/images/user-interface/pixel-art-mission-status-card-center-001.png");
-  --ui-mission-header: url("docs/images/user-interface/pixel-art-mission-status-card-header-001.png");
-  --ui-status-wide: url("docs/images/user-interface/pixel-art-status-tile-wide-001.png");
-  --ui-status-wide-active: url("docs/images/user-interface/pixel-art-status-tile-wide-active-001.png");
-  --ui-status-small: url("docs/images/user-interface/pixel-art-status-tile-small-001.png");
-  --ui-status-small-active: url("docs/images/user-interface/pixel-art-status-tile-small-active-001.png");
-  --ui-tutorial-card-frame: url("docs/images/user-interface/pixel-art-tutorial-card-frame-002.png");
-  --ui-tutorial-card-center: url("docs/images/user-interface/pixel-art-tutorial-card-center-001.png");
-  --ui-tutorial-card-header: url("docs/images/user-interface/pixel-art-tutorial-card-header-001.png");
-  --ui-tutorial-step: url("docs/images/user-interface/pixel-art-tutorial-step-row-001.png");
-  --ui-tutorial-step-active: url("docs/images/user-interface/pixel-art-tutorial-step-row-active-001.png");
-  --ui-tutorial-progress-track: url("docs/images/user-interface/pixel-art-tutorial-progress-track-001.png");
-  --ui-tutorial-progress-fill: url("docs/images/user-interface/pixel-art-tutorial-progress-fill-001.png");
-  --ui-tutorial-arrow: url("docs/images/user-interface/pixel-art-tutorial-arrow-large-002.png");
-  --ui-hint-frame: url("docs/images/user-interface/pixel-art-hint-card-frame-001.png");
-  --ui-hint-center: url("docs/images/user-interface/pixel-art-hint-card-center-001.png");
-  --ui-hint-header: url("docs/images/user-interface/pixel-art-hint-card-header-001.png");
-  --ui-hint-message: url("docs/images/user-interface/pixel-art-hint-message-frame-001.png");
-  --ui-hint-warning: url("docs/images/user-interface/pixel-art-hint-message-frame-warning-001.png");
-  --ui-actions-frame: url("docs/images/user-interface/pixel-art-actions-card-frame-001.png");
-  --ui-actions-center: url("docs/images/user-interface/pixel-art-actions-card-center-001.png");
-  --ui-actions-header: url("docs/images/user-interface/pixel-art-actions-card-header-001.png");
-  --ui-action-normal: url("docs/images/user-interface/pixel-art-action-button-normal-001.png");
-  --ui-action-hover: url("docs/images/user-interface/pixel-art-action-button-hover-001.png");
-  --ui-action-pressed: url("docs/images/user-interface/pixel-art-action-button-pressed-001.png");
-  --ui-action-active: url("docs/images/user-interface/pixel-art-action-button-active-001.png");
-  --ui-action-disabled: url("docs/images/user-interface/pixel-art-action-button-disabled-001.png");
-  --ui-action-execute-wide: url("docs/images/user-interface/pixel-art-execute-button-normal-001.png");
-  --ui-action-execute-hover: url("docs/images/user-interface/pixel-art-execute-button-hover-001.png");
-  --ui-health-frame: url("docs/images/user-interface/pixel-art-operator-health-card-frame-001.png");
-  --ui-health-center: url("docs/images/user-interface/pixel-art-operator-health-card-center-001.png");
-  --ui-health-header: url("docs/images/user-interface/pixel-art-operator-health-card-header-001.png");
-  --ui-health-row: url("docs/images/user-interface/pixel-art-operator-health-row-001.png");
-  --ui-health-row-selected: url("docs/images/user-interface/pixel-art-operator-health-row-selected-001.png");
-  --ui-health-row-downed: url("docs/images/user-interface/pixel-art-operator-health-row-downed-001.png");
-  --ui-health-bar-track: url("docs/images/user-interface/pixel-art-health-bar-track-001.png");
-  --ui-health-bar-fill: url("docs/images/user-interface/pixel-art-health-bar-fill-green-001.png");
-  --ui-health-bar-red: url("docs/images/user-interface/pixel-art-health-bar-fill-red-001.png");
-  --ui-armor-bar-track: url("docs/images/user-interface/pixel-art-armor-bar-track-001.png");
-  --ui-armor-bar-fill: url("docs/images/user-interface/pixel-art-armor-bar-fill-white-001.png");
-  --ui-show-all-normal: url("docs/images/user-interface/pixel-art-show-all-button-normal-001.png");
-  --ui-show-all-hover: url("docs/images/user-interface/pixel-art-show-all-button-hover-001.png");
-  --ui-settings-frame: url("docs/images/user-interface/pixel-art-settings-overlay-frame-001.png");
-  --ui-settings-center: url("docs/images/user-interface/pixel-art-settings-overlay-center-001.png");
-  --ui-settings-section: url("docs/images/user-interface/pixel-art-settings-section-frame-001.png");
-  --ui-settings-section-center: url("docs/images/user-interface/pixel-art-settings-section-center-001.png");
-  --ui-settings-tab: url("docs/images/user-interface/pixel-art-settings-tab-normal-001.png");
-  --ui-settings-tab-hover: url("docs/images/user-interface/pixel-art-settings-tab-hover-001.png");
-  --ui-settings-tab-active: url("docs/images/user-interface/pixel-art-settings-tab-active-001.png");
-  --ui-selector-frame: url("docs/images/user-interface/pixel-art-selector-frame-001.png");
-  --ui-selector-hover: url("docs/images/user-interface/pixel-art-selector-frame-hover-001.png");
-  --ui-selector-arrow: url("docs/images/user-interface/pixel-art-selector-arrow-001.png");
-  --ui-slider-track: url("docs/images/user-interface/pixel-art-slider-track-001.png");
-  --ui-slider-fill: url("docs/images/user-interface/pixel-art-slider-fill-001.png");
-  --ui-slider-thumb: url("docs/images/user-interface/pixel-art-slider-thumb-001.png");
-  --ui-keybinding-row: url("docs/images/user-interface/pixel-art-keybinding-row-001.png");
-  --ui-keybinding-row-hover: url("docs/images/user-interface/pixel-art-keybinding-row-hover-001.png");
-  --ui-keycap: url("docs/images/user-interface/pixel-art-keycap-medium-001.png");
-  --ui-keycap-hover: url("docs/images/user-interface/pixel-art-keycap-hover-001.png");
-  --ui-equipment-table-frame: url("docs/images/user-interface/pixel-art-equipment-table-overlay-frame-001.png");
-  --ui-equipment-table-center: url("docs/images/user-interface/pixel-art-equipment-table-overlay-center-001.png");
-  --ui-equipment-table-section: url("docs/images/user-interface/pixel-art-equipment-table-section-frame-001.png");
-  --ui-equipment-table-item: url("docs/images/user-interface/pixel-art-equipment-table-item-button-normal-001.png");
-  --ui-equipment-table-item-hover: url("docs/images/user-interface/pixel-art-equipment-table-item-button-hover-001.png");
-  --ui-equipment-table-close: url("docs/images/user-interface/pixel-art-equipment-table-close-button-normal-001.png");
-  --ui-equipment-table-close-hover: url("docs/images/user-interface/pixel-art-equipment-table-close-button-hover-001.png");
-  --ui-laptop-frame: url("docs/images/user-interface/pixel-art-laptop-overlay-frame-001.png");
-  --ui-laptop-screen-frame: url("docs/images/user-interface/pixel-art-laptop-screen-frame-001.png");
-  --ui-laptop-screen-center: url("docs/images/user-interface/pixel-art-laptop-screen-center-001.png");
-  --ui-camera-button: url("docs/images/user-interface/pixel-art-camera-button-normal-001.png");
-  --ui-camera-button-hover: url("docs/images/user-interface/pixel-art-camera-button-hover-001.png");
-  --ui-camera-button-revealed: url("docs/images/user-interface/pixel-art-camera-button-revealed-001.png");
-  --ui-start-hack-button: url("docs/images/user-interface/pixel-art-start-hack-button-normal-001.png");
-  --ui-start-hack-button-hover: url("docs/images/user-interface/pixel-art-start-hack-button-hover-001.png");
-  --ui-laptop-close: url("docs/images/user-interface/pixel-art-laptop-close-button-normal-001.png");
-  --ui-laptop-close-hover: url("docs/images/user-interface/pixel-art-laptop-close-button-hover-001.png");
-  --ui-pause-frame: url("docs/images/user-interface/pixel-art-pause-overlay-frame-001.png");
-  --ui-pause-center: url("docs/images/user-interface/pixel-art-pause-overlay-center-001.png");
-  --ui-pause-title: url("docs/images/user-interface/pixel-art-pause-title-strip-001.png");
-  --ui-pause-button: url("docs/images/user-interface/pixel-art-pause-nav-button-normal-001.png");
-  --ui-pause-button-hover: url("docs/images/user-interface/pixel-art-pause-nav-button-hover-001.png");
-  --ui-pause-button-pressed: url("docs/images/user-interface/pixel-art-pause-nav-button-pressed-001.png");
-  --ui-pause-button-disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-disabled-001.png");
-  --ui-report-frame: url("docs/images/user-interface/pixel-art-mission-report-frame-001.png");
-  --ui-report-center: url("docs/images/user-interface/pixel-art-mission-report-center-001.png");
-  --ui-report-success: url("docs/images/user-interface/pixel-art-mission-report-header-success-001.png");
-  --ui-report-failed: url("docs/images/user-interface/pixel-art-mission-report-header-failed-001.png");
-  --ui-report-stat-row: url("docs/images/user-interface/pixel-art-mission-report-stat-row-001.png");
-  --ui-report-button: url("docs/images/user-interface/pixel-art-mission-report-button-normal-001.png");
-  --ui-report-button-hover: url("docs/images/user-interface/pixel-art-mission-report-button-hover-001.png");
-  --ui-report-selector: url("docs/images/user-interface/pixel-art-mission-report-selector-frame-001.png");
-  --ui-expanded-pause-sign: url("docs/images/user-interface/pixel-art-expanded-pause-sign-normal-001.png");
-  --ui-expanded-pause-sign-hover: url("docs/images/user-interface/pixel-art-expanded-pause-sign-hover-001.png");
-  --ui-expanded-pause-sign-pressed: url("docs/images/user-interface/pixel-art-expanded-pause-sign-pressed-001.png");
-  --ui-expanded-pause-card-frame: url("docs/images/user-interface/pixel-art-expanded-pause-card-frame-001.png");
-  --ui-expanded-pause-card-center: url("docs/images/user-interface/pixel-art-expanded-pause-card-center-001.png");
-  --ui-expanded-panel-tab: url("docs/images/user-interface/pixel-art-expanded-panel-tab-normal-001.png");
-  --ui-expanded-panel-tab-hover: url("docs/images/user-interface/pixel-art-expanded-panel-tab-hover-001.png");
-  --ui-overlay-dim-safe: url("docs/images/user-interface/pixel-art-overlay-dim-safe-001.png");
-  --ui-overlay-divider: url("docs/images/user-interface/pixel-art-overlay-divider-001.png");
-  --ui-overlay-focus-ring: url("docs/images/user-interface/pixel-art-overlay-focus-ring-001.png");
-  --ui-overlay-close-icon: url("docs/images/user-interface/pixel-art-overlay-close-icon-001.png");
+  --ui-start-background: url("docs/start-menu-geometry-background.png");
+  --ui-start-title: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-logo-001.png") */;
+  --ui-start-title-small: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-logo-small-001.png") */;
+  --ui-start-title-glow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-glow-001.png") */;
+  --ui-start-subtitle: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-subtitle-panel-001.png") */;
+  --ui-start-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-frame-001.png") */;
+  --ui-start-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-center-001.png") */;
+  --ui-start-card-corner-tl: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-corner-tl-001.png") */;
+  --ui-start-card-corner-tr: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-corner-tr-001.png") */;
+  --ui-start-card-corner-bl: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-corner-bl-001.png") */;
+  --ui-start-card-corner-br: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-corner-br-001.png") */;
+  --ui-start-card-edge-top: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-edge-top-001.png") */;
+  --ui-start-card-edge-bottom: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-edge-bottom-001.png") */;
+  --ui-start-card-edge-left: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-edge-left-001.png") */;
+  --ui-start-card-edge-right: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-card-edge-right-001.png") */;
+  --ui-primary-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-primary-normal-001.png") */;
+  --ui-primary-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-primary-hover-001.png") */;
+  --ui-primary-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-primary-pressed-001.png") */;
+  --ui-primary-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-primary-disabled-001.png") */;
+  --ui-secondary-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-secondary-normal-001.png") */;
+  --ui-secondary-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-secondary-hover-001.png") */;
+  --ui-secondary-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-secondary-pressed-001.png") */;
+  --ui-secondary-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-secondary-disabled-001.png") */;
+  --ui-small-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-small-normal-001.png") */;
+  --ui-small-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-small-hover-001.png") */;
+  --ui-small-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-small-pressed-001.png") */;
+  --ui-small-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-small-disabled-001.png") */;
+  --ui-focus-ring: none /* PNG disabled: url("docs/images/user-interface/pixel-art-button-focus-ring-001.png") */;
+  --ui-credits-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-credits-card-frame-001.png") */;
+  --ui-credits-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-credits-card-center-001.png") */;
+  --ui-credits-badge: none /* PNG disabled: url("docs/images/user-interface/pixel-art-credits-label-badge-001.png") */;
+  --ui-onboarding-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-card-frame-001.png") */;
+  --ui-onboarding-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-card-center-001.png") */;
+  --ui-onboarding-question: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-question-strip-001.png") */;
+  --ui-onboarding-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-divider-001.png") */;
+  --ui-onboarding-yes: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-choice-yes-normal-001.png") */;
+  --ui-onboarding-yes-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-choice-yes-hover-001.png") */;
+  --ui-onboarding-no: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-choice-no-normal-001.png") */;
+  --ui-onboarding-no-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-onboarding-choice-no-hover-001.png") */;
+  --ui-main-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-main-menu-card-frame-001.png") */;
+  --ui-main-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-main-menu-card-center-001.png") */;
+  --ui-main-card-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-main-menu-card-header-001.png") */;
+  --ui-main-card-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-main-menu-card-divider-001.png") */;
+  --ui-level-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-level-block-normal-001.png") */;
+  --ui-level-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-level-block-hover-001.png") */;
+  --ui-level-locked: none /* PNG disabled: url("docs/images/user-interface/pixel-art-level-block-locked-001.png") */;
+  --ui-level-completed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-level-block-completed-001.png") */;
+  --ui-tutorial-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-block-normal-001.png") */;
+  --ui-tutorial-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-block-hover-001.png") */;
+  --ui-tutorial-completed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-block-completed-001.png") */;
+  --ui-locked-icon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-locked-icon-001.png") */;
+  --ui-completed-icon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-completed-check-icon-001.png") */;
+  --ui-selection-arrow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-selection-arrow-001.png") */;
+  --ui-scanline: none /* PNG disabled: url("docs/images/user-interface/pixel-art-menu-scanline-overlay-001.png") */;
+  --ui-corner-light: none /* PNG disabled: url("docs/images/user-interface/pixel-art-menu-corner-light-001.png") */;
+  --ui-glow-cyan: none /* PNG disabled: url("docs/images/user-interface/pixel-art-menu-panel-glow-cyan-001.png") */;
+  --ui-glow-amber: none /* PNG disabled: url("docs/images/user-interface/pixel-art-menu-panel-glow-amber-001.png") */;
+  --ui-side-left-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-side-panel-left-frame-001.png") */;
+  --ui-side-right-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-side-panel-right-frame-001.png") */;
+  --ui-side-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-side-panel-center-tile-001.png") */;
+  --ui-card-frame-small: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-frame-small-001.png") */;
+  --ui-card-frame-medium: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-frame-medium-001.png") */;
+  --ui-card-frame-large: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-frame-large-001.png") */;
+  --ui-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-center-tile-001.png") */;
+  --ui-card-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-header-strip-001.png") */;
+  --ui-card-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-card-divider-001.png") */;
+  --ui-loadout-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-card-frame-001.png") */;
+  --ui-loadout-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-card-center-001.png") */;
+  --ui-loadout-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-card-header-001.png") */;
+  --ui-loadout-preview: none /* PNG disabled: url("docs/images/user-interface/pixel-art-weapon-preview-frame-001.png") */;
+  --ui-loadout-preview-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-weapon-preview-frame-hover-001.png") */;
+  --ui-loadout-preview-empty: none /* PNG disabled: url("docs/images/user-interface/pixel-art-weapon-preview-frame-empty-001.png") */;
+  --ui-loadout-preview-grid: none /* PNG disabled: url("docs/images/user-interface/pixel-art-weapon-preview-background-grid-001.png") */;
+  --ui-loadout-tooltip-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-tooltip-frame-001.png") */;
+  --ui-loadout-tooltip-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-tooltip-center-001.png") */;
+  --ui-loadout-slot-weapon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-slot-weapon-001.png") */;
+  --ui-loadout-slot-armor: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-slot-armor-001.png") */;
+  --ui-loadout-slot-backpack: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-slot-backpack-001.png") */;
+  --ui-inventory-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-card-frame-001.png") */;
+  --ui-inventory-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-card-center-001.png") */;
+  --ui-inventory-card-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-card-header-001.png") */;
+  --ui-inventory-open-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-open-button-normal-001.png") */;
+  --ui-inventory-open-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-open-button-hover-001.png") */;
+  --ui-inventory-open-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-open-button-pressed-001.png") */;
+  --ui-inventory-overlay-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-frame-001.png") */;
+  --ui-inventory-overlay-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-center-001.png") */;
+  --ui-inventory-close-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-normal-001.png") */;
+  --ui-inventory-close-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-hover-001.png") */;
+  --ui-inventory-close-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-overlay-close-button-pressed-001.png") */;
+  --ui-inventory-close-icon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-close-icon-001.png") */;
+  --ui-inventory-slot-empty: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-slot-empty-001.png") */;
+  --ui-inventory-slot-filled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-slot-filled-001.png") */;
+  --ui-inventory-slot-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-slot-hover-001.png") */;
+  --ui-inventory-slot-selected: none /* PNG disabled: url("docs/images/user-interface/pixel-art-inventory-slot-selected-001.png") */;
+  --ui-item-detail-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-frame-001.png") */;
+  --ui-item-detail-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-center-001.png") */;
+  --ui-item-detail-text: none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-text-box-001.png") */;
+  --ui-item-detail-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-divider-001.png") */;
+  --ui-paper-clue-tooltip: none /* PNG disabled: url("docs/images/user-interface/pixel-art-paper-clue-hover-tooltip-001.png") */;
+  --ui-mission-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-status-card-frame-001.png") */;
+  --ui-mission-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-status-card-center-001.png") */;
+  --ui-mission-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-status-card-header-001.png") */;
+  --ui-status-wide: none /* PNG disabled: url("docs/images/user-interface/pixel-art-status-tile-wide-001.png") */;
+  --ui-status-wide-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-status-tile-wide-active-001.png") */;
+  --ui-status-small: none /* PNG disabled: url("docs/images/user-interface/pixel-art-status-tile-small-001.png") */;
+  --ui-status-small-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-status-tile-small-active-001.png") */;
+  --ui-tutorial-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-card-frame-002.png") */;
+  --ui-tutorial-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-card-center-001.png") */;
+  --ui-tutorial-card-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-card-header-001.png") */;
+  --ui-tutorial-step: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-step-row-001.png") */;
+  --ui-tutorial-step-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-step-row-active-001.png") */;
+  --ui-tutorial-progress-track: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-progress-track-001.png") */;
+  --ui-tutorial-progress-fill: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-progress-fill-001.png") */;
+  --ui-tutorial-arrow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-tutorial-arrow-large-002.png") */;
+  --ui-hint-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-card-frame-001.png") */;
+  --ui-hint-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-card-center-001.png") */;
+  --ui-hint-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-card-header-001.png") */;
+  --ui-hint-message: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-message-frame-001.png") */;
+  --ui-hint-warning: none /* PNG disabled: url("docs/images/user-interface/pixel-art-hint-message-frame-warning-001.png") */;
+  --ui-actions-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-actions-card-frame-001.png") */;
+  --ui-actions-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-actions-card-center-001.png") */;
+  --ui-actions-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-actions-card-header-001.png") */;
+  --ui-action-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-normal-001.png") */;
+  --ui-action-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-hover-001.png") */;
+  --ui-action-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-pressed-001.png") */;
+  --ui-action-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-active-001.png") */;
+  --ui-action-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-button-disabled-001.png") */;
+  --ui-action-execute-wide: none /* PNG disabled: url("docs/images/user-interface/pixel-art-execute-button-normal-001.png") */;
+  --ui-action-execute-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-execute-button-hover-001.png") */;
+  --ui-health-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-card-frame-001.png") */;
+  --ui-health-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-card-center-001.png") */;
+  --ui-health-header: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-card-header-001.png") */;
+  --ui-health-row: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-row-001.png") */;
+  --ui-health-row-selected: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-row-selected-001.png") */;
+  --ui-health-row-downed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-operator-health-row-downed-001.png") */;
+  --ui-health-bar-track: none /* PNG disabled: url("docs/images/user-interface/pixel-art-health-bar-track-001.png") */;
+  --ui-health-bar-fill: none /* PNG disabled: url("docs/images/user-interface/pixel-art-health-bar-fill-green-001.png") */;
+  --ui-health-bar-red: none /* PNG disabled: url("docs/images/user-interface/pixel-art-health-bar-fill-red-001.png") */;
+  --ui-armor-bar-track: none /* PNG disabled: url("docs/images/user-interface/pixel-art-armor-bar-track-001.png") */;
+  --ui-armor-bar-fill: none /* PNG disabled: url("docs/images/user-interface/pixel-art-armor-bar-fill-white-001.png") */;
+  --ui-show-all-normal: none /* PNG disabled: url("docs/images/user-interface/pixel-art-show-all-button-normal-001.png") */;
+  --ui-show-all-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-show-all-button-hover-001.png") */;
+  --ui-settings-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-overlay-frame-001.png") */;
+  --ui-settings-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-overlay-center-001.png") */;
+  --ui-settings-section: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-section-frame-001.png") */;
+  --ui-settings-section-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-section-center-001.png") */;
+  --ui-settings-tab: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-tab-normal-001.png") */;
+  --ui-settings-tab-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-tab-hover-001.png") */;
+  --ui-settings-tab-active: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-tab-active-001.png") */;
+  --ui-selector-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-selector-frame-001.png") */;
+  --ui-selector-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-selector-frame-hover-001.png") */;
+  --ui-selector-arrow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-selector-arrow-001.png") */;
+  --ui-slider-track: none /* PNG disabled: url("docs/images/user-interface/pixel-art-slider-track-001.png") */;
+  --ui-slider-fill: none /* PNG disabled: url("docs/images/user-interface/pixel-art-slider-fill-001.png") */;
+  --ui-slider-thumb: none /* PNG disabled: url("docs/images/user-interface/pixel-art-slider-thumb-001.png") */;
+  --ui-keybinding-row: none /* PNG disabled: url("docs/images/user-interface/pixel-art-keybinding-row-001.png") */;
+  --ui-keybinding-row-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-keybinding-row-hover-001.png") */;
+  --ui-keycap: none /* PNG disabled: url("docs/images/user-interface/pixel-art-keycap-medium-001.png") */;
+  --ui-keycap-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-keycap-hover-001.png") */;
+  --ui-equipment-table-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-overlay-frame-001.png") */;
+  --ui-equipment-table-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-overlay-center-001.png") */;
+  --ui-equipment-table-section: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-section-frame-001.png") */;
+  --ui-equipment-table-item: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-item-button-normal-001.png") */;
+  --ui-equipment-table-item-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-item-button-hover-001.png") */;
+  --ui-equipment-table-close: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-close-button-normal-001.png") */;
+  --ui-equipment-table-close-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-equipment-table-close-button-hover-001.png") */;
+  --ui-laptop-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-overlay-frame-001.png") */;
+  --ui-laptop-screen-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-screen-frame-001.png") */;
+  --ui-laptop-screen-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-screen-center-001.png") */;
+  --ui-camera-button: none /* PNG disabled: url("docs/images/user-interface/pixel-art-camera-button-normal-001.png") */;
+  --ui-camera-button-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-camera-button-hover-001.png") */;
+  --ui-camera-button-revealed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-camera-button-revealed-001.png") */;
+  --ui-start-hack-button: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-hack-button-normal-001.png") */;
+  --ui-start-hack-button-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-hack-button-hover-001.png") */;
+  --ui-laptop-close: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-close-button-normal-001.png") */;
+  --ui-laptop-close-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-laptop-close-button-hover-001.png") */;
+  --ui-pause-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-overlay-frame-001.png") */;
+  --ui-pause-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-overlay-center-001.png") */;
+  --ui-pause-title: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-title-strip-001.png") */;
+  --ui-pause-button: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-normal-001.png") */;
+  --ui-pause-button-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-hover-001.png") */;
+  --ui-pause-button-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-pressed-001.png") */;
+  --ui-pause-button-disabled: none /* PNG disabled: url("docs/images/user-interface/pixel-art-pause-nav-button-disabled-001.png") */;
+  --ui-report-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-frame-001.png") */;
+  --ui-report-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-center-001.png") */;
+  --ui-report-success: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-header-success-001.png") */;
+  --ui-report-failed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-header-failed-001.png") */;
+  --ui-report-stat-row: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-stat-row-001.png") */;
+  --ui-report-button: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-button-normal-001.png") */;
+  --ui-report-button-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-button-hover-001.png") */;
+  --ui-report-selector: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mission-report-selector-frame-001.png") */;
+  --ui-expanded-pause-sign: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-sign-normal-001.png") */;
+  --ui-expanded-pause-sign-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-sign-hover-001.png") */;
+  --ui-expanded-pause-sign-pressed: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-sign-pressed-001.png") */;
+  --ui-expanded-pause-card-frame: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-card-frame-001.png") */;
+  --ui-expanded-pause-card-center: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-pause-card-center-001.png") */;
+  --ui-expanded-panel-tab: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-panel-tab-normal-001.png") */;
+  --ui-expanded-panel-tab-hover: none /* PNG disabled: url("docs/images/user-interface/pixel-art-expanded-panel-tab-hover-001.png") */;
+  --ui-overlay-dim-safe: none /* PNG disabled: url("docs/images/user-interface/pixel-art-overlay-dim-safe-001.png") */;
+  --ui-overlay-divider: none /* PNG disabled: url("docs/images/user-interface/pixel-art-overlay-divider-001.png") */;
+  --ui-overlay-focus-ring: none /* PNG disabled: url("docs/images/user-interface/pixel-art-overlay-focus-ring-001.png") */;
+  --ui-overlay-close-icon: none /* PNG disabled: url("docs/images/user-interface/pixel-art-overlay-close-icon-001.png") */;
+}
+
+body.pixel-style-v2 {
+  --ui-primary-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-start-menu-primary-button-001.png") */;
+  --ui-primary-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-start-menu-primary-button-001.png") */;
+  --ui-primary-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-start-menu-primary-button-001.png") */;
+  --ui-secondary-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-secondary-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-secondary-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-start-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-start-menu-panel-card-frame-001.png") */;
+  --ui-start-card-center: none;
+  --ui-onboarding-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-card-frame-001.png") */;
+  --ui-onboarding-center: none;
+  --ui-onboarding-yes: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-onboarding-yes-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-onboarding-no: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-onboarding-no-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-onboarding-choice-button-001.png") */;
+  --ui-main-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-main-privilege-access-card-frame-001.png") */;
+  --ui-main-card-center: none;
+  --ui-level-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-level-numbered-block-001.png") */;
+  --ui-level-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-level-numbered-block-001.png") */;
+  --ui-level-locked: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-locked-numbered-block-001.png") */;
+  --ui-level-completed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-level-numbered-block-001.png") */;
+  --ui-tutorial-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-numbered-block-001.png") */;
+  --ui-tutorial-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-numbered-block-001.png") */;
+  --ui-tutorial-completed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-numbered-block-001.png") */;
+  --ui-locked-icon: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-privilege-badge-lock-icon-001.png") */;
+  --ui-side-left-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-left-side-panel-frame-001.png") */;
+  --ui-side-right-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-right-side-panel-frame-001.png") */;
+  --ui-side-center: none;
+  --ui-card-frame-medium: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-card-frame-001.png") */;
+  --ui-card-center: none;
+  --ui-loadout-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-card-frame-001.png") */;
+  --ui-loadout-center: none;
+  --ui-loadout-preview: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-item-slot-001.png") */;
+  --ui-loadout-preview-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-item-slot-001.png") */;
+  --ui-loadout-preview-empty: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selected-loadout-item-slot-001.png") */;
+  --ui-inventory-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-card-frame-001.png") */;
+  --ui-inventory-card-center: none;
+  --ui-inventory-overlay-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-overlay-frame-001.png") */;
+  --ui-inventory-overlay-center: none;
+  --ui-inventory-close-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-close-button-001.png") */;
+  --ui-inventory-close-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-close-button-001.png") */;
+  --ui-inventory-close-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-close-button-001.png") */;
+  --ui-inventory-slot-empty: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-slot-001.png") */;
+  --ui-inventory-slot-filled: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-slot-001.png") */;
+  --ui-inventory-slot-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-slot-001.png") */;
+  --ui-inventory-slot-selected: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-slot-001.png") */;
+  --ui-item-detail-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-inventory-item-detail-bar-001.png") */;
+  --ui-item-detail-center: none;
+  --ui-mission-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-card-frame-001.png") */;
+  --ui-mission-center: none;
+  --ui-status-wide: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-tile-001.png") */;
+  --ui-status-wide-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-tile-001.png") */;
+  --ui-status-small: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-tile-001.png") */;
+  --ui-status-small-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-status-tile-001.png") */;
+  --ui-tutorial-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-card-frame-001.png") */;
+  --ui-tutorial-card-center: none;
+  --ui-tutorial-step-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-tutorial-active-step-marker-001.png") */;
+  --ui-hint-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-hint-card-frame-001.png") */;
+  --ui-hint-center: none;
+  --ui-actions-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-actions-card-frame-001.png") */;
+  --ui-actions-center: none;
+  --ui-action-normal: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-disabled: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-execute-wide: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-action-execute-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-action-button-001.png") */;
+  --ui-health-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-operator-health-card-frame-001.png") */;
+  --ui-health-center: none;
+  --ui-health-row: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-operator-health-row-001.png") */;
+  --ui-health-row-selected: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-operator-health-row-001.png") */;
+  --ui-health-row-downed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-operator-health-row-001.png") */;
+  --ui-health-bar-track: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-health-bar-frame-001.png") */;
+  --ui-armor-bar-track: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-armor-bar-frame-001.png") */;
+  --ui-settings-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-overlay-frame-001.png") */;
+  --ui-settings-center: none;
+  --ui-settings-section: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-overlay-frame-001.png") */;
+  --ui-settings-section-center: none;
+  --ui-settings-tab: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-tab-001.png") */;
+  --ui-settings-tab-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-tab-001.png") */;
+  --ui-settings-tab-active: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-settings-tab-001.png") */;
+  --ui-selector-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selector-frame-001.png") */;
+  --ui-selector-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-selector-frame-001.png") */;
+  --ui-slider-track: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-slider-track-001.png") */;
+  --ui-slider-thumb: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-slider-knob-001.png") */;
+  --ui-keybinding-row: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-keybinding-row-001.png") */;
+  --ui-keybinding-row-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-keybinding-row-001.png") */;
+  --ui-equipment-table-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-equipment-table-overlay-frame-001.png") */;
+  --ui-equipment-table-center: none;
+  --ui-equipment-table-item: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-equipment-table-item-button-001.png") */;
+  --ui-equipment-table-item-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-equipment-table-item-button-001.png") */;
+  --ui-laptop-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-laptop-camera-hack-overlay-frame-001.png") */;
+  --ui-laptop-screen-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-laptop-camera-hack-overlay-frame-001.png") */;
+  --ui-camera-button: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-camera-select-button-001.png") */;
+  --ui-camera-button-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-camera-select-button-001.png") */;
+  --ui-camera-button-revealed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-camera-select-button-001.png") */;
+  --ui-pause-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-pause-navigation-overlay-frame-001.png") */;
+  --ui-pause-center: none;
+  --ui-pause-button: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-pause-menu-button-001.png") */;
+  --ui-pause-button-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-pause-menu-button-001.png") */;
+  --ui-pause-button-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-pause-menu-button-001.png") */;
+  --ui-report-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-report-overlay-frame-001.png") */;
+  --ui-report-center: none;
+  --ui-report-stat-row: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-report-stat-tile-001.png") */;
+  --ui-report-button: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-report-button-001.png") */;
+  --ui-report-button-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-mission-report-button-001.png") */;
+  --ui-expanded-pause-sign: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-expanded-pause-button-001.png") */;
+  --ui-expanded-pause-sign-hover: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-expanded-pause-button-001.png") */;
+  --ui-expanded-pause-sign-pressed: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-expanded-pause-button-001.png") */;
+  --ui-expanded-pause-card-frame: none /* PNG disabled: url("docs/images/pixel-art-v2/pixel-art-expanded-pause-panel-frame-001.png") */;
+  --ui-expanded-pause-card-center: none;
 }
 
 * {
@@ -592,21 +714,69 @@ h2 {
   accent-color: var(--green);
 }
 
-body.png-art-disabled * {
+/* Optional start-menu PNG setting area is disabled while geometry-only UI is active. */
+.start-menu-setting {
+  display: none !important;
+}
+
+body.pixel-style-geometry * {
   border-image-source: none !important;
   background-image: none !important;
 }
 
-body.png-art-disabled .equipment-icon {
+body.pixel-style-geometry .menu-panel,
+body.pixel-style-geometry .credits-card,
+body.pixel-style-geometry .control-card,
+body.pixel-style-geometry .settings-panel,
+body.pixel-style-geometry .settings-change-card,
+body.pixel-style-geometry .inventory-card,
+body.pixel-style-geometry .inventory-dialog,
+body.pixel-style-geometry .equipment-table-dialog,
+body.pixel-style-geometry .laptop-dialog,
+body.pixel-style-geometry .pause-card,
+body.pixel-style-geometry .mission-report,
+body.pixel-style-geometry .weapon-tooltip,
+body.pixel-style-geometry .item-detail,
+body.pixel-style-geometry .paper-tooltip {
+  border: 1px solid var(--line) !important;
+  background: rgba(18, 22, 25, 0.92) !important;
+}
+
+body.pixel-style-geometry button,
+body.pixel-style-geometry select,
+body.pixel-style-geometry input[type="range"],
+body.pixel-style-geometry .level-block,
+body.pixel-style-geometry .tutorial-block,
+body.pixel-style-geometry .inventory-slot,
+body.pixel-style-geometry .keybinding-row,
+body.pixel-style-geometry .equipment-table-option {
+  border: 1px solid var(--line) !important;
+  background: var(--panel-2) !important;
+}
+
+body.pixel-style-geometry button:hover,
+body.pixel-style-geometry .level-block:hover,
+body.pixel-style-geometry .tutorial-block:hover,
+body.pixel-style-geometry .inventory-slot:hover,
+body.pixel-style-geometry .equipment-table-option:hover {
+  background: #293238 !important;
+}
+
+body.pixel-style-geometry .bullet {
+  border: 1px solid var(--line);
+  background: #1d2326 !important;
+}
+
+body.pixel-style-geometry .bullet.filled {
+  background: var(--cyan) !important;
+}
+
+body.pixel-style-geometry .equipment-icon:not(.equipment-icon-fallback) {
   display: none;
 }
 
-body.png-art-disabled .weapon-image-frame::after {
-  content: "PNG OFF";
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0;
+body.pixel-style-geometry .weapon-image-frame::after {
+  content: none;
 }
 
 .selected-loadout-label {
@@ -721,12 +891,12 @@ body.png-art-disabled .weapon-image-frame::after {
   height: 18px;
   border: 0;
   border-radius: 0;
-  background: url("docs/images/user-interface/pixel-art-ammo-bullet-empty-001.png") center / contain no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-ammo-bullet-empty-001.png") */ center / contain no-repeat;
   image-rendering: pixelated;
 }
 
 .bullet.filled {
-  background-image: url("docs/images/user-interface/pixel-art-ammo-bullet-full-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-ammo-bullet-full-001.png") */;
 }
 
 .ammo-count,
@@ -984,26 +1154,21 @@ body.png-art-disabled .weapon-image-frame::after {
 }
 
 .actions button::before {
-  content: "";
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  margin-right: 6px;
-  vertical-align: middle;
-  background: url("docs/images/user-interface/pixel-art-action-icon-execute-001.png") center / contain no-repeat;
-  image-rendering: pixelated;
+  display: none;
+  content: none;
+  /* Inactive action icon spacer disabled for geometry-only UI. */
 }
 
 #restartButton::before {
-  background-image: url("docs/images/user-interface/pixel-art-action-icon-restart-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-icon-restart-001.png") */;
 }
 
 #debugButton::before {
-  background-image: url("docs/images/user-interface/pixel-art-action-icon-debug-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-icon-debug-001.png") */;
 }
 
 #settingsButton::before {
-  background-image: url("docs/images/user-interface/pixel-art-action-icon-settings-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-icon-settings-001.png") */;
 }
 
 .hint-text {
@@ -1084,7 +1249,7 @@ body.png-art-disabled .weapon-image-frame::after {
 .settings-overlay {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 46;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -1105,11 +1270,11 @@ body.png-art-disabled .weapon-image-frame::after {
 .settings-change-card {
   width: min(360px, calc(100vw - 48px));
   border: 24px solid transparent;
-  border-image: url("docs/images/user-interface/pixel-art-settings-warning-card-frame-001.png") 64 fill / 24px / 0 stretch;
+  border-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-warning-card-frame-001.png") */ 64 fill / 24px / 0 stretch;
   border-radius: 0;
   padding: 16px;
   background:
-    url("docs/images/user-interface/pixel-art-settings-warning-card-center-001.png") 0 0 / 32px 32px repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-warning-card-center-001.png") */ 0 0 / 32px 32px repeat,
     #121619;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
   image-rendering: pixelated;
@@ -1288,27 +1453,27 @@ body.png-art-disabled .weapon-image-frame::after {
 }
 
 #resetSettingsButton {
-  background: url("docs/images/user-interface/pixel-art-settings-reset-button-normal-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-reset-button-normal-001.png") */ center / 100% 100% no-repeat;
 }
 
 #resetSettingsButton:hover {
-  background-image: url("docs/images/user-interface/pixel-art-settings-reset-button-hover-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-reset-button-hover-001.png") */;
 }
 
 #resetSettingsButton:active {
-  background-image: url("docs/images/user-interface/pixel-art-settings-reset-button-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-reset-button-pressed-001.png") */;
 }
 
 #closeSettingsButton {
-  background: url("docs/images/user-interface/pixel-art-settings-close-button-normal-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-close-button-normal-001.png") */ center / 100% 100% no-repeat;
 }
 
 #closeSettingsButton:hover {
-  background-image: url("docs/images/user-interface/pixel-art-settings-close-button-hover-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-close-button-hover-001.png") */;
 }
 
 #closeSettingsButton:active {
-  background-image: url("docs/images/user-interface/pixel-art-settings-close-button-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-close-button-pressed-001.png") */;
 }
 
 .settings-grid {
@@ -1432,7 +1597,7 @@ body.png-art-disabled .weapon-image-frame::after {
   min-height: 64px;
   border-top: 0;
   padding: 8px 10px;
-  background: url("docs/images/user-interface/pixel-art-loadout-setting-row-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-loadout-setting-row-001.png") */ center / 100% 100% no-repeat;
   image-rendering: pixelated;
 }
 
@@ -1455,7 +1620,7 @@ body.png-art-disabled .weapon-image-frame::after {
   border-radius: 0;
   padding: 10px;
   background:
-    url("docs/images/user-interface/pixel-art-item-detail-center-001.png") 0 0 / 24px 24px repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-item-detail-center-001.png") */ 0 0 / 24px 24px repeat,
     var(--panel);
   image-rendering: pixelated;
 }
@@ -2306,12 +2471,12 @@ canvas {
   min-height: 72px;
   align-items: center;
   padding: 10px 14px;
-  background: url("docs/images/user-interface/pixel-art-summary-tile-frame-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-summary-tile-frame-001.png") */ center / 100% 100% no-repeat;
   image-rendering: pixelated;
 }
 
 .privilege-board .summary-row:first-child {
-  background-image: url("docs/images/user-interface/pixel-art-summary-tile-highlight-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-summary-tile-highlight-001.png") */;
 }
 
 .reward-list {
@@ -2328,7 +2493,7 @@ canvas {
   border-radius: 6px;
   padding: 7px 8px 7px 42px;
   background:
-    url("docs/images/user-interface/pixel-art-access-row-locked-001.png") center / 100% 100% no-repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-access-row-locked-001.png") */ center / 100% 100% no-repeat,
     linear-gradient(180deg, rgba(12, 18, 20, 0.78), rgba(12, 18, 20, 0.92));
   color: var(--muted);
   font-size: 12px;
@@ -2350,7 +2515,7 @@ canvas {
 
 .reward-list span.unlocked {
   background:
-    url("docs/images/user-interface/pixel-art-access-row-unlocked-001.png") center / 100% 100% no-repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-access-row-unlocked-001.png") */ center / 100% 100% no-repeat,
     linear-gradient(180deg, rgba(31, 54, 38, 0.7), rgba(11, 22, 16, 0.92));
   color: var(--green);
 }
@@ -2443,7 +2608,7 @@ canvas {
 }
 
 .settings-tabs button:active {
-  background-image: url("docs/images/user-interface/pixel-art-settings-tab-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-settings-tab-pressed-001.png") */;
 }
 
 .level-picker select:hover,
@@ -2954,13 +3119,1526 @@ body.game-expanded.expanded-paused .right-panel {
   }
 }
 
+@media (min-width: 1051px) {
+  :root {
+    --desktop-ui-gap: 10px;
+    --desktop-ui-card-gap: 12px;
+    --desktop-ui-card-pad: 14px;
+    --desktop-ui-row: 42px;
+    --desktop-ui-button: 42px;
+    --desktop-ui-small-button: 34px;
+    --desktop-ui-label: 32px;
+    --desktop-ui-line: 1.28;
+  }
+
+  body.pixel-style-geometry .menu-panel,
+  body.pixel-style-geometry .pause-panel,
+  body.pixel-style-geometry .credits-card,
+  body.pixel-style-geometry .control-card,
+  body.pixel-style-geometry .settings-panel,
+  body.pixel-style-geometry .settings-change-card,
+  body.pixel-style-geometry .inventory-panel,
+  body.pixel-style-geometry .lock-panel,
+  body.pixel-style-geometry .banner,
+  body.pixel-style-geometry .mission-report {
+    border: 1px solid rgba(114, 183, 206, 0.24) !important;
+    border-radius: 6px !important;
+    background:
+      linear-gradient(180deg, rgba(21, 26, 29, 0.96), rgba(13, 17, 19, 0.98)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 18px 45px rgba(0, 0, 0, 0.32);
+  }
+
+  body.pixel-style-geometry .side-panel {
+    gap: var(--desktop-ui-card-gap);
+    padding: 0;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  body.pixel-style-geometry .control-card {
+    display: grid;
+    align-content: start;
+    gap: var(--desktop-ui-gap);
+    min-width: 0;
+    padding: var(--desktop-ui-card-pad) !important;
+  }
+
+  body.pixel-style-geometry .control-card::before,
+  body.pixel-style-geometry .control-card::after,
+  body.pixel-style-geometry .main-menu-panel .control-card::before,
+  body.pixel-style-geometry .main-menu-panel .control-card .panel-label::after,
+  body.pixel-style-geometry .start-panel::before,
+  body.pixel-style-geometry .onboarding-question .menu-actions::before {
+    display: none !important;
+  }
+
+  body.pixel-style-geometry .eyebrow,
+  body.pixel-style-geometry .panel-label,
+  body.pixel-style-geometry .control-card > .panel-label,
+  body.pixel-style-geometry .main-menu-panel .control-card .panel-label,
+  body.pixel-style-geometry .control-card .panel-heading-row {
+    display: flex;
+    align-items: center;
+    min-height: var(--desktop-ui-label);
+    margin: 0;
+    padding: 0;
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.15;
+    text-align: left;
+    text-shadow: none;
+  }
+
+  body.pixel-style-geometry .panel-heading-row {
+    justify-content: space-between;
+    gap: var(--desktop-ui-gap);
+  }
+
+  body.pixel-style-geometry button,
+  body.pixel-style-geometry select,
+  body.pixel-style-geometry input,
+  body.pixel-style-geometry textarea {
+    line-height: 1.2;
+  }
+
+  body.pixel-style-geometry button,
+  body.pixel-style-geometry select {
+    min-height: var(--desktop-ui-button);
+    border-radius: 4px !important;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 850;
+    text-align: center;
+    text-shadow: none !important;
+  }
+
+  body.pixel-style-geometry select {
+    text-align: left;
+  }
+
+  body.pixel-style-geometry .field-stack,
+  body.pixel-style-geometry .level-picker,
+  body.pixel-style-geometry .lock-entry {
+    gap: 6px;
+    margin-top: 0;
+    font-size: 11px;
+    line-height: var(--desktop-ui-line);
+  }
+
+  body.pixel-style-geometry .field-stack span,
+  body.pixel-style-geometry .level-picker span,
+  body.pixel-style-geometry .field-stack label,
+  body.pixel-style-geometry .level-picker label {
+    display: flex;
+    align-items: center;
+    min-height: 16px;
+  }
+
+  body.pixel-style-geometry .start-panel {
+    align-content: center;
+    gap: 16px;
+    width: min(720px, calc(100vw - 72px));
+    min-height: min(500px, calc(100vh - 96px));
+    padding: 36px !important;
+    text-align: center;
+  }
+
+  body.pixel-style-geometry .start-panel h2 {
+    width: auto;
+    aspect-ratio: auto;
+    margin: 0;
+    background: none !important;
+    color: var(--text);
+    font-size: clamp(42px, 5vw, 68px);
+    line-height: 0.96;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  body.pixel-style-geometry .start-panel .eyebrow {
+    justify-content: center;
+    width: auto;
+    min-height: 24px;
+    margin: 0;
+    color: var(--amber);
+    font-size: 12px;
+  }
+
+  body.pixel-style-geometry .start-panel #playMenuButton {
+    justify-self: center;
+    width: min(360px, 88%);
+    min-height: 66px;
+    margin-top: 4px;
+    font-size: 24px;
+  }
+
+  body.pixel-style-geometry .onboarding-question {
+    gap: 12px;
+    width: min(500px, 100%);
+    margin-top: 0;
+    padding: 14px !important;
+    border-radius: 6px !important;
+  }
+
+  body.pixel-style-geometry .onboarding-question p {
+    min-height: 50px;
+    padding: 0 8px;
+    line-height: 1.25;
+    text-shadow: none;
+  }
+
+  body.pixel-style-geometry .menu-actions,
+  body.pixel-style-geometry .pause-actions,
+  body.pixel-style-geometry .banner-actions,
+  body.pixel-style-geometry .settings-actions {
+    align-items: center;
+    gap: var(--desktop-ui-gap);
+    margin-top: 0;
+  }
+
+  body.pixel-style-geometry .onboarding-question .menu-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-top: 0;
+  }
+
+  body.pixel-style-geometry .credits-card {
+    gap: 4px;
+    padding: 12px !important;
+    line-height: 1.25;
+  }
+
+  body.pixel-style-geometry .credits-card .panel-label {
+    justify-content: flex-start;
+    min-height: 20px;
+    margin: 0;
+    color: var(--green);
+  }
+
+  body.pixel-style-geometry .main-menu-panel {
+    width: min(1120px, calc(100vw - 48px));
+    padding: 18px !important;
+  }
+
+  body.pixel-style-geometry .main-menu-grid {
+    grid-template-columns: minmax(230px, 0.9fr) minmax(220px, 0.8fr) minmax(250px, 1fr) minmax(250px, 1fr);
+    gap: var(--desktop-ui-card-gap);
+    align-items: stretch;
+  }
+
+  body.pixel-style-geometry .main-menu-panel .control-card {
+    min-height: 100%;
+    padding: var(--desktop-ui-card-pad) !important;
+  }
+
+  body.pixel-style-geometry .privilege-board,
+  body.pixel-style-geometry .reward-list,
+  body.pixel-style-geometry .number-block-grid {
+    gap: var(--desktop-ui-gap);
+    margin-top: 0;
+  }
+
+  body.pixel-style-geometry .privilege-board .summary-row,
+  body.pixel-style-geometry .reward-list span {
+    display: grid;
+    align-items: center;
+    min-height: var(--desktop-ui-row);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 8px 10px;
+    line-height: 1.24;
+  }
+
+  body.pixel-style-geometry .reward-list span {
+    padding-left: 10px;
+  }
+
+  body.pixel-style-geometry .reward-list span::before,
+  body.pixel-style-geometry .number-block-grid button.completed::after,
+  body.pixel-style-geometry .number-block-grid button.locked::after {
+    display: none;
+  }
+
+  body.pixel-style-geometry .number-block-grid {
+    grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  }
+
+  body.pixel-style-geometry .number-block-grid button {
+    display: grid;
+    place-items: center;
+    min-height: 58px;
+    border-radius: 4px !important;
+    font-size: 20px;
+  }
+
+  body.pixel-style-geometry .settings-panel {
+    width: min(900px, calc(100vw - 48px));
+    height: min(780px, calc(100vh - 48px));
+    padding: 16px !important;
+  }
+
+  body.pixel-style-geometry .settings-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    min-height: 54px;
+    margin-bottom: 12px;
+  }
+
+  body.pixel-style-geometry .settings-header h2,
+  body.pixel-style-geometry .settings-change-card h2,
+  body.pixel-style-geometry .pause-panel h2 {
+    margin: 0;
+    line-height: 1.05;
+  }
+
+  body.pixel-style-geometry .settings-actions button,
+  body.pixel-style-geometry #resetSettingsButton,
+  body.pixel-style-geometry #closeSettingsButton {
+    min-width: 112px;
+    min-height: 38px;
+  }
+
+  body.pixel-style-geometry .settings-grid {
+    gap: var(--desktop-ui-card-gap);
+    padding-right: 6px;
+  }
+
+  body.pixel-style-geometry .settings-grid > .control-card {
+    height: min(560px, calc(100vh - 226px));
+    overflow: auto;
+  }
+
+  body.pixel-style-geometry .settings-tabs {
+    gap: 8px;
+    padding: 0;
+    background: transparent;
+  }
+
+  body.pixel-style-geometry .settings-tabs button {
+    min-height: 38px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  body.pixel-style-geometry .keybinding-list {
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  body.pixel-style-geometry .keybinding-row,
+  body.pixel-style-geometry .enemy-loadout-row {
+    min-height: 48px;
+    border-radius: 4px;
+    padding: 7px 9px;
+    line-height: 1.2;
+  }
+
+  body.pixel-style-geometry .keybinding-row {
+    grid-template-columns: minmax(0, 1fr) 118px;
+  }
+
+  body.pixel-style-geometry .keybinding-row button {
+    min-height: 32px;
+  }
+
+  body.pixel-style-geometry .enemy-loadout-row {
+    grid-template-columns: 54px minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  body.pixel-style-geometry .icon-select-row {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  body.pixel-style-geometry .mission-status-grid {
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  body.pixel-style-geometry .mission-status-grid div,
+  body.pixel-style-geometry .inventory-grid div,
+  body.pixel-style-geometry .mission-report div {
+    display: grid;
+    align-content: center;
+    min-height: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 8px 9px;
+    line-height: var(--desktop-ui-line);
+  }
+
+  body.pixel-style-geometry .mission-status-grid span,
+  body.pixel-style-geometry .inventory-grid span,
+  body.pixel-style-geometry .mission-report span,
+  body.pixel-style-geometry .operator-card span {
+    line-height: 1.18;
+  }
+
+  body.pixel-style-geometry .mission-status-grid strong,
+  body.pixel-style-geometry .inventory-grid strong,
+  body.pixel-style-geometry .mission-report strong {
+    margin-top: 3px;
+    line-height: 1.18;
+  }
+
+  body.pixel-style-geometry .inventory-summary {
+    align-items: center;
+    gap: 8px;
+  }
+
+  body.pixel-style-geometry #inventoryButton,
+  body.pixel-style-geometry #showAllHealthButton,
+  body.pixel-style-geometry .actions button {
+    min-height: var(--desktop-ui-small-button);
+  }
+
+  body.pixel-style-geometry .actions {
+    gap: 8px;
+  }
+
+  body.pixel-style-geometry .operator-card {
+    display: grid;
+    gap: 6px;
+    min-height: 78px;
+    border-radius: 4px;
+    padding: 9px;
+    line-height: 1.2;
+  }
+
+  body.pixel-style-geometry .operator-card strong {
+    display: flex;
+    align-items: center;
+    min-height: 18px;
+  }
+
+  body.pixel-style-geometry .weapon-pixel-preview {
+    display: grid;
+    place-items: center;
+    min-height: 86px;
+    border-radius: 4px;
+  }
+
+  body.pixel-style-geometry .bullet-strip,
+  body.pixel-style-geometry .loadout-summary,
+  body.pixel-style-geometry .inventory-grid,
+  body.pixel-style-geometry .equipment-table-options {
+    gap: var(--desktop-ui-gap);
+  }
+
+  body.pixel-style-geometry .inventory-panel,
+  body.pixel-style-geometry .equipment-table-dialog,
+  body.pixel-style-geometry .laptop-dialog {
+    padding: 16px !important;
+  }
+
+  body.pixel-style-geometry .inventory-details {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+  }
+
+  body.pixel-style-geometry .inventory-slot-grid {
+    gap: 6px;
+  }
+
+  body.pixel-style-geometry .inventory-slot {
+    border-radius: 3px !important;
+  }
+
+  body.pixel-style-geometry .inventory-item-detail {
+    border-radius: 4px;
+    padding: 10px 12px;
+    line-height: 1.3;
+  }
+
+  body.pixel-style-geometry .lock-panel {
+    display: grid;
+    gap: 12px;
+    padding: 16px !important;
+  }
+
+  body.pixel-style-geometry .lock-display,
+  body.pixel-style-geometry .lock-keypad {
+    gap: 8px;
+  }
+
+  body.pixel-style-geometry .lock-keypad button {
+    min-height: 44px;
+  }
+
+  body.pixel-style-geometry .pause-panel {
+    display: grid;
+    gap: 14px;
+    width: min(500px, calc(100vw - 48px));
+    padding: 18px !important;
+  }
+
+  body.pixel-style-geometry .pause-panel h2 {
+    min-height: 36px;
+    padding: 0;
+  }
+
+  body.pixel-style-geometry .mission-report,
+  body.pixel-style-geometry .banner {
+    gap: var(--desktop-ui-gap);
+    padding: 16px !important;
+    line-height: 1.25;
+  }
+
+  body.pixel-style-geometry .banner strong {
+    min-height: 42px;
+    padding: 0;
+    font-size: 22px;
+  }
+}
+
+body.pixel-style-geometry .brandbar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+body.pixel-style-geometry .brandbar > div:first-child {
+  display: grid;
+  align-content: center;
+  min-width: min(420px, 42vw);
+}
+
+body.pixel-style-geometry .brandbar-status {
+  flex: 1 1 760px;
+  max-width: 980px;
+  padding: 10px 12px !important;
+}
+
+body.pixel-style-geometry .brandbar-status .panel-label {
+  min-height: 18px;
+  margin-bottom: 6px;
+}
+
+body.pixel-style-geometry .brandbar-status .mission-status-grid {
+  grid-template-columns: repeat(5, minmax(92px, 1fr));
+  gap: 7px;
+  margin-top: 0;
+}
+
+body.pixel-style-geometry .brandbar-status .mission-status-grid div,
+body.pixel-style-geometry .brandbar-status .mission-status-grid div:first-child,
+body.pixel-style-geometry .brandbar-status .mission-status-grid div:nth-child(2),
+body.pixel-style-geometry .brandbar-status .mission-status-grid div:nth-child(5) {
+  grid-column: auto;
+  min-height: 42px;
+}
+
+body.pixel-style-geometry .brandbar-status .mission-status-grid strong {
+  white-space: normal;
+}
+
+body.pixel-style-geometry .weapon-pixel-preview {
+  min-height: 92px;
+  border: 1px solid rgba(114, 183, 206, 0.24);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, rgba(114, 183, 206, 0.08), rgba(255, 255, 255, 0.02)),
+    #0f1417 !important;
+}
+
+body.pixel-style-geometry .weapon-image-frame {
+  min-height: 82px;
+}
+
+.weapon-pixel-art {
+  display: grid;
+  grid-template-columns: repeat(12, 8px);
+  grid-template-rows: repeat(5, 8px);
+  gap: 0;
+  image-rendering: pixelated;
+}
+
+.weapon-pixel-cell {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+
+.weapon-pixel-art-rifle .weapon-pixel-cell:is(
+  .weapon-pixel-cell-26,
+  .weapon-pixel-cell-27,
+  .weapon-pixel-cell-28,
+  .weapon-pixel-cell-29,
+  .weapon-pixel-cell-30,
+  .weapon-pixel-cell-31,
+  .weapon-pixel-cell-32,
+  .weapon-pixel-cell-33,
+  .weapon-pixel-cell-34,
+  .weapon-pixel-cell-35,
+  .weapon-pixel-cell-36,
+  .weapon-pixel-cell-37
+) {
+  background: #8fb9c4;
+}
+
+.weapon-pixel-art-rifle .weapon-pixel-cell:is(.weapon-pixel-cell-38, .weapon-pixel-cell-39, .weapon-pixel-cell-40) {
+  background: #d9d2b9;
+}
+
+.weapon-pixel-art-rifle .weapon-pixel-cell:is(.weapon-pixel-cell-14, .weapon-pixel-cell-15, .weapon-pixel-cell-16, .weapon-pixel-cell-41, .weapon-pixel-cell-42) {
+  background: #566269;
+}
+
+.weapon-pixel-art-rifle .weapon-pixel-cell:is(.weapon-pixel-cell-43, .weapon-pixel-cell-44, .weapon-pixel-cell-45, .weapon-pixel-cell-55) {
+  background: #3e4a50;
+}
+
+.weapon-pixel-art-smg .weapon-pixel-cell:is(
+  .weapon-pixel-cell-27,
+  .weapon-pixel-cell-28,
+  .weapon-pixel-cell-29,
+  .weapon-pixel-cell-30,
+  .weapon-pixel-cell-31,
+  .weapon-pixel-cell-32,
+  .weapon-pixel-cell-33
+) {
+  background: #77c996;
+}
+
+.weapon-pixel-art-smg .weapon-pixel-cell:is(.weapon-pixel-cell-34, .weapon-pixel-cell-35, .weapon-pixel-cell-36) {
+  background: #d9d2b9;
+}
+
+.weapon-pixel-art-smg .weapon-pixel-cell:is(.weapon-pixel-cell-16, .weapon-pixel-cell-17, .weapon-pixel-cell-40, .weapon-pixel-cell-41, .weapon-pixel-cell-42, .weapon-pixel-cell-53) {
+  background: #3f5348;
+}
+
+.weapon-pixel-art-pistol .weapon-pixel-cell:is(
+  .weapon-pixel-cell-28,
+  .weapon-pixel-cell-29,
+  .weapon-pixel-cell-30,
+  .weapon-pixel-cell-31,
+  .weapon-pixel-cell-32,
+  .weapon-pixel-cell-33
+) {
+  background: #e3b456;
+}
+
+.weapon-pixel-art-pistol .weapon-pixel-cell:is(.weapon-pixel-cell-34, .weapon-pixel-cell-35) {
+  background: #d9d2b9;
+}
+
+.weapon-pixel-art-pistol .weapon-pixel-cell:is(.weapon-pixel-cell-41, .weapon-pixel-cell-42, .weapon-pixel-cell-53, .weapon-pixel-cell-54) {
+  background: #5b4930;
+}
+
+.weapon-pixel-art-melee .weapon-pixel-cell:is(
+  .weapon-pixel-cell-26,
+  .weapon-pixel-cell-27,
+  .weapon-pixel-cell-28,
+  .weapon-pixel-cell-29,
+  .weapon-pixel-cell-30,
+  .weapon-pixel-cell-31,
+  .weapon-pixel-cell-32,
+  .weapon-pixel-cell-33
+) {
+  background: #e8eef0;
+}
+
+.weapon-pixel-art-melee .weapon-pixel-cell:is(.weapon-pixel-cell-24, .weapon-pixel-cell-25, .weapon-pixel-cell-36, .weapon-pixel-cell-37) {
+  background: #5c4435;
+}
+
+.weapon-pixel-art-melee .weapon-pixel-cell:is(.weapon-pixel-cell-38, .weapon-pixel-cell-39) {
+  background: #e3b456;
+}
+
+.weapon-pixel-art-none {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  min-height: 46px;
+  border: 1px dashed rgba(152, 162, 155, 0.36);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+/*
+Geometry weapon group disabled.
+.weapon-geometry {
+  position: relative;
+  width: 150px;
+  height: 54px;
+  image-rendering: pixelated;
+}
+
+.weapon-part {
+  position: absolute;
+  display: block;
+  border: 1px solid rgba(238, 243, 239, 0.22);
+  background: var(--cyan);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.24);
+}
+
+.weapon-geometry-rifle .weapon-stock {
+  left: 10px;
+  top: 24px;
+  width: 28px;
+  height: 14px;
+  background: #58646a;
+}
+
+.weapon-geometry-rifle .weapon-body {
+  left: 34px;
+  top: 18px;
+  width: 54px;
+  height: 18px;
+  background: #6bb5c9;
+}
+
+.weapon-geometry-rifle .weapon-barrel {
+  left: 86px;
+  top: 22px;
+  width: 50px;
+  height: 8px;
+  background: #d8d2bc;
+}
+
+.weapon-geometry-rifle .weapon-grip {
+  left: 54px;
+  top: 34px;
+  width: 11px;
+  height: 16px;
+  background: #3e4b51;
+}
+
+.weapon-geometry-rifle .weapon-magazine {
+  left: 70px;
+  top: 35px;
+  width: 12px;
+  height: 18px;
+  background: #46545a;
+}
+
+.weapon-geometry-smg {
+  width: 128px;
+}
+
+.weapon-geometry-smg .weapon-stock {
+  left: 18px;
+  top: 25px;
+  width: 22px;
+  height: 10px;
+  background: #4c565d;
+}
+
+.weapon-geometry-smg .weapon-body {
+  left: 38px;
+  top: 18px;
+  width: 44px;
+  height: 20px;
+  background: #67c690;
+}
+
+.weapon-geometry-smg .weapon-barrel {
+  left: 80px;
+  top: 23px;
+  width: 30px;
+  height: 7px;
+  background: #d8d2bc;
+}
+
+.weapon-geometry-smg .weapon-grip {
+  left: 52px;
+  top: 36px;
+  width: 10px;
+  height: 15px;
+  background: #3d4a3f;
+}
+
+.weapon-geometry-smg .weapon-magazine {
+  left: 67px;
+  top: 35px;
+  width: 10px;
+  height: 18px;
+  background: #415047;
+}
+
+.weapon-geometry-pistol {
+  width: 96px;
+}
+
+.weapon-geometry-pistol .weapon-body {
+  left: 24px;
+  top: 18px;
+  width: 38px;
+  height: 16px;
+  background: #e3b456;
+}
+
+.weapon-geometry-pistol .weapon-barrel {
+  left: 60px;
+  top: 21px;
+  width: 18px;
+  height: 7px;
+  background: #d8d2bc;
+}
+
+.weapon-geometry-pistol .weapon-grip {
+  left: 36px;
+  top: 32px;
+  width: 12px;
+  height: 20px;
+  background: #5c4b2b;
+  transform: skewX(-8deg);
+}
+
+.weapon-geometry-pistol .weapon-stock,
+.weapon-geometry-pistol .weapon-magazine {
+  display: none;
+}
+
+.weapon-geometry-melee {
+  width: 118px;
+}
+
+.weapon-geometry-melee .weapon-blade {
+  left: 46px;
+  top: 10px;
+  width: 56px;
+  height: 10px;
+  background: #e7edf0;
+}
+
+.weapon-geometry-melee .weapon-guard {
+  left: 39px;
+  top: 8px;
+  width: 8px;
+  height: 18px;
+  background: #e3b456;
+}
+
+.weapon-geometry-melee .weapon-grip {
+  left: 18px;
+  top: 12px;
+  width: 24px;
+  height: 10px;
+  background: #5b4637;
+}
+
+.weapon-geometry-melee .weapon-stock,
+.weapon-geometry-melee .weapon-body,
+.weapon-geometry-melee .weapon-barrel,
+.weapon-geometry-melee .weapon-magazine {
+  display: none;
+}
+
+.weapon-geometry-none {
+  display: grid;
+  place-items: center;
+  width: 130px;
+  height: 54px;
+  border: 1px dashed rgba(152, 162, 155, 0.36);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+*/
+
+body.pixel-style-geometry .equipment-icon,
+body.pixel-style-geometry .equipment-icon-fallback,
+body.pixel-style-geometry .equipment-icon-preview,
+body.pixel-style-geometry .equipment-icon-small,
+body.pixel-style-geometry .equipment-icon-tiny {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+}
+
+body.pixel-style-geometry .loadout-text-strip {
+  display: grid;
+  gap: 5px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.pixel-style-geometry .loadout-text-strip span,
+body.pixel-style-geometry .operator-equipment-label,
+body.pixel-style-geometry .inventory-grid strong,
+body.pixel-style-geometry .summary-row strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+body.pixel-style-geometry .plain-select-row {
+  display: grid;
+  min-width: 0;
+}
+
+body.pixel-style-geometry .actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+body.pixel-style-geometry .health-meter {
+  height: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  background: #0b0f11;
+}
+
+body.pixel-style-geometry .armor-fill {
+  background: #eef3ef;
+}
+
+body.pixel-style-geometry .health-fill {
+  background: var(--green);
+}
+
+body.pixel-style-geometry .operator-card.down .health-fill {
+  background: var(--red);
+}
+
+body.pixel-style-geometry .inventory-slot {
+  background: #101417 !important;
+}
+
+body.pixel-style-geometry .inventory-slot:not(.empty) {
+  background: #172025 !important;
+}
+
+body.pixel-style-geometry .inventory-slot:hover,
+body.pixel-style-geometry .inventory-slot.drop-target {
+  background: #223039 !important;
+}
+
+body.pixel-style-geometry .inventory-grid div,
+body.pixel-style-geometry .inventory-item-detail {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 4px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+body.pixel-style-geometry .expanded-pause-button {
+  min-width: 0;
+  min-height: 28px;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none;
+  color: rgba(238, 243, 239, 0.58);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
+}
+
+body.pixel-style-geometry .settings-change-overlay {
+  display: none !important;
+}
+
+@media (min-width: 1051px) {
+  body.pixel-style-geometry .settings-grid {
+    grid-template-columns: 160px minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  body.pixel-style-geometry .settings-tabs {
+    position: static;
+    grid-template-columns: 1fr;
+    grid-column: 1;
+    grid-row: 1;
+    align-content: start;
+  }
+
+  body.pixel-style-geometry .settings-tabs button {
+    justify-content: center;
+    min-height: 46px;
+    white-space: normal;
+  }
+
+  body.pixel-style-geometry .settings-grid > .control-card {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 1050px) {
+  body.pixel-style-geometry .brandbar {
+    display: grid;
+    align-items: stretch;
+  }
+
+  body.pixel-style-geometry .brandbar > div:first-child {
+    min-width: 0;
+  }
+
+  body.pixel-style-geometry .brandbar-status {
+    max-width: none;
+  }
+}
+
+@media (max-width: 760px) {
+  body.pixel-style-geometry .brandbar-status .mission-status-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.pixel-style-geometry .brandbar-status .mission-status-grid div:first-child,
+  body.pixel-style-geometry .brandbar-status .mission-status-grid div:nth-child(2),
+  body.pixel-style-geometry .brandbar-status .mission-status-grid div:nth-child(5) {
+    grid-column: span 2;
+  }
+}
+
+body.pixel-style-geometry .settings-panel {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+body.pixel-style-geometry .settings-grid {
+  display: grid;
+  grid-template-columns: minmax(150px, 180px) minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+body.pixel-style-geometry .settings-tabs {
+  position: static;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: 8px;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+}
+
+body.pixel-style-geometry .settings-tabs button {
+  display: grid;
+  place-items: center;
+  min-height: 46px;
+  white-space: normal;
+}
+
+body.pixel-style-geometry .settings-grid > .control-card {
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  overflow: auto;
+}
+
+body.pixel-style-geometry .settings-grid > .control-card.hidden {
+  display: none;
+}
+
+body.pixel-style-geometry [data-settings-panel] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+@media (max-width: 900px) {
+  body.pixel-style-geometry .settings-grid {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+
+  body.pixel-style-geometry .settings-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.pixel-style-geometry [data-settings-panel] {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+#startMenuOverlay {
+  place-items: start end;
+  padding: clamp(18px, 4vw, 48px);
+  background:
+    linear-gradient(90deg, rgba(5, 7, 8, 0.22), rgba(5, 7, 8, 0.74)),
+    radial-gradient(circle at 26% 70%, rgba(96, 198, 137, 0.12), transparent 34%),
+    rgba(5, 7, 8, 0.86);
+}
+
+html.start-menu-active,
+body.start-menu-active {
+  overflow: hidden;
+}
+
+#startMenuOverlay::before {
+  inset: 0;
+  background: var(--ui-start-background) center / cover no-repeat;
+  transform: none;
+  opacity: 0.82;
+  image-rendering: auto;
+}
+
+#startMenuOverlay::after {
+  background:
+    linear-gradient(90deg, rgba(5, 7, 8, 0.14), rgba(5, 7, 8, 0.82)),
+    linear-gradient(180deg, rgba(5, 7, 8, 0.16), rgba(5, 7, 8, 0.66));
+  opacity: 1;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-panel {
+  justify-self: end;
+  align-self: start;
+  align-content: start;
+  justify-items: stretch;
+  gap: 14px;
+  width: min(430px, calc(100vw - 36px));
+  min-height: auto;
+  max-height: calc(100vh - 56px);
+  padding: clamp(18px, 2.4vw, 26px) !important;
+  border: 1px solid rgba(114, 183, 206, 0.42) !important;
+  border-left: 6px solid rgba(96, 198, 137, 0.72) !important;
+  border-radius: 6px !important;
+  background:
+    linear-gradient(180deg, rgba(12, 17, 19, 0.68), rgba(12, 17, 19, 0.54)),
+    rgba(16, 20, 22, 0.5) !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52);
+  text-align: left;
+  backdrop-filter: blur(2px);
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-panel .eyebrow {
+  justify-content: flex-start;
+  color: var(--cyan);
+}
+
+/* Previous CSS pixel-letter/block title group disabled in favor of PressStart2P-Regular.ttf.
+.pixel-title {
+  display: grid;
+  gap: 8px;
+}
+
+.pixel-title-word {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pixel-title-word span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 0.86em;
+  min-height: 1.02em;
+  padding: 0 0.06em;
+  border: 2px solid rgba(238, 243, 239, 0.92);
+  background:
+    linear-gradient(180deg, rgba(238, 243, 239, 0.14), rgba(96, 198, 137, 0.08)),
+    rgba(10, 14, 16, 0.62);
+  color: #f5fbf7;
+  font-family: "Courier New", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-weight: 900;
+  line-height: 0.86;
+  text-align: center;
+  text-shadow: 2px 0 0 rgba(0, 0, 0, 0.72), 0 2px 0 rgba(0, 0, 0, 0.72);
+  box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.42), inset 3px 3px 0 rgba(255, 255, 255, 0.08);
+}
+
+body.pixel-style-geometry .start-panel h2.pixel-title {
+  width: 100%;
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(30px, 4.2vw, 52px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+*/
+
+.press-start-title {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  color: var(--text);
+  font-family: "PressStart2P", "Courier New", ui-monospace, monospace;
+  font-size: clamp(28px, 4.1vw, 50px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.58);
+}
+
+.press-start-title span {
+  display: block;
+}
+
+.start-menu-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+body.pixel-style-geometry .start-menu-options button,
+body.pixel-style-geometry .start-info-card button {
+  width: 100%;
+  min-height: 48px;
+  justify-content: center;
+  font-family: "PressStart2P", "Courier New", ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.start-menu-message {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(227, 180, 86, 0.5);
+  border-radius: 4px;
+  color: var(--amber);
+  background: rgba(16, 20, 22, 0.84);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* Inline start information card disabled; the separate overlay below is active instead.
+.start-info-panel {
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
+  padding: 12px;
+  border: 1px solid rgba(114, 183, 206, 0.34);
+  border-radius: 5px;
+  background: rgba(8, 12, 14, 0.8);
+  line-height: 1.35;
+}
+
+.start-info-panel blockquote {
+  margin: 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--green);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.start-info-panel strong,
+.start-info-panel span {
+  display: block;
+  font-size: 12px;
+}
+
+.start-info-panel span {
+  color: var(--muted);
+}
+*/
+
+.start-info-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 7, 8, 0.34);
+}
+
+.start-info-overlay.hidden {
+  display: none;
+}
+
+.start-onboarding-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 7, 8, 0.24);
+}
+
+.start-onboarding-overlay.hidden {
+  display: none;
+}
+
+.start-onboarding-overlay .start-onboarding-card {
+  width: min(560px, calc(100vw - 48px));
+  margin: 0;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(114, 183, 206, 0.42);
+  border-left: 6px solid rgba(96, 198, 137, 0.72);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(12, 17, 19, 0.72), rgba(12, 17, 19, 0.58)),
+    rgba(16, 20, 22, 0.5);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(2px);
+}
+
+.start-onboarding-overlay .start-onboarding-card p {
+  min-height: auto;
+  padding: 0;
+  background: none;
+  color: var(--text);
+  font-family: "PressStart2P", "Courier New", ui-monospace, monospace;
+  font-size: clamp(13px, 1.25vw, 18px);
+  line-height: 1.75;
+  text-align: center;
+}
+
+.start-onboarding-overlay .start-onboarding-card .menu-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 0;
+}
+
+.start-onboarding-overlay .start-onboarding-card .menu-actions::before {
+  display: none;
+}
+
+.start-onboarding-overlay .start-onboarding-card .menu-actions button {
+  min-height: 58px;
+}
+
+.start-onboarding-overlay .start-onboarding-card .subtle-menu-button {
+  justify-self: center;
+  width: min(220px, 100%);
+  min-height: 34px;
+  margin-top: 4px;
+  opacity: 0.78;
+  font-size: 10px !important;
+}
+
+.start-info-card {
+  display: grid;
+  gap: 14px;
+  width: min(560px, calc(100vw - 48px));
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(114, 183, 206, 0.42);
+  border-left: 6px solid rgba(227, 180, 86, 0.72);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(12, 17, 19, 0.76), rgba(12, 17, 19, 0.6)),
+    rgba(16, 20, 22, 0.56);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(2px);
+}
+
+.start-info-card blockquote {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--green);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.start-info-card strong,
+.start-info-card span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.start-info-card span {
+  color: var(--muted);
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button {
+  font-family: "PressStart2P", "Courier New", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+body.pixel-style-geometry .onboarding-question {
+  width: 100%;
+  border: 1px solid rgba(96, 198, 137, 0.34) !important;
+  background: rgba(8, 12, 14, 0.84) !important;
+}
+
+@media (max-width: 720px) {
+  #startMenuOverlay {
+    place-items: end center;
+    padding: 16px;
+  }
+
+  body.pixel-style-geometry #startMenuOverlay .start-panel {
+    width: min(100%, 440px);
+    max-height: calc(100vh - 32px);
+  }
+
+  body.pixel-style-geometry .start-panel h2.press-start-title {
+    font-size: clamp(27px, 9vw, 42px);
+  }
+}
+
+.range-value {
+  justify-self: end;
+  margin-left: auto;
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(114, 183, 206, 0.22);
+}
+
+.settings-footer-actions button {
+  min-width: 148px;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-panel {
+  border: 0 !important;
+  border-left: 0 !important;
+  background: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+  width: min(660px, calc(100vw - 56px));
+  min-height: min(780px, calc(100vh - 88px));
+  padding: clamp(22px, 4vh, 42px) !important;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+  overflow: visible;
+  gap: clamp(28px, 5.8vh, 58px);
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0;
+  width: min(440px, 100%);
+  gap: clamp(18px, 3.2vh, 36px);
+  justify-self: center;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button,
+body.pixel-style-geometry #startMenuOverlay #playMenuButton,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: auto;
+  padding: clamp(8px, 1.8vh, 16px) 0;
+  text-align: center;
+  text-indent: 0;
+  border: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: rgba(219, 255, 235, 0.94);
+  font-size: clamp(14px, 1.55vw, 20px) !important;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button:hover,
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button:focus-visible,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button:hover,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button:focus-visible {
+  border: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: var(--accent-cyan);
+  transform: translateX(8px);
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button:focus-visible::after,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button:focus-visible::after {
+  display: none !important;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button:active,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button:active {
+  color: var(--accent-amber);
+  transform: translateX(8px) translateY(1px);
+}
+
+body.pixel-style-geometry #startMenuOverlay .eyebrow {
+  font-size: clamp(12px, 1.1vw, 16px);
+  line-height: 1.6;
+}
+
+body.pixel-style-geometry #startMenuOverlay .press-start-title {
+  max-width: min(100%, 640px);
+  overflow: visible;
+  font-size: clamp(36px, 5vw, 70px);
+  line-height: 1.32;
+  gap: clamp(10px, 1.7vh, 20px);
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.52);
+}
+
+body.pixel-style-geometry #startMenuOverlay .press-start-title span {
+  overflow: visible;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay {
+  display: grid;
+  place-items: center;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay.hidden {
+  display: none;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay .start-onboarding-card {
+  width: min(560px, calc(100vw - 48px)) !important;
+  margin: 0 !important;
+  padding: clamp(18px, 3vw, 28px) !important;
+  align-content: start;
+  justify-items: stretch;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay .start-onboarding-card .menu-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay .start-onboarding-card .subtle-menu-button {
+  justify-self: center;
+  width: min(220px, 100%);
+  min-height: 34px;
+  font-size: 10px !important;
+}
+
 </style>
     <style>
-body.mobile-isolated,
+﻿body.mobile-isolated,
 body.mobile-isolated * {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+}
+
+body.pixel-style-geometry .mobile-pause-button,
+body.pixel-style-geometry .mobile-action-button,
+body.pixel-style-geometry .mobile-pause-nav button {
+  border: 1px solid rgba(114, 183, 206, 0.52);
+  background: rgba(20, 25, 28, 0.9) !important;
+  color: #eef3ef;
+}
+
+body.pixel-style-geometry .joystick-ring,
+body.pixel-style-geometry .joystick-thumb,
+body.pixel-style-geometry .mobile-pause-panel {
+  border: 1px solid rgba(114, 183, 206, 0.42);
+  background: rgba(20, 25, 28, 0.72) !important;
 }
 
 .mobile-controls {
@@ -2985,17 +4663,17 @@ body.mobile-isolated * {
   min-height: 44px;
   border: 0;
   border-radius: 0;
-  background: url("docs/images/user-interface/pixel-art-mobile-pause-button-normal-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-pause-button-normal-001.png") */ center / 100% 100% no-repeat;
   image-rendering: pixelated;
   transform: translateX(-50%);
 }
 
 .mobile-pause-button:hover {
-  background-image: url("docs/images/user-interface/pixel-art-mobile-pause-button-hover-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-pause-button-hover-001.png") */;
 }
 
 .mobile-pause-button:active {
-  background-image: url("docs/images/user-interface/pixel-art-mobile-pause-button-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-pause-button-pressed-001.png") */;
 }
 
 .mobile-joystick {
@@ -3019,7 +4697,7 @@ body.mobile-isolated * {
   border: 0;
   border-radius: 50%;
   background:
-    url("docs/images/user-interface/pixel-art-mobile-joystick-ring-001.png") center / 100% 100% no-repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-joystick-ring-001.png") */ center / 100% 100% no-repeat,
     radial-gradient(circle at center, rgba(114, 183, 206, 0.12), rgba(23, 27, 30, 0.74) 64%),
     rgba(23, 27, 30, 0.62);
   box-shadow: inset 0 0 24px rgba(114, 183, 206, 0.14);
@@ -3036,7 +4714,7 @@ body.mobile-isolated * {
   border: 0;
   border-radius: 50%;
   background:
-    url("docs/images/user-interface/pixel-art-mobile-joystick-thumb-001.png") center / 100% 100% no-repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-joystick-thumb-001.png") */ center / 100% 100% no-repeat,
     linear-gradient(180deg, rgba(96, 198, 137, 0.32), rgba(96, 198, 137, 0.12)),
     rgba(23, 27, 30, 0.86);
   image-rendering: pixelated;
@@ -3054,7 +4732,7 @@ body.mobile-isolated * {
   border: 0;
   border-radius: 0;
   background:
-    url("docs/images/user-interface/pixel-art-mobile-e-button-normal-001.png") center / 100% 100% no-repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-e-button-normal-001.png") */ center / 100% 100% no-repeat,
     radial-gradient(circle at center, rgba(227, 180, 86, 0.22), rgba(23, 27, 30, 0.78)),
     rgba(23, 27, 30, 0.78);
   color: var(--amber);
@@ -3065,11 +4743,11 @@ body.mobile-isolated * {
 }
 
 .mobile-interact-button:hover {
-  background-image: url("docs/images/user-interface/pixel-art-mobile-e-button-hover-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-e-button-hover-001.png") */;
 }
 
 .mobile-interact-button:active {
-  background-image: url("docs/images/user-interface/pixel-art-mobile-e-button-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-e-button-pressed-001.png") */;
 }
 
 .mobile-switch-button {
@@ -3083,7 +4761,7 @@ body.mobile-isolated * {
   border: 0;
   border-radius: 0;
   background:
-    url("docs/images/user-interface/pixel-art-mobile-h-button-normal-001.png") center / 100% 100% no-repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-h-button-normal-001.png") */ center / 100% 100% no-repeat,
     radial-gradient(circle at center, rgba(114, 183, 206, 0.2), rgba(23, 27, 30, 0.78)),
     rgba(23, 27, 30, 0.78);
   color: var(--cyan);
@@ -3094,11 +4772,11 @@ body.mobile-isolated * {
 }
 
 .mobile-switch-button:hover {
-  background-image: url("docs/images/user-interface/pixel-art-mobile-h-button-hover-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-h-button-hover-001.png") */;
 }
 
 .mobile-switch-button:active {
-  background-image: url("docs/images/user-interface/pixel-art-mobile-h-button-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-h-button-pressed-001.png") */;
 }
 
 body.mobile-isolated .control-card,
@@ -3135,12 +4813,12 @@ body.mobile-isolated .pause-overlay {
 body.mobile-isolated .pause-overlay .pause-panel {
   width: min(92vw, 360px);
   border: 20px solid transparent;
-  border-image: url("docs/images/user-interface/pixel-art-mobile-pause-panel-frame-001.png") 72 fill / 20px / 0 stretch;
+  border-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-pause-panel-frame-001.png") */ 72 fill / 20px / 0 stretch;
   padding: 10px;
   border-radius: 8px;
   background:
     linear-gradient(180deg, rgba(8, 13, 16, 0.84), rgba(8, 13, 16, 0.96)),
-    url("docs/images/user-interface/pixel-art-mobile-pause-panel-center-001.png") 0 0 / 32px 32px repeat,
+    none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-pause-panel-center-001.png") */ 0 0 / 32px 32px repeat,
     rgba(18, 22, 24, 0.94);
   image-rendering: pixelated;
 }
@@ -3155,17 +4833,17 @@ body.mobile-isolated .pause-actions button {
   border: 0;
   border-radius: 0;
   padding: 5px 4px;
-  background: url("docs/images/user-interface/pixel-art-mobile-pause-nav-button-normal-001.png") center / 100% 100% no-repeat;
+  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-pause-nav-button-normal-001.png") */ center / 100% 100% no-repeat;
   font-size: 10px;
   image-rendering: pixelated;
 }
 
 body.mobile-isolated .pause-actions button:hover {
-  background-image: url("docs/images/user-interface/pixel-art-mobile-pause-nav-button-hover-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-pause-nav-button-hover-001.png") */;
 }
 
 body.mobile-isolated .pause-actions button:active {
-  background-image: url("docs/images/user-interface/pixel-art-mobile-pause-nav-button-pressed-001.png");
+  background-image: none /* PNG disabled: url("docs/images/user-interface/pixel-art-mobile-pause-nav-button-pressed-001.png") */;
 }
 
 body.mobile-isolated.game-expanded.expanded-paused .left-panel,
@@ -3250,27 +4928,64 @@ body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
   </head>
   <body>
     <section id="startMenuOverlay" class="menu-overlay" aria-label="Start menu" aria-modal="true" role="dialog">
-      <div class="credits-card">
-        <p class="panel-label">Credits</p>
-        <strong>Original tactical prototype</strong>
-        <span>Built with HTML, CSS, and JavaScript Canvas.</span>
-      </div>
       <div class="menu-panel start-panel">
-        <p class="eyebrow">Breachline Training</p>
-        <h2>2D tactical shooter</h2>
-        <button id="playMenuButton" type="button">Play</button>
-        <div id="onboardingQuestion" class="onboarding-question hidden">
+        <p class="eyebrow">Tactical Canvas Command</p>
+        <h2 class="press-start-title" aria-label="Delta Geometry">
+          <!-- Previous CSS pixel-letter title block disabled.
+          <span class="pixel-title-word" aria-hidden="true">
+            <span>D</span><span>E</span><span>L</span><span>T</span><span>A</span>
+          </span>
+          <span class="pixel-title-word" aria-hidden="true">
+            <span>G</span><span>E</span><span>O</span><span>M</span><span>E</span><span>T</span><span>R</span><span>Y</span>
+          </span>
+          -->
+          <span>Delta</span>
+          <span>Geometry</span>
+        </h2>
+        <nav class="start-menu-options" aria-label="Start menu options">
+          <button id="playMenuButton" type="button">Start</button>
+          <button id="startSettingButton" type="button">Setting</button>
+          <button id="startInfoButton" type="button">Information</button>
+          <button id="startExitButton" type="button">Exit</button>
+        </nav>
+        <p id="startExitMessage" class="start-menu-message hidden" role="status"></p>
+        <!-- Inline information card disabled. Information now opens in a separate transparent overlay.
+        <div id="startInfoPanel" class="start-info-panel hidden" aria-live="polite">
+          <p class="panel-label">Information</p>
+          <blockquote>Clear the unknown one angle, one door, and one decision at a time.</blockquote>
+          <strong>Credits</strong>
+          <span>Original tactical prototype.</span>
+          <span>Built with HTML, CSS, and JavaScript Canvas.</span>
+          <button id="closeStartInfoButton" type="button">Close</button>
+        </div>
+        -->
+      </div>
+      <div id="onboardingQuestion" class="start-onboarding-overlay hidden" aria-live="polite">
+        <section class="onboarding-question start-onboarding-card" aria-label="Start question">
           <p>Have you played this game before?</p>
           <div class="menu-actions">
             <button id="playedYesButton" type="button">Yes</button>
             <button id="playedNoButton" type="button">No</button>
           </div>
-        </div>
+          <button id="closeOnboardingButton" class="subtle-menu-button" type="button">Back</button>
+        </section>
       </div>
+      <div id="startInfoPanel" class="start-info-overlay hidden" aria-live="polite">
+        <section class="start-info-card" aria-label="Game information">
+          <p class="panel-label">Information</p>
+          <blockquote>Clear the unknown one angle, one door, and one decision at a time.</blockquote>
+          <strong>Credits</strong>
+          <span>Original tactical prototype.</span>
+          <span>Built with HTML, CSS, and JavaScript Canvas.</span>
+          <button id="closeStartInfoButton" type="button">Exit</button>
+        </section>
+      </div>
+      <!--
       <label class="start-menu-setting checkbox-row" for="startPngRenderingCheckbox">
         <span>Use PNGs</span>
         <input id="startPngRenderingCheckbox" type="checkbox" checked>
       </label>
+      -->
     </section>
 
     <section id="mainMenuOverlay" class="menu-overlay hidden" aria-label="Main menu" aria-modal="true" role="dialog">
@@ -3322,6 +5037,31 @@ body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
           <p class="eyebrow">Breachline 2D</p>
           <h1 id="levelTitle">Ridge House Entry</h1>
         </div>
+        <section class="control-card mission-status-card brandbar-status" aria-label="Mission status">
+          <p class="panel-label">Mission Status</p>
+          <div class="mission-status-grid">
+            <div>
+              <span>Mode</span>
+              <strong id="modeLabel">Planning</strong>
+            </div>
+            <div>
+              <span>Objective</span>
+              <strong id="objectiveLabel">Secure</strong>
+            </div>
+            <div>
+              <span>Operator</span>
+              <strong id="selectedStatusLabel">ALPHA</strong>
+            </div>
+            <div>
+              <span>Shooting</span>
+              <strong id="shootingStatusLabel">Automatic</strong>
+            </div>
+            <div>
+              <span>Zone</span>
+              <strong id="selectedZoneLabel">Floor 1</strong>
+            </div>
+          </div>
+        </section>
       </header>
 
       <section class="play-layout">
@@ -3340,6 +5080,7 @@ body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
             <button id="inventoryButton" type="button">Open Inventory</button>
           </section>
 
+          <!--
           <section class="control-card mission-status-card" aria-label="Mission status">
             <p class="panel-label">Mission Status</p>
             <div class="mission-status-grid">
@@ -3365,12 +5106,13 @@ body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
               </div>
             </div>
           </section>
+          -->
         </aside>
 
         <section class="game-panel">
           <canvas id="game" width="960" height="640" aria-label="Breachline 2D tactical map"></canvas>
           <button id="expandGameButton" class="expand-game-button" type="button">Expand</button>
-          <button id="expandedPauseButton" class="expanded-pause-button" type="button">PAUSE</button>
+          <button id="expandedPauseButton" class="expanded-pause-button" type="button">Press Esc to pause</button>
           <!--
           <div id="expandedNav" class="expanded-nav hidden" aria-label="Expanded gameplay navigation">
             <button type="button" data-expanded-action="inventory">Inventory</button>
@@ -3513,17 +5255,29 @@ body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
                 </select>
               </label>
               <label class="level-picker" for="hintOpacityRange">
-                <span>Hint Transparency</span>
+                <span>Hint Transparency <strong id="hintOpacityValue" class="range-value">42%</strong></span>
                 <input id="hintOpacityRange" type="range" min="0.18" max="0.78" step="0.04" value="0.42">
               </label>
               <label class="level-picker" for="viewRange">
-                <span>View</span>
+                <span>View <strong id="viewValueLabel" class="range-value">50</strong></span>
                 <input id="viewRange" type="range" min="0" max="100" step="1" value="50">
               </label>
+              <!--
+              <label class="level-picker" for="pixelArtStyleSelect">
+                <span>Pixel Art Style</span>
+                <select id="pixelArtStyleSelect">
+                  <option value="geometry" selected>Geometry Only</option>
+                  <option value="v1">Pixel Art V1</option>
+                  <option value="v2">Pixel Art V2</option>
+                </select>
+              </label>
+              -->
+              <!--
               <label class="level-picker checkbox-row" for="pngRenderingCheckbox">
                 <span>Use PNGs</span>
                 <input id="pngRenderingCheckbox" type="checkbox" checked>
               </label>
+              -->
             </section>
 
             <section class="control-card" data-settings-panel="operator">
@@ -3549,9 +5303,13 @@ body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
               </div>
             </section>
           </div>
+          <div class="settings-footer-actions">
+            <button id="settingsExitToMenuButton" type="button">Exit to menu</button>
+          </div>
         </div>
       </section>
 
+      <!--
       <section id="settingsChangeOverlay" class="settings-change-overlay hidden" aria-label="Settings change warning" aria-modal="true" role="dialog">
         <div class="settings-change-card">
           <p class="eyebrow">Restart Required</p>
@@ -3563,6 +5321,7 @@ body.mobile-isolated.game-expanded.expanded-paused #tutorialCard:not(.hidden) {
           </div>
         </div>
       </section>
+      -->
 
       <section id="digitalLockOverlay" class="settings-overlay hidden" aria-label="Digital lock" aria-modal="true" role="dialog">
         <div class="lock-panel">
@@ -5737,33 +7496,53 @@ function demoResponse(data) {
 
     // Shows the start screen at boot.
     function showStart() {
+      document.documentElement.classList.add("start-menu-active");
+      document.body.classList.add("start-menu-active");
       if (elements.startMenuOverlay) elements.startMenuOverlay.classList.remove("hidden");
       if (elements.mainMenuOverlay) elements.mainMenuOverlay.classList.add("hidden");
+      if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
+      if (elements.startInfoPanel) elements.startInfoPanel.classList.add("hidden");
+      if (deps.refreshStartMenu) deps.refreshStartMenu();
       closePause();
       if (runtime.state) runtime.state.running = false;
     }
 
     // Shows the main navigation page.
-    function showMain() {
+    function showMain(options = {}) {
+      const returnToPause = Boolean(options.returnToPause);
+      const returnResumeRunning = Boolean(options.resumeRunning);
+      document.documentElement.classList.remove("start-menu-active");
+      document.body.classList.remove("start-menu-active");
       if (elements.startMenuOverlay) elements.startMenuOverlay.classList.add("hidden");
+      if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
       if (elements.mainMenuOverlay) elements.mainMenuOverlay.classList.remove("hidden");
-      closePause();
+      closePause({ resume: false });
+      runtime.menuReturnToPause = returnToPause;
+      runtime.menuReturnResumeRunning = returnResumeRunning;
       if (runtime.state) runtime.state.running = false;
       render();
     }
 
     // Enters active gameplay from menus.
     function enterGame() {
+      if (deps.settings && deps.settings.isOpen && deps.settings.isOpen()) deps.settings.closeSettings();
+      document.documentElement.classList.remove("start-menu-active");
+      document.body.classList.remove("start-menu-active");
       if (elements.startMenuOverlay) elements.startMenuOverlay.classList.add("hidden");
+      if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
       if (elements.mainMenuOverlay) elements.mainMenuOverlay.classList.add("hidden");
+      runtime.menuReturnToPause = false;
+      runtime.menuReturnResumeRunning = false;
       closePause();
       deps.updateHud();
     }
 
     // Opens pause navigation and freezes gameplay.
-    function openPause() {
+    function openPause(options = {}) {
       if (runtime.pauseOpen) return;
-      runtime.pauseResumeRunning = Boolean(runtime.state && runtime.state.running);
+      runtime.pauseResumeRunning = typeof options.resumeRunning === "boolean"
+        ? options.resumeRunning
+        : Boolean(runtime.state && runtime.state.running);
       if (runtime.state) runtime.state.running = false;
       runtime.pauseOpen = true;
       runtime.expandedPaused = Boolean(runtime.expandedGame);
@@ -5774,13 +7553,14 @@ function demoResponse(data) {
     }
 
     // Closes pause navigation and optionally resumes gameplay.
-    function closePause() {
+    function closePause(options = {}) {
       if (!runtime.pauseOpen) return;
+      const shouldResume = options.resume !== false;
       runtime.pauseOpen = false;
       runtime.expandedPaused = false;
       document.body.classList.remove("expanded-paused");
       elements.pauseOverlay.classList.add("hidden");
-      if (runtime.state && !runtime.state.gameOver && runtime.pauseResumeRunning) runtime.state.running = true;
+      if (shouldResume && runtime.state && !runtime.state.gameOver && runtime.pauseResumeRunning) runtime.state.running = true;
       runtime.pauseResumeRunning = false;
       deps.updateHud();
     }
@@ -5793,14 +7573,18 @@ function demoResponse(data) {
 
     // Opens main page focused on levels.
     function showLevelMenu() {
-      closePause();
-      showMain();
+      showMain({
+        returnToPause: runtime.pauseOpen,
+        resumeRunning: runtime.pauseResumeRunning
+      });
     }
 
     // Opens main page focused on tutorials.
     function showTutorialMenu() {
-      closePause();
-      showMain();
+      showMain({
+        returnToPause: runtime.pauseOpen,
+        resumeRunning: runtime.pauseResumeRunning
+      });
     }
 
     // Opens Settings from pause.
@@ -5824,8 +7608,37 @@ function demoResponse(data) {
       deps.updateHud();
     }
 
+    // Reports whether the main navigation page is currently visible.
+    function isMainOpen() {
+      return Boolean(elements.mainMenuOverlay && !elements.mainMenuOverlay.classList.contains("hidden"));
+    }
+
+    // Closes main navigation, returning to pause when it was opened from pause.
+    function closeMainOverlay() {
+      if (!isMainOpen()) return false;
+      if (elements.mainMenuOverlay) elements.mainMenuOverlay.classList.add("hidden");
+      if (runtime.menuReturnToPause) {
+        const resumeRunning = Boolean(runtime.menuReturnResumeRunning);
+        runtime.menuReturnToPause = false;
+        runtime.menuReturnResumeRunning = false;
+        openPause({ resumeRunning });
+      } else {
+        runtime.menuReturnToPause = false;
+        runtime.menuReturnResumeRunning = false;
+        if (runtime.state) runtime.state.running = false;
+        deps.updateHud();
+      }
+      return true;
+    }
+
     // Renders level/tutorial number blocks and privilege state.
     function render() {
+      if (!runtime.gameDataReady) {
+        if (elements.menuLevelBlocks) elements.menuLevelBlocks.innerHTML = "";
+        if (elements.menuTutorialBlocks) elements.menuTutorialBlocks.innerHTML = "";
+        if (elements.privilegeBoard) elements.privilegeBoard.innerHTML = "";
+        return;
+      }
       deps.progression.renderPrivilegeBoard();
       renderLevelBlocks();
       renderTutorialBlocks();
@@ -5864,6 +7677,8 @@ function demoResponse(data) {
       openSettingsFromPause,
       togglePause,
       toggleExpanded,
+      isMainOpen,
+      closeMainOverlay,
       render
     };
   }
@@ -6131,6 +7946,7 @@ function demoResponse(data) {
     const elements = deps.elements;
     let lastHealthBoardHtml = "";
     let lastEnemyLoadoutHtml = "";
+    /*
     const equipmentImages = {
       "no-weapon": "pixel-art-no-weapon-001.png",
       rifle: "pixel-art-rifle-001.png",
@@ -6148,6 +7964,8 @@ function demoResponse(data) {
       "medium-backpack": "pixel-art-medium-backpack-001.png",
       "large-backpack": "pixel-art-large-backpack-001.png"
     };
+    */
+    const equipmentImages = {};
 
     // Resolves a weapon definition, falling back to rifle.
     function weaponById(id) {
@@ -6225,19 +8043,26 @@ function demoResponse(data) {
 
     // Resolves the static pixel-art image for any equipment id.
     function equipmentImagePath(id) {
-      const file = equipmentImages[id];
-      return file ? `docs/images/equipments/${file}` : "";
+      // if (runtime.pixelArtStyle === "geometry") return "";
+      // const file = equipmentImages[id];
+      // if (!file) return "";
+      // const base = runtime.pixelArtStyle === "v2" ? "docs/images/pixel-art-v2" : "docs/images/equipments";
+      // return `${base}/${file}`;
+      return "";
     }
 
     // Renders a compact static equipment image with a text fallback.
     function equipmentIconHtml(id, label, className = "") {
-      const src = equipmentImagePath(id);
-      const safeLabel = escapeAttr(label || id || "Equipment");
-      const classes = ["equipment-icon", className].filter(Boolean).join(" ");
-      if (!src) {
-        return `<span class="${classes} equipment-icon-fallback" aria-label="${safeLabel}">${fallbackInitial(label || id)}</span>`;
+      // const src = equipmentImagePath(id);
+      // const safeLabel = escapeAttr(label || id || "Equipment");
+      // const classes = ["equipment-icon", className].filter(Boolean).join(" ");
+      /*
+      if (src) {
+        return `<img class="${classes}" src="${src}" alt="${safeLabel}" loading="lazy" draggable="false" onerror="this.replaceWith(document.createTextNode('${fallbackInitial(label || id)}'))">`;
       }
-      return `<img class="${classes}" src="${src}" alt="${safeLabel}" loading="lazy" draggable="false" onerror="this.replaceWith(document.createTextNode('${fallbackInitial(label || id)}'))">`;
+      return `<span class="${classes} equipment-icon-fallback" aria-label="${safeLabel}">${fallbackInitial(label || id)}</span>`;
+      */
+      return "";
     }
 
     // Loads all weapon and armor JSON definitions from the equipment folder.
@@ -6334,14 +8159,12 @@ function demoResponse(data) {
         return `
           <div class="enemy-loadout-row">
             <strong>${enemy.id}</strong>
-            <label class="icon-select-row">
-              ${equipmentIconHtml(selectedWeaponId, weapon ? weapon.name : selectedWeaponId, "equipment-icon-small")}
+            <label class="plain-select-row">
               <select data-enemy-weapon-id="${enemy.id}" aria-label="${enemy.id} weapon">
                 ${weaponOptionsHtml(selectedWeaponId)}
               </select>
             </label>
-            <label class="icon-select-row">
-              ${equipmentIconHtml(selectedArmorId, armor ? armor.name : selectedArmorId, "equipment-icon-small")}
+            <label class="plain-select-row">
               <select data-enemy-armor-id="${enemy.id}" aria-label="${enemy.id} armor">
                 ${armorOptionsHtml(selectedArmorId)}
               </select>
@@ -6501,10 +8324,10 @@ function demoResponse(data) {
       renderWeaponTooltip(op, weapon, armor, backpack);
       renderAmmoBoard(op);
       elements.weaponStats.innerHTML = `
-        <div class="loadout-icon-strip" aria-label="Selected equipment">
-          ${equipmentIconHtml(weapon.id, weapon.name, "equipment-icon-small")}
-          ${equipmentIconHtml(armor.id, armor.name, "equipment-icon-small")}
-          ${equipmentIconHtml(backpack.id, backpack.name, "equipment-icon-small")}
+        <div class="loadout-text-strip" aria-label="Selected equipment">
+          <span>Weapon: <strong>${weapon.name}</strong></span>
+          <span>Armor: <strong>${armor.name}</strong></span>
+          <span>Backpack: <strong>${backpack.name}</strong></span>
         </div>
         <div>${weapon.role}</div>
         <div class="empty-note">Hover weapon art for equipment details.</div>
@@ -6561,11 +8384,11 @@ function demoResponse(data) {
         return;
       }
       const weapon = weaponById(weaponId);
-      const image = equipmentIconHtml(weaponId, weapon ? weapon.name : weaponId, "equipment-icon-preview");
+      const art = weaponPixelBlockHtml(weaponId, weapon);
       elements.weaponPixelPreview.classList.remove("empty");
       elements.weaponPixelPreview.innerHTML = `
         <div class="weapon-image-frame" role="img" aria-label="${weapon ? weapon.name : weaponId} pixel preview">
-          ${image}
+          ${art}
         </div>
       `;
     }
@@ -6604,14 +8427,14 @@ function demoResponse(data) {
               <span class="armor-fill" style="width: ${armorPercent}%"></span>
             </span>
             <span class="operator-row">
-              <span class="operator-equipment-label">${equipmentIconHtml(op.armorId, armorById(op.armorId).name, "equipment-icon-tiny")}${armorById(op.armorId).name}</span>
+              <span class="operator-equipment-label">${armorById(op.armorId).name}</span>
               <span>${op.armor.toFixed(0)} AR</span>
             </span>
             <span class="health-meter" aria-hidden="true">
               <span class="health-fill" style="width: ${health}%"></span>
             </span>
             <span class="operator-row">
-              <span class="operator-equipment-label">${equipmentIconHtml(op.weaponId, weapon ? weapon.name : "Rifle", "equipment-icon-tiny")}${weapon ? weapon.name : "Rifle"}</span>
+              <span class="operator-equipment-label">${weapon ? weapon.name : "Rifle"}</span>
               <span>${health.toFixed(0)} HP</span>
             </span>
           </button>
@@ -6655,6 +8478,61 @@ function demoResponse(data) {
       renderWeaponTooltip,
       renderAmmoBoard
     };
+
+    // Builds CSS pixel-block weapon art without PNG assets.
+    function weaponPixelBlockHtml(id, weapon) {
+      const type = pixelWeaponType(id, weapon);
+      const label = escapeAttr(weapon ? weapon.name : id || "Weapon");
+      if (type === "none") {
+        return `<div class="weapon-pixel-art weapon-pixel-art-none" aria-label="${label}"><span>No weapon</span></div>`;
+      }
+      return `
+        <div class="weapon-pixel-art weapon-pixel-art-${type}" aria-label="${label}">
+          ${Array.from({ length: 60 }, (_, index) => `<span class="weapon-pixel-cell weapon-pixel-cell-${index}" aria-hidden="true"></span>`).join("")}
+        </div>
+      `;
+    }
+
+    // Maps equipment ids to CSS pixel-block weapon art classes.
+    function pixelWeaponType(id, weapon) {
+      if (!id || id === "no-weapon" || weapon?.canFire === false && weapon?.attackType !== "melee") return "none";
+      if (weapon?.attackType === "melee" || id === "melee") return "melee";
+      if (id.includes("smg") || id.includes("pdw")) return "smg";
+      if (id.includes("pistol")) return "pistol";
+      return "rifle";
+    }
+
+    /*
+    Geometry weapon group disabled.
+    // Builds a CSS-only tactical weapon silhouette for the selected loadout.
+    function weaponGeometryHtml(id, weapon) {
+      const type = weaponGeometryType(id, weapon);
+      const label = escapeAttr(weapon ? weapon.name : id || "Weapon");
+      if (type === "none") {
+        return `<div class="weapon-geometry weapon-geometry-none" aria-label="${label}"><span>No weapon</span></div>`;
+      }
+      return `
+        <div class="weapon-geometry weapon-geometry-${type}" aria-label="${label}">
+          <span class="weapon-part weapon-stock"></span>
+          <span class="weapon-part weapon-body"></span>
+          <span class="weapon-part weapon-barrel"></span>
+          <span class="weapon-part weapon-grip"></span>
+          <span class="weapon-part weapon-magazine"></span>
+          <span class="weapon-part weapon-blade"></span>
+          <span class="weapon-part weapon-guard"></span>
+        </div>
+      `;
+    }
+
+    // Maps equipment ids to reusable CSS geometry classes.
+    function weaponGeometryType(id, weapon) {
+      if (!id || id === "no-weapon" || weapon?.canFire === false && weapon?.attackType !== "melee") return "none";
+      if (weapon?.attackType === "melee" || id === "melee") return "melee";
+      if (id.includes("smg") || id.includes("pdw")) return "smg";
+      if (id.includes("pistol")) return "pistol";
+      return "rifle";
+    }
+    */
   }
 
   // Escapes text for safe use inside HTML attributes.
@@ -6896,6 +8774,7 @@ function demoResponse(data) {
       elements.banner.classList.add("hidden");
       if (elements.exitTutorialButton) elements.exitTutorialButton.classList.add("hidden");
       elements.levelTitle.textContent = runtime.currentLevel.title || runtime.currentLevelMeta.title;
+      if (deps.saveResumePoint) deps.saveResumePoint(runtime.currentLevelMeta, runtime.activeMode);
       deps.updateHud();
     }
 
@@ -7165,6 +9044,12 @@ function demoResponse(data) {
 
     // Applies a setup change immediately or asks for restart confirmation after units move.
     function requestSettingChange(applyChange, options = {}) {
+      applyChange();
+      if (options.restartWhenClean && deps.level && deps.level.restart) deps.level.restart();
+      deps.updateHud();
+      return true;
+      /*
+      Restart-warning flow disabled: settings now apply directly after the game has started.
       if (runtime.activeMode === "tutorial") {
         applyChange();
         deps.updateHud();
@@ -7184,6 +9069,7 @@ function demoResponse(data) {
       if (elements.settingsChangeOverlay) elements.settingsChangeOverlay.classList.remove("hidden");
       deps.keysDown.clear();
       return false;
+      */
     }
 
     // Confirms the pending settings change and restarts the current mission when required.
@@ -7237,8 +9123,9 @@ function demoResponse(data) {
       if (elements.enemyTraceSelect) elements.enemyTraceSelect.value = runtime.enemyTraceMode || "current";
       if (elements.hintOpacityRange) elements.hintOpacityRange.value = String(runtime.hintOpacity || 0.42);
       if (elements.viewRange) elements.viewRange.value = String(runtime.viewValue || 50);
-      if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
-      if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+      // if (elements.pixelArtStyleSelect) elements.pixelArtStyleSelect.value = runtime.pixelArtStyle || "geometry";
+      // if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+      // if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
     }
 
     // Restores controls, setup options, and saved loadout selections to defaults.
@@ -7251,7 +9138,7 @@ function demoResponse(data) {
       runtime.showAllHealth = false;
       runtime.hintOpacity = 0.42;
       runtime.viewValue = 50;
-      runtime.usePngRendering = true;
+      runtime.pixelArtStyle = "geometry";
       if (runtime.state) {
         runtime.state.shootingMode = "automatic";
         runtime.state.message = "Settings reset to defaults";
@@ -7268,8 +9155,9 @@ function demoResponse(data) {
       if (elements.enemyTraceSelect) elements.enemyTraceSelect.value = "current";
       if (elements.hintOpacityRange) elements.hintOpacityRange.value = "0.42";
       if (elements.viewRange) elements.viewRange.value = "50";
-      if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = true;
-      if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = true;
+      // if (elements.pixelArtStyleSelect) elements.pixelArtStyleSelect.value = "geometry";
+      // if (elements.pngRenderingCheckbox) elements.pngRenderingCheckbox.checked = true;
+      // if (elements.startPngRenderingCheckbox) elements.startPngRenderingCheckbox.checked = true;
       if (deps.camera && deps.camera.setViewValue) deps.camera.setViewValue(50);
       if (runtime.activeMode !== "tutorial" && deps.level && deps.level.restart) deps.level.restart();
       deps.renderEnemyLoadouts();
@@ -7758,6 +9646,7 @@ function demoResponse(data) {
       state.gameOver = true;
       state.running = false;
       state.result = result;
+      if (deps.clearResumePoint) deps.clearResumePoint();
       deps.audio.play(result === "success" ? "mission-success" : "mission-failed");
       const tutorialSuccess = runtime.activeMode === "tutorial" && result === "success";
       const storySuccess = runtime.activeMode === "level" && result === "success";
@@ -7788,6 +9677,7 @@ function demoResponse(data) {
       renderMissionReport(result, progress);
       populateResultSelector();
       elements.banner.classList.remove("hidden");
+      if (deps.refreshStartMenu) deps.refreshStartMenu();
       deps.updateHud();
     }
 
@@ -7839,64 +9729,124 @@ function demoResponse(data) {
     const world = deps.world;
     const colors = deps.colors;
     const twoPi = deps.twoPi;
-    const imageCache = new Map();
-    const objectPath = "docs/images/gameplay-objects/";
-    const sprites = {
-      floor: `${objectPath}pixel-art-floor-tile-001.png`,
-      floorBackground: `${objectPath}pixel-art-floor-background-001.png`,
-      grid: `${objectPath}pixel-art-grid-overlay-tile-001.png`,
-      zone: `${objectPath}pixel-art-room-zone-fill-tile-001.png`,
-      labelFrame: `${objectPath}pixel-art-room-label-plaque-001.png`,
-      labelSmallFrame: `${objectPath}pixel-art-room-label-small-plaque-001.png`,
-      wallHorizontal: `${objectPath}pixel-art-horizontal-wall-segment-001.png`,
-      wallVertical: `${objectPath}pixel-art-vertical-wall-segment-001.png`,
-      wallCorner: `${objectPath}pixel-art-wall-corner-001.png`,
-      wallEndCap: `${objectPath}pixel-art-wall-end-cap-001.png`,
-      doorClosedHorizontal: `${objectPath}pixel-art-normal-door-closed-horizontal-001.png`,
-      doorClosedVertical: `${objectPath}pixel-art-normal-door-closed-vertical-001.png`,
-      doorOpenHorizontal: `${objectPath}pixel-art-normal-door-open-horizontal-001.png`,
-      doorOpenVertical: `${objectPath}pixel-art-normal-door-open-vertical-001.png`,
-      digitalDoorClosedHorizontal: `${objectPath}pixel-art-digital-lock-door-closed-horizontal-001.png`,
-      digitalDoorClosedVertical: `${objectPath}pixel-art-digital-lock-door-closed-vertical-001.png`,
-      lockedMarker: `${objectPath}pixel-art-locked-marker-001.png`,
-      unlockedMarker: `${objectPath}pixel-art-unlocked-marker-001.png`,
-      windowClosedHorizontal: `${objectPath}pixel-art-closed-horizontal-window-001.png`,
-      windowClosedVertical: `${objectPath}pixel-art-closed-vertical-window-001.png`,
-      windowOpenHorizontal: `${objectPath}pixel-art-open-horizontal-window-001.png`,
-      windowOpenVertical: `${objectPath}pixel-art-open-vertical-window-001.png`,
-      windowBrokenHorizontal: `${objectPath}pixel-art-broken-horizontal-window-001.png`,
-      windowBrokenVertical: `${objectPath}pixel-art-broken-vertical-window-001.png`,
-      glassBreak: `${objectPath}pixel-art-glass-break-effect-001.png`,
-      paper: `${objectPath}pixel-art-paper-clue-on-floor-001.png`,
-      paperHighlighted: `${objectPath}pixel-art-paper-clue-highlighted-001.png`,
-      genericPickup: `${objectPath}pixel-art-generic-pickup-item-001.png`,
-      stairs: `${objectPath}pixel-art-stair-up-marker-001.png`,
-      stairsDown: `${objectPath}pixel-art-stair-down-marker-001.png`,
-      stairGlow: `${objectPath}pixel-art-stair-interaction-glow-001.png`,
-      gearTable: `${objectPath}pixel-art-gear-table-top-down-001.png`,
-      gearTableActive: `${objectPath}pixel-art-gear-table-active-highlighted-001.png`,
-      laptopClosed: `${objectPath}pixel-art-laptop-closed-001.png`,
-      laptopOpen: `${objectPath}pixel-art-laptop-open-001.png`,
-      laptopUsed: `${objectPath}pixel-art-laptop-hacked-used-001.png`,
-      camera: `${objectPath}pixel-art-camera-body-001.png`,
-      cameraActive: `${objectPath}pixel-art-camera-active-001.png`,
-      cameraLabel: `${objectPath}pixel-art-camera-label-badge-c1-c2-base-001.png`,
-      operator: `${objectPath}pixel-art-operator-idle-top-down-001.png`,
-      operatorMoving: `${objectPath}pixel-art-operator-moving-top-down-001.png`,
-      operatorDown: `${objectPath}pixel-art-operator-downed-001.png`,
-      enemy: `${objectPath}pixel-art-enemy-calm-001.png`,
-      enemySuspicious: `${objectPath}pixel-art-enemy-suspicious-001.png`,
-      enemyAlert: `${objectPath}pixel-art-enemy-alert-001.png`,
-      enemyDown: `${objectPath}pixel-art-enemy-downed-001.png`,
-      objective: `${objectPath}pixel-art-vip-objective-idle-001.png`,
-      objectiveSecured: `${objectPath}pixel-art-vip-secured-001.png`,
-      routeDash: `${objectPath}pixel-art-planned-path-dash-001.png`,
-      waypoint: `${objectPath}pixel-art-waypoint-dot-001.png`,
-      waypointActive: `${objectPath}pixel-art-active-waypoint-dot-001.png`,
-      bullet: `${objectPath}pixel-art-bullet-tracer-segment-001.png`,
-      muzzleFlash: `${objectPath}pixel-art-muzzle-flash-001.png`,
-      hitSpark: `${objectPath}pixel-art-hit-spark-001.png`
+    // const imageCache = new Map();
+    /*
+    const v1ObjectPath = "docs/images/gameplay-objects/";
+    const v2ObjectPath = "docs/images/pixel-art-v2/";
+    const v1Sprites = {
+      floor: `${v1ObjectPath}pixel-art-floor-tile-001.png`,
+      floorBackground: `${v1ObjectPath}pixel-art-floor-background-001.png`,
+      grid: `${v1ObjectPath}pixel-art-grid-overlay-tile-001.png`,
+      zone: `${v1ObjectPath}pixel-art-room-zone-fill-tile-001.png`,
+      labelFrame: `${v1ObjectPath}pixel-art-room-label-plaque-001.png`,
+      labelSmallFrame: `${v1ObjectPath}pixel-art-room-label-small-plaque-001.png`,
+      wallHorizontal: `${v1ObjectPath}pixel-art-horizontal-wall-segment-001.png`,
+      wallVertical: `${v1ObjectPath}pixel-art-vertical-wall-segment-001.png`,
+      wallCorner: `${v1ObjectPath}pixel-art-wall-corner-001.png`,
+      wallEndCap: `${v1ObjectPath}pixel-art-wall-end-cap-001.png`,
+      doorClosedHorizontal: `${v1ObjectPath}pixel-art-normal-door-closed-horizontal-001.png`,
+      doorClosedVertical: `${v1ObjectPath}pixel-art-normal-door-closed-vertical-001.png`,
+      doorOpenHorizontal: `${v1ObjectPath}pixel-art-normal-door-open-horizontal-001.png`,
+      doorOpenVertical: `${v1ObjectPath}pixel-art-normal-door-open-vertical-001.png`,
+      digitalDoorClosedHorizontal: `${v1ObjectPath}pixel-art-digital-lock-door-closed-horizontal-001.png`,
+      digitalDoorClosedVertical: `${v1ObjectPath}pixel-art-digital-lock-door-closed-vertical-001.png`,
+      lockedMarker: `${v1ObjectPath}pixel-art-locked-marker-001.png`,
+      unlockedMarker: `${v1ObjectPath}pixel-art-unlocked-marker-001.png`,
+      windowClosedHorizontal: `${v1ObjectPath}pixel-art-closed-horizontal-window-001.png`,
+      windowClosedVertical: `${v1ObjectPath}pixel-art-closed-vertical-window-001.png`,
+      windowOpenHorizontal: `${v1ObjectPath}pixel-art-open-horizontal-window-001.png`,
+      windowOpenVertical: `${v1ObjectPath}pixel-art-open-vertical-window-001.png`,
+      windowBrokenHorizontal: `${v1ObjectPath}pixel-art-broken-horizontal-window-001.png`,
+      windowBrokenVertical: `${v1ObjectPath}pixel-art-broken-vertical-window-001.png`,
+      glassBreak: `${v1ObjectPath}pixel-art-glass-break-effect-001.png`,
+      paper: `${v1ObjectPath}pixel-art-paper-clue-on-floor-001.png`,
+      paperHighlighted: `${v1ObjectPath}pixel-art-paper-clue-highlighted-001.png`,
+      genericPickup: `${v1ObjectPath}pixel-art-generic-pickup-item-001.png`,
+      stairs: `${v1ObjectPath}pixel-art-stair-up-marker-001.png`,
+      stairsDown: `${v1ObjectPath}pixel-art-stair-down-marker-001.png`,
+      stairGlow: `${v1ObjectPath}pixel-art-stair-interaction-glow-001.png`,
+      gearTable: `${v1ObjectPath}pixel-art-gear-table-top-down-001.png`,
+      gearTableActive: `${v1ObjectPath}pixel-art-gear-table-active-highlighted-001.png`,
+      laptopClosed: `${v1ObjectPath}pixel-art-laptop-closed-001.png`,
+      laptopOpen: `${v1ObjectPath}pixel-art-laptop-open-001.png`,
+      laptopUsed: `${v1ObjectPath}pixel-art-laptop-hacked-used-001.png`,
+      camera: `${v1ObjectPath}pixel-art-camera-body-001.png`,
+      cameraActive: `${v1ObjectPath}pixel-art-camera-active-001.png`,
+      cameraLabel: `${v1ObjectPath}pixel-art-camera-label-badge-c1-c2-base-001.png`,
+      operator: `${v1ObjectPath}pixel-art-operator-idle-top-down-001.png`,
+      operatorMoving: `${v1ObjectPath}pixel-art-operator-moving-top-down-001.png`,
+      operatorDown: `${v1ObjectPath}pixel-art-operator-downed-001.png`,
+      enemy: `${v1ObjectPath}pixel-art-enemy-calm-001.png`,
+      enemySuspicious: `${v1ObjectPath}pixel-art-enemy-suspicious-001.png`,
+      enemyAlert: `${v1ObjectPath}pixel-art-enemy-alert-001.png`,
+      enemyDown: `${v1ObjectPath}pixel-art-enemy-downed-001.png`,
+      objective: `${v1ObjectPath}pixel-art-vip-objective-idle-001.png`,
+      objectiveSecured: `${v1ObjectPath}pixel-art-vip-secured-001.png`,
+      routeDash: `${v1ObjectPath}pixel-art-planned-path-dash-001.png`,
+      waypoint: `${v1ObjectPath}pixel-art-waypoint-dot-001.png`,
+      waypointActive: `${v1ObjectPath}pixel-art-active-waypoint-dot-001.png`,
+      bullet: `${v1ObjectPath}pixel-art-bullet-tracer-segment-001.png`,
+      muzzleFlash: `${v1ObjectPath}pixel-art-muzzle-flash-001.png`,
+      hitSpark: `${v1ObjectPath}pixel-art-hit-spark-001.png`
     };
+    const v2Sprites = {
+      floor: `${v2ObjectPath}pixel-art-floor-tile-001.png`,
+      floorBackground: `${v2ObjectPath}pixel-art-floor-tile-001.png`,
+      grid: `${v2ObjectPath}pixel-art-grid-tile-overlay-001.png`,
+      zone: `${v2ObjectPath}pixel-art-room-zone-fill-tile-001.png`,
+      labelFrame: `${v2ObjectPath}pixel-art-room-label-plaque-001.png`,
+      labelSmallFrame: `${v2ObjectPath}pixel-art-room-label-plaque-001.png`,
+      wallHorizontal: `${v2ObjectPath}pixel-art-horizontal-wall-segment-001.png`,
+      wallVertical: `${v2ObjectPath}pixel-art-vertical-wall-segment-001.png`,
+      wallCorner: `${v2ObjectPath}pixel-art-wall-corner-001.png`,
+      wallEndCap: `${v2ObjectPath}pixel-art-wall-end-cap-001.png`,
+      lockedMarker: `${v2ObjectPath}pixel-art-locked-door-marker-001.png`,
+      unlockedMarker: `${v2ObjectPath}pixel-art-unlocked-door-marker-001.png`,
+      windowClosedHorizontal: `${v2ObjectPath}pixel-art-closed-horizontal-window-001.png`,
+      windowClosedVertical: `${v2ObjectPath}pixel-art-closed-vertical-window-001.png`,
+      windowOpenHorizontal: `${v2ObjectPath}pixel-art-open-horizontal-window-001.png`,
+      windowOpenVertical: `${v2ObjectPath}pixel-art-open-vertical-window-001.png`,
+      windowBrokenHorizontal: `${v2ObjectPath}pixel-art-broken-horizontal-window-001.png`,
+      windowBrokenVertical: `${v2ObjectPath}pixel-art-broken-vertical-window-001.png`,
+      paper: `${v2ObjectPath}pixel-art-paper-clue-item-001.png`,
+      paperHighlighted: `${v2ObjectPath}pixel-art-paper-clue-item-001.png`,
+      genericPickup: `${v2ObjectPath}pixel-art-generic-pickup-item-001.png`,
+      stairs: `${v2ObjectPath}pixel-art-stairs-up-marker-001.png`,
+      stairsDown: `${v2ObjectPath}pixel-art-stairs-down-marker-001.png`,
+      gearTable: `${v2ObjectPath}pixel-art-gear-equipment-table-001.png`,
+      gearTableActive: `${v2ObjectPath}pixel-art-gear-equipment-table-001.png`,
+      laptopClosed: `${v2ObjectPath}pixel-art-laptop-closed-001.png`,
+      laptopOpen: `${v2ObjectPath}pixel-art-laptop-open-001.png`,
+      laptopUsed: `${v2ObjectPath}pixel-art-laptop-used-001.png`,
+      camera: `${v2ObjectPath}pixel-art-camera-body-001.png`,
+      cameraActive: `${v2ObjectPath}pixel-art-camera-active-marker-001.png`,
+      cameraLabel: `${v2ObjectPath}pixel-art-camera-label-badge-001.png`,
+      operator: `${v2ObjectPath}pixel-art-operator-top-down-001.png`,
+      operatorMoving: `${v2ObjectPath}pixel-art-operator-top-down-001.png`,
+      operatorDown: `${v2ObjectPath}pixel-art-operator-top-down-001.png`,
+      enemy: `${v2ObjectPath}pixel-art-enemy-top-down-001.png`,
+      enemySuspicious: `${v2ObjectPath}pixel-art-enemy-top-down-001.png`,
+      enemyAlert: `${v2ObjectPath}pixel-art-enemy-top-down-001.png`,
+      enemyDown: `${v2ObjectPath}pixel-art-enemy-top-down-001.png`,
+      objective: `${v2ObjectPath}pixel-art-vip-top-down-001.png`,
+      objectiveSecured: `${v2ObjectPath}pixel-art-vip-top-down-001.png`,
+      routeDash: `${v2ObjectPath}pixel-art-path-dash-001.png`,
+      waypoint: `${v2ObjectPath}pixel-art-waypoint-dot-001.png`,
+      waypointActive: `${v2ObjectPath}pixel-art-waypoint-dot-001.png`,
+      bullet: `${v2ObjectPath}pixel-art-bullet-tracer-001.png`,
+      muzzleFlash: `${v2ObjectPath}pixel-art-muzzle-flash-001.png`,
+      hitSpark: `${v2ObjectPath}pixel-art-hit-spark-001.png`
+    };
+    const sprites = new Proxy({}, {
+      get(target, key) {
+        if (typeof key !== "string") return target[key];
+        return spriteSource(key);
+      }
+    });
+    */
+    const v1Sprites = {};
+    const v2Sprites = {};
+    const sprites = {};
     const spriteCrops = {
       wallShort: { x: 176, y: 166, w: 362, h: 142 },
       wallLong: { x: 622, y: 166, w: 758, h: 142 },
@@ -8399,24 +10349,36 @@ function demoResponse(data) {
 
     // Returns optional scene-source image metadata for image-backed temporary levels.
     function sceneSource() {
-      return runtime.state && runtime.state.level ? runtime.state.level.sceneSource : null;
+      // return runtime.state && runtime.state.level ? runtime.state.level.sceneSource : null;
+      return null;
     }
 
-    // Allows Mission Setup to switch canvas PNG art off while preserving geometry fallbacks.
-    function pngRenderingEnabled() {
-      return runtime.usePngRendering !== false;
+    // Returns the currently selected pixel-art style.
+    function pixelArtStyle() {
+      // return runtime.pixelArtStyle === "geometry" || runtime.pixelArtStyle === "v2" ? runtime.pixelArtStyle : "v1";
+      return "geometry";
+    }
+
+    // Resolves a gameplay sprite key for the selected pixel-art style.
+    function spriteSource(key) {
+      // const style = pixelArtStyle();
+      // if (style === "geometry") return "";
+      // if (style === "v2") return Object.prototype.hasOwnProperty.call(v2Sprites, key) ? v2Sprites[key] : "";
+      // return v1Sprites[key] || "";
+      return "";
     }
 
     // Retrieves and begins loading an image, returning null until it is drawable.
     function loadImage(src) {
-      if (!pngRenderingEnabled()) return null;
-      if (!src) return null;
-      if (!imageCache.has(src)) {
-        const image = new Image();
-        image.src = src;
-        imageCache.set(src, image);
-      }
-      return imageCache.get(src);
+      // if (pixelArtStyle() === "geometry") return null;
+      // if (!src) return null;
+      // if (!imageCache.has(src)) {
+      //   const image = new Image();
+      //   image.src = src;
+      //   imageCache.set(src, image);
+      // }
+      // return imageCache.get(src);
+      return null;
     }
 
     // Resolves PDF-capable visual descriptors to the drawable browser image fallback.
@@ -9029,10 +10991,13 @@ function demoResponse(data) {
       const key = event.key.toLowerCase();
       if (deps.keybindings.matches(event, "settings")) {
         event.preventDefault();
-        if (deps.settings.isOpen()) deps.settings.closeSettings();
+        if (elements.onboardingQuestion && !elements.onboardingQuestion.classList.contains("hidden")) {
+          elements.onboardingQuestion.classList.add("hidden");
+        } else if (deps.settings.isOpen()) deps.settings.closeSettings();
         else if (deps.inventoryIsOpen()) deps.inventory.closeInventory();
         else if (deps.equipmentTableIsOpen()) deps.inventory.closeEquipmentTable();
         else if (deps.laptopIsOpen()) deps.cameraHack.closeLaptop();
+        else if (deps.menu.isMainOpen && deps.menu.isMainOpen()) deps.menu.closeMainOverlay();
         else deps.menu.togglePause();
         return;
       }
@@ -9193,22 +11158,66 @@ function demoResponse(data) {
       }
       elements.settingsButton.addEventListener("click", deps.settings.openSettings);
       if (elements.playMenuButton) {
-        elements.playMenuButton.addEventListener("click", () => elements.onboardingQuestion.classList.remove("hidden"));
+        elements.playMenuButton.addEventListener("click", async () => {
+          if (deps.hasResumePoint && deps.hasResumePoint()) {
+            await deps.resumeFromStartMenu();
+            return;
+          }
+          if (elements.startInfoPanel) elements.startInfoPanel.classList.add("hidden");
+          elements.onboardingQuestion.classList.remove("hidden");
+        });
+      }
+      if (elements.startSettingButton) {
+        elements.startSettingButton.addEventListener("click", () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
+          if (elements.startInfoPanel) elements.startInfoPanel.classList.add("hidden");
+          deps.settings.openSettings();
+        });
+      }
+      if (elements.startInfoButton) {
+        elements.startInfoButton.addEventListener("click", () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
+          if (elements.startInfoPanel) elements.startInfoPanel.classList.remove("hidden");
+        });
+      }
+      if (elements.closeStartInfoButton) {
+        elements.closeStartInfoButton.addEventListener("click", () => elements.startInfoPanel.classList.add("hidden"));
+      }
+      if (elements.closeOnboardingButton) {
+        elements.closeOnboardingButton.addEventListener("click", () => elements.onboardingQuestion.classList.add("hidden"));
+      }
+      if (elements.startExitButton) {
+        elements.startExitButton.addEventListener("click", () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
+          if (elements.startInfoPanel) elements.startInfoPanel.classList.add("hidden");
+          deps.exitFromStartMenu();
+        });
       }
       if (elements.playedNoButton) {
-        elements.playedNoButton.addEventListener("click", () => {
+        elements.playedNoButton.addEventListener("click", async () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
           deps.menu.closePause();
-          deps.level.loadLevel("tutorial-basics-movement");
+          await deps.ensureGameDataReady();
+          await deps.level.loadLevel("tutorial-basics-movement");
           deps.menu.enterGame();
         });
       }
       if (elements.playedYesButton) {
-        elements.playedYesButton.addEventListener("click", () => {
+        elements.playedYesButton.addEventListener("click", async () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
           deps.menu.closePause();
+          await deps.ensureGameDataReady();
           deps.menu.showMain();
         });
       }
-      if (elements.mainMenuCloseButton) elements.mainMenuCloseButton.addEventListener("click", () => deps.menu.closePause() || deps.menu.enterGame());
+      if (elements.mainMenuCloseButton) {
+        elements.mainMenuCloseButton.addEventListener("click", async () => {
+          await deps.ensureGameDataReady();
+          if (!runtime.state) await deps.level.loadFirstLevel();
+          deps.menu.closePause();
+          deps.menu.enterGame();
+        });
+      }
       if (elements.pauseResumeButton) elements.pauseResumeButton.addEventListener("click", deps.menu.closePause);
       if (elements.pauseRestartButton) {
         elements.pauseRestartButton.addEventListener("click", () => {
@@ -9221,7 +11230,7 @@ function demoResponse(data) {
       if (elements.pauseSettingButton) elements.pauseSettingButton.addEventListener("click", deps.menu.openSettingsFromPause);
       if (elements.expandGameButton) elements.expandGameButton.addEventListener("click", () => deps.menu.toggleExpanded());
       if (elements.expandedPauseButton) elements.expandedPauseButton.addEventListener("click", deps.menu.togglePause);
-      if (elements.exitToMenuButton) elements.exitToMenuButton.addEventListener("click", deps.menu.showMain);
+      if (elements.exitToMenuButton) elements.exitToMenuButton.addEventListener("click", deps.menu.showStart);
       if (elements.resultLevelSelect) {
         elements.resultLevelSelect.addEventListener("change", () => loadWithTutorialWarning(elements.resultLevelSelect.value));
       }
@@ -9235,28 +11244,30 @@ function demoResponse(data) {
           deps.updateHud();
         });
       }
-      if (elements.startPngRenderingCheckbox) {
-        elements.startPngRenderingCheckbox.addEventListener("change", () => {
-          runtime.usePngRendering = elements.startPngRenderingCheckbox.checked;
-          if (runtime.state) {
-            runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
-          }
-          deps.updateHud();
-        });
-      }
+      // if (elements.startPngRenderingCheckbox) {
+      //   elements.startPngRenderingCheckbox.addEventListener("change", () => {
+      //     runtime.usePngRendering = elements.startPngRenderingCheckbox.checked;
+      //     if (runtime.state) {
+      //       runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
+      //     }
+      //     deps.updateHud();
+      //   });
+      // }
       if (elements.menuLevelBlocks) {
-        elements.menuLevelBlocks.addEventListener("click", (event) => {
+        elements.menuLevelBlocks.addEventListener("click", async (event) => {
           const button = event.target.closest("[data-menu-level]");
           if (!button || button.disabled) return;
-          deps.level.loadLevel(button.dataset.menuLevel);
+          await deps.ensureGameDataReady();
+          await deps.level.loadLevel(button.dataset.menuLevel);
           deps.menu.enterGame();
         });
       }
       if (elements.menuTutorialBlocks) {
-        elements.menuTutorialBlocks.addEventListener("click", (event) => {
+        elements.menuTutorialBlocks.addEventListener("click", async (event) => {
           const button = event.target.closest("[data-menu-tutorial]");
           if (!button) return;
-          deps.level.loadLevel(button.dataset.menuTutorial);
+          await deps.ensureGameDataReady();
+          await deps.level.loadLevel(button.dataset.menuTutorial);
           deps.menu.enterGame();
         });
       }
@@ -9275,6 +11286,12 @@ function demoResponse(data) {
       elements.closeSettingsButton.addEventListener("click", deps.settings.closeSettings);
       if (elements.resetSettingsButton) {
         elements.resetSettingsButton.addEventListener("click", deps.settings.resetDefaults);
+      }
+      if (elements.settingsExitToMenuButton) {
+        elements.settingsExitToMenuButton.addEventListener("click", () => {
+          deps.settings.closeSettings();
+          deps.menu.showStart();
+        });
       }
       if (elements.confirmSettingsChangeButton) {
         elements.confirmSettingsChangeButton.addEventListener("click", deps.settings.confirmPendingSettingChange);
@@ -9333,32 +11350,48 @@ function demoResponse(data) {
         });
       });
       if (elements.hintOpacityRange) {
-        elements.hintOpacityRange.addEventListener("change", () => {
+        const applyHintOpacity = () => {
           const value = Number(elements.hintOpacityRange.value) || 0.42;
           deps.settings.requestSettingChange(() => {
             runtime.hintOpacity = value;
           });
-        });
+        };
+        elements.hintOpacityRange.addEventListener("input", applyHintOpacity);
+        elements.hintOpacityRange.addEventListener("change", applyHintOpacity);
       }
       if (elements.viewRange) {
-        elements.viewRange.addEventListener("change", () => {
+        const applyView = () => {
           const next = Number(elements.viewRange.value);
           const value = Number.isFinite(next) ? next : 50;
           deps.settings.requestSettingChange(() => {
             runtime.viewValue = value;
             if (deps.camera && deps.camera.setViewValue) deps.camera.setViewValue(runtime.viewValue);
           });
-        });
+        };
+        elements.viewRange.addEventListener("input", applyView);
+        elements.viewRange.addEventListener("change", applyView);
       }
-      if (elements.pngRenderingCheckbox) {
-        elements.pngRenderingCheckbox.addEventListener("change", () => {
-          runtime.usePngRendering = elements.pngRenderingCheckbox.checked;
-          if (runtime.state) {
-            runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
-          }
-          deps.updateHud();
-        });
-      }
+      // if (elements.pixelArtStyleSelect) {
+      //   elements.pixelArtStyleSelect.addEventListener("change", () => {
+      //     const value = elements.pixelArtStyleSelect.value;
+      //     runtime.pixelArtStyle = value === "geometry" || value === "v2" ? value : "v1";
+      //     if (runtime.state) {
+      //       runtime.state.message = runtime.pixelArtStyle === "geometry"
+      //         ? "Geometry-only style enabled"
+      //         : (runtime.pixelArtStyle === "v2" ? "Pixel Art V2 enabled" : "Pixel Art V1 enabled");
+      //     }
+      //     deps.updateHud();
+      //   });
+      // }
+      // if (elements.pngRenderingCheckbox) {
+      //   elements.pngRenderingCheckbox.addEventListener("change", () => {
+      //     runtime.usePngRendering = elements.pngRenderingCheckbox.checked;
+      //     if (runtime.state) {
+      //       runtime.state.message = runtime.usePngRendering ? "PNG art enabled" : "PNG art disabled";
+      //     }
+      //     deps.updateHud();
+      //   });
+      // }
       elements.keyBindingList.addEventListener("click", (event) => {
         const button = event.target.closest("[data-keybinding-action]");
         if (!button) return;
@@ -9780,10 +11813,17 @@ const elements = {
   canvas: document.getElementById("game"),
   startMenuOverlay: document.getElementById("startMenuOverlay"),
   playMenuButton: document.getElementById("playMenuButton"),
+  startSettingButton: document.getElementById("startSettingButton"),
+  startInfoButton: document.getElementById("startInfoButton"),
+  startExitButton: document.getElementById("startExitButton"),
+  startExitMessage: document.getElementById("startExitMessage"),
+  startInfoPanel: document.getElementById("startInfoPanel"),
+  closeStartInfoButton: document.getElementById("closeStartInfoButton"),
   onboardingQuestion: document.getElementById("onboardingQuestion"),
+  closeOnboardingButton: document.getElementById("closeOnboardingButton"),
   playedYesButton: document.getElementById("playedYesButton"),
   playedNoButton: document.getElementById("playedNoButton"),
-  startPngRenderingCheckbox: document.getElementById("startPngRenderingCheckbox"),
+  // startPngRenderingCheckbox: document.getElementById("startPngRenderingCheckbox"),
   mainMenuOverlay: document.getElementById("mainMenuOverlay"),
   mainMenuCloseButton: document.getElementById("mainMenuCloseButton"),
   privilegeBoard: document.getElementById("privilegeBoard"),
@@ -9824,14 +11864,18 @@ const elements = {
   cancelSettingsChangeButton: document.getElementById("cancelSettingsChangeButton"),
   closeSettingsButton: document.getElementById("closeSettingsButton"),
   resetSettingsButton: document.getElementById("resetSettingsButton"),
+  settingsExitToMenuButton: document.getElementById("settingsExitToMenuButton"),
   settingsTabs: document.querySelectorAll("[data-settings-tab]"),
   settingsPanels: document.querySelectorAll("[data-settings-panel]"),
   difficultySelect: document.getElementById("difficultySelect"),
   shootingModeSelect: document.getElementById("shootingModeSelect"),
   enemyTraceSelect: document.getElementById("enemyTraceSelect"),
   hintOpacityRange: document.getElementById("hintOpacityRange"),
+  hintOpacityValue: document.getElementById("hintOpacityValue"),
   viewRange: document.getElementById("viewRange"),
-  pngRenderingCheckbox: document.getElementById("pngRenderingCheckbox"),
+  viewValueLabel: document.getElementById("viewValueLabel"),
+  // pixelArtStyleSelect: document.getElementById("pixelArtStyleSelect"),
+  // pngRenderingCheckbox: document.getElementById("pngRenderingCheckbox"),
   keyBindingList: document.getElementById("keyBindingList"),
   enemyLoadoutList: document.getElementById("enemyLoadoutList"),
   digitalLockOverlay: document.getElementById("digitalLockOverlay"),
@@ -9887,6 +11931,7 @@ const elements = {
 
 const ctx = elements.canvas.getContext("2d");
 const DEFAULT_WORLD = { w: 960, h: 640 };
+const RESUME_STORAGE_KEY = "delta-geometry-resume";
 const WORLD = { ...DEFAULT_WORLD };
 const TWO_PI = Math.PI * 2;
 const UNIT_RADIUS = 12;
@@ -10010,9 +12055,11 @@ const runtime = {
   expandedGame: false,
   expandedPaused: false,
   mobileMode: false,
+  gameDataReady: false,
+  gameDataLoading: null,
   hintOpacity: 0.42,
   viewValue: 50,
-  usePngRendering: true,
+  pixelArtStyle: "geometry",
   showAllHealth: false,
   activeSettingsTab: "keys",
   capturingKeyAction: null,
@@ -10110,6 +12157,99 @@ function setDifficulty(value) {
   updateHud();
 }
 
+// Saves the last playable destination for the start-menu Resume action.
+function saveResumePoint(meta, mode) {
+  if (!meta || !meta.id) return;
+  const payload = {
+    id: meta.id,
+    mode: mode || runtime.activeMode || "level",
+    title: meta.title || meta.id,
+    status: "in-progress",
+    savedAt: Date.now()
+  };
+  try {
+    localStorage.setItem(RESUME_STORAGE_KEY, JSON.stringify(payload));
+  } catch (error) {
+    // Resume is helpful, but the game should still run when storage is blocked.
+  }
+}
+
+// Clears finished or invalid Resume data.
+function clearResumePoint() {
+  try {
+    localStorage.removeItem(RESUME_STORAGE_KEY);
+  } catch (error) {
+    // Storage may be blocked; the visible button still falls back to runtime state.
+  }
+}
+
+// Reads the unfinished destination saved for Resume.
+function readResumePoint() {
+  try {
+    const raw = localStorage.getItem(RESUME_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.id !== "string") return null;
+    if (parsed.status !== "in-progress") {
+      clearResumePoint();
+      return null;
+    }
+    const exists = [...LEVEL_OPTIONS, ...TUTORIAL_OPTIONS, ...TEMP_LEVEL_OPTIONS].some((option) => option.id === parsed.id);
+    if (!exists) {
+      clearResumePoint();
+      return null;
+    }
+    return parsed;
+  } catch (error) {
+    clearResumePoint();
+    return null;
+  }
+}
+
+// Reports whether the start menu can resume active or saved gameplay.
+function hasResumePoint() {
+  return Boolean((runtime.state && !runtime.state.gameOver) || readResumePoint());
+}
+
+// Updates the adaptive Start/Resume button and clears transient start-menu text.
+function refreshStartMenu() {
+  if (elements.playMenuButton) {
+    elements.playMenuButton.textContent = hasResumePoint() ? "Resume" : "Start";
+  }
+  if (elements.startExitMessage) {
+    elements.startExitMessage.classList.add("hidden");
+    elements.startExitMessage.textContent = "";
+  }
+}
+
+// Starts or resumes gameplay from the start menu.
+async function resumeFromStartMenu() {
+  if (runtime.state && !runtime.state.gameOver) {
+    if (menu) menu.enterGame();
+    return true;
+  }
+  const point = readResumePoint();
+  if (!point) return false;
+  await ensureGameDataReady();
+  await level.loadLevel(point.id);
+  if (menu) menu.enterGame();
+  return true;
+}
+
+// Attempts to close the current browser tab and shows a fallback when blocked.
+function exitFromStartMenu() {
+  if (elements.startExitMessage) {
+    elements.startExitMessage.textContent = "Trying to close the tab...";
+    elements.startExitMessage.classList.remove("hidden");
+  }
+  window.close();
+  window.setTimeout(() => {
+    if (!elements.startExitMessage) return;
+    elements.startExitMessage.textContent = "Your browser blocked tab closing. Close this tab manually to exit.";
+    elements.startExitMessage.classList.remove("hidden");
+  }, 180);
+}
+
 // Advances gameplay simulation for one frame.
 function update(dt) {
   const state = runtime.state;
@@ -10143,7 +12283,11 @@ function update(dt) {
 // Refreshes labels, loadout controls, health cards, and mission status.
 function updateHud() {
   const state = runtime.state;
-  document.body.classList.toggle("png-art-disabled", runtime.usePngRendering === false);
+  runtime.pixelArtStyle = "geometry";
+  const style = "geometry";
+  document.body.classList.toggle("pixel-style-geometry", style === "geometry");
+  document.body.classList.toggle("pixel-style-v1", style === "v1");
+  document.body.classList.toggle("pixel-style-v2", style === "v2");
   if (!state) {
     elements.modeLabel.textContent = "Loading";
     elements.objectiveLabel.textContent = "Loading";
@@ -10156,6 +12300,8 @@ function updateHud() {
       equipment.renderHealthBoard();
       equipment.renderEnemyLoadouts();
     }
+    if (elements.hintOpacityValue) elements.hintOpacityValue.textContent = `${Math.round(runtime.hintOpacity * 100)}%`;
+    if (elements.viewValueLabel) elements.viewValueLabel.textContent = String(Math.round(runtime.viewValue));
     return;
   }
   elements.modeLabel.textContent = runtime.digitalLockOpen ? "Digital Lock" : (runtime.settingsOpen ? "Settings" : (state.gameOver ? titleCase(state.result) : (hasManualInput() ? "Manual" : (state.running ? "Execute" : "Planning"))));
@@ -10189,15 +12335,24 @@ function updateHud() {
   if (elements.hintOpacityRange && Number(elements.hintOpacityRange.value) !== runtime.hintOpacity) {
     elements.hintOpacityRange.value = String(runtime.hintOpacity);
   }
+  if (elements.hintOpacityValue) {
+    elements.hintOpacityValue.textContent = `${Math.round(runtime.hintOpacity * 100)}%`;
+  }
   if (elements.viewRange && Number(elements.viewRange.value) !== runtime.viewValue) {
     elements.viewRange.value = String(runtime.viewValue);
   }
-  if (elements.pngRenderingCheckbox && elements.pngRenderingCheckbox.checked !== (runtime.usePngRendering !== false)) {
-    elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+  if (elements.viewValueLabel) {
+    elements.viewValueLabel.textContent = String(Math.round(runtime.viewValue));
   }
-  if (elements.startPngRenderingCheckbox && elements.startPngRenderingCheckbox.checked !== (runtime.usePngRendering !== false)) {
-    elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
-  }
+  // if (elements.pixelArtStyleSelect && elements.pixelArtStyleSelect.value !== style) {
+  //   elements.pixelArtStyleSelect.value = style;
+  // }
+  // if (elements.pngRenderingCheckbox && elements.pngRenderingCheckbox.checked !== (runtime.usePngRendering !== false)) {
+  //   elements.pngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+  // }
+  // if (elements.startPngRenderingCheckbox && elements.startPngRenderingCheckbox.checked !== (runtime.usePngRendering !== false)) {
+  //   elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
+  // }
   if (runtime.inventoryOpen) inventory.renderInventory();
   if (runtime.laptopOpen && cameraHack) cameraHack.render();
   if (tutorial) tutorial.update();
@@ -10415,6 +12570,7 @@ function initializeSystems() {
     operatorBackpackLoadouts,
     progression,
     keysDown,
+    saveResumePoint,
     updateHud
   });
 
@@ -10462,6 +12618,8 @@ function initializeSystems() {
     currentTutorialIndex: () => level.currentTutorialIndex(),
     tutorial,
     progression,
+    clearResumePoint,
+    refreshStartMenu,
     menu: {
       showMain: () => menu && menu.showMain()
     },
@@ -10532,6 +12690,11 @@ function initializeSystems() {
     cycleOperator,
     toggleRun,
     setDifficulty,
+    hasResumePoint,
+    refreshStartMenu,
+    resumeFromStartMenu,
+    exitFromStartMenu,
+    ensureGameDataReady,
     updateHud,
     operatorLoadouts,
     inventoryIsOpen: () => runtime.inventoryOpen,
@@ -10541,11 +12704,14 @@ function initializeSystems() {
       openPause: () => menu && menu.openPause(),
       closePause: () => menu && menu.closePause(),
       togglePause: () => menu && menu.togglePause(),
+      showStart: () => menu && menu.showStart(),
       showMain: () => menu && menu.showMain(),
       showLevelMenu: () => menu && menu.showLevelMenu(),
       showTutorialMenu: () => menu && menu.showTutorialMenu(),
       openSettingsFromPause: () => menu && menu.openSettingsFromPause(),
       enterGame: () => menu && menu.enterGame(),
+      isMainOpen: () => menu && menu.isMainOpen(),
+      closeMainOverlay: () => menu && menu.closeMainOverlay(),
       toggleExpanded: (...args) => menu && menu.toggleExpanded(...args)
     }
   });
@@ -10567,10 +12733,11 @@ function initializeSystems() {
       if (camera) camera.resizeCanvas();
       if (objectScale) objectScale.update();
     },
+    hasResumePoint,
+    refreshStartMenu,
     setDifficulty,
     updateHud
   });
-  menu.render();
 
   mobileControls = window.MobileControlSystem.create({
     runtime,
@@ -10599,22 +12766,67 @@ window.__breachline = {
   getArmors: () => [...armors.values()],
   getObjectScale: () => objectScale ? objectScale.objectScale() : 1,
   restart: () => level.restart(),
-  loadLevel: (levelId) => level.loadLevel(levelId),
-  loadTutorial: (tutorialId) => level.loadLevel(tutorialId),
-  loadNextLevel: () => level.loadNextLevel(),
-  loadNextTutorial: () => level.loadNextTutorial(),
-  loadFirstLevel: () => level.loadFirstLevel(),
-  showMain: () => menu.showMain(),
+  loadLevel: async (levelId) => {
+    await ensureGameDataReady();
+    return level.loadLevel(levelId);
+  },
+  loadTutorial: async (tutorialId) => {
+    await ensureGameDataReady();
+    return level.loadLevel(tutorialId);
+  },
+  loadNextLevel: async () => {
+    await ensureGameDataReady();
+    return level.loadNextLevel();
+  },
+  loadNextTutorial: async () => {
+    await ensureGameDataReady();
+    return level.loadNextTutorial();
+  },
+  loadFirstLevel: async () => {
+    await ensureGameDataReady();
+    return level.loadFirstLevel();
+  },
+  showMain: async () => {
+    await ensureGameDataReady();
+    return menu.showMain();
+  },
   cycleOperator,
   toggleRun
 };
 
-// Loads startup data and opens the first level.
-async function boot() {
-  level.populateLevelSelect();
-  try {
+// Lazily loads equipment and selectors only after the player chooses a route.
+async function ensureGameDataReady() {
+  if (runtime.gameDataReady) return true;
+  if (runtime.gameDataLoading) return runtime.gameDataLoading;
+  runtime.gameDataLoading = (async () => {
+    level.populateLevelSelect();
     await equipment.loadEquipment();
-    await level.loadLevel(LEVEL_OPTIONS[0].id);
+    runtime.gameDataReady = true;
+    if (menu) menu.render();
+    updateHud();
+    return true;
+  })();
+  try {
+    return await runtime.gameDataLoading;
+  } catch (error) {
+    runtime.gameDataReady = false;
+    runtime.state = null;
+    elements.levelTitle.textContent = "Load Failed";
+    elements.bannerTitle.textContent = "Load Failed";
+    elements.bannerText.textContent = error.message;
+    elements.banner.classList.remove("hidden");
+    updateHud();
+    throw error;
+  } finally {
+    runtime.gameDataLoading = null;
+  }
+}
+
+// Shows only the start menu at boot; gameplay data is loaded after user choice.
+async function boot() {
+  try {
+    if (menu) menu.showStart();
+    updateHud();
   } catch (error) {
     runtime.state = null;
     elements.levelTitle.textContent = "Load Failed";
