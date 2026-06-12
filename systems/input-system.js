@@ -115,10 +115,13 @@
       const key = event.key.toLowerCase();
       if (deps.keybindings.matches(event, "settings")) {
         event.preventDefault();
-        if (deps.settings.isOpen()) deps.settings.closeSettings();
+        if (elements.onboardingQuestion && !elements.onboardingQuestion.classList.contains("hidden")) {
+          elements.onboardingQuestion.classList.add("hidden");
+        } else if (deps.settings.isOpen()) deps.settings.closeSettings();
         else if (deps.inventoryIsOpen()) deps.inventory.closeInventory();
         else if (deps.equipmentTableIsOpen()) deps.inventory.closeEquipmentTable();
         else if (deps.laptopIsOpen()) deps.cameraHack.closeLaptop();
+        else if (deps.menu.isMainOpen && deps.menu.isMainOpen()) deps.menu.closeMainOverlay();
         else deps.menu.togglePause();
         return;
       }
@@ -279,22 +282,66 @@
       }
       elements.settingsButton.addEventListener("click", deps.settings.openSettings);
       if (elements.playMenuButton) {
-        elements.playMenuButton.addEventListener("click", () => elements.onboardingQuestion.classList.remove("hidden"));
+        elements.playMenuButton.addEventListener("click", async () => {
+          if (deps.hasResumePoint && deps.hasResumePoint()) {
+            await deps.resumeFromStartMenu();
+            return;
+          }
+          if (elements.startInfoPanel) elements.startInfoPanel.classList.add("hidden");
+          elements.onboardingQuestion.classList.remove("hidden");
+        });
+      }
+      if (elements.startSettingButton) {
+        elements.startSettingButton.addEventListener("click", () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
+          if (elements.startInfoPanel) elements.startInfoPanel.classList.add("hidden");
+          deps.settings.openSettings();
+        });
+      }
+      if (elements.startInfoButton) {
+        elements.startInfoButton.addEventListener("click", () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
+          if (elements.startInfoPanel) elements.startInfoPanel.classList.remove("hidden");
+        });
+      }
+      if (elements.closeStartInfoButton) {
+        elements.closeStartInfoButton.addEventListener("click", () => elements.startInfoPanel.classList.add("hidden"));
+      }
+      if (elements.closeOnboardingButton) {
+        elements.closeOnboardingButton.addEventListener("click", () => elements.onboardingQuestion.classList.add("hidden"));
+      }
+      if (elements.startExitButton) {
+        elements.startExitButton.addEventListener("click", () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
+          if (elements.startInfoPanel) elements.startInfoPanel.classList.add("hidden");
+          deps.exitFromStartMenu();
+        });
       }
       if (elements.playedNoButton) {
-        elements.playedNoButton.addEventListener("click", () => {
+        elements.playedNoButton.addEventListener("click", async () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
           deps.menu.closePause();
-          deps.level.loadLevel("tutorial-basics-movement");
+          await deps.ensureGameDataReady();
+          await deps.level.loadLevel("tutorial-basics-movement");
           deps.menu.enterGame();
         });
       }
       if (elements.playedYesButton) {
-        elements.playedYesButton.addEventListener("click", () => {
+        elements.playedYesButton.addEventListener("click", async () => {
+          if (elements.onboardingQuestion) elements.onboardingQuestion.classList.add("hidden");
           deps.menu.closePause();
+          await deps.ensureGameDataReady();
           deps.menu.showMain();
         });
       }
-      if (elements.mainMenuCloseButton) elements.mainMenuCloseButton.addEventListener("click", () => deps.menu.closePause() || deps.menu.enterGame());
+      if (elements.mainMenuCloseButton) {
+        elements.mainMenuCloseButton.addEventListener("click", async () => {
+          await deps.ensureGameDataReady();
+          if (!runtime.state) await deps.level.loadFirstLevel();
+          deps.menu.closePause();
+          deps.menu.enterGame();
+        });
+      }
       if (elements.pauseResumeButton) elements.pauseResumeButton.addEventListener("click", deps.menu.closePause);
       if (elements.pauseRestartButton) {
         elements.pauseRestartButton.addEventListener("click", () => {
@@ -307,7 +354,7 @@
       if (elements.pauseSettingButton) elements.pauseSettingButton.addEventListener("click", deps.menu.openSettingsFromPause);
       if (elements.expandGameButton) elements.expandGameButton.addEventListener("click", () => deps.menu.toggleExpanded());
       if (elements.expandedPauseButton) elements.expandedPauseButton.addEventListener("click", deps.menu.togglePause);
-      if (elements.exitToMenuButton) elements.exitToMenuButton.addEventListener("click", deps.menu.showMain);
+      if (elements.exitToMenuButton) elements.exitToMenuButton.addEventListener("click", deps.menu.showStart);
       if (elements.resultLevelSelect) {
         elements.resultLevelSelect.addEventListener("change", () => loadWithTutorialWarning(elements.resultLevelSelect.value));
       }
@@ -331,18 +378,20 @@
       //   });
       // }
       if (elements.menuLevelBlocks) {
-        elements.menuLevelBlocks.addEventListener("click", (event) => {
+        elements.menuLevelBlocks.addEventListener("click", async (event) => {
           const button = event.target.closest("[data-menu-level]");
           if (!button || button.disabled) return;
-          deps.level.loadLevel(button.dataset.menuLevel);
+          await deps.ensureGameDataReady();
+          await deps.level.loadLevel(button.dataset.menuLevel);
           deps.menu.enterGame();
         });
       }
       if (elements.menuTutorialBlocks) {
-        elements.menuTutorialBlocks.addEventListener("click", (event) => {
+        elements.menuTutorialBlocks.addEventListener("click", async (event) => {
           const button = event.target.closest("[data-menu-tutorial]");
           if (!button) return;
-          deps.level.loadLevel(button.dataset.menuTutorial);
+          await deps.ensureGameDataReady();
+          await deps.level.loadLevel(button.dataset.menuTutorial);
           deps.menu.enterGame();
         });
       }
@@ -361,6 +410,12 @@
       elements.closeSettingsButton.addEventListener("click", deps.settings.closeSettings);
       if (elements.resetSettingsButton) {
         elements.resetSettingsButton.addEventListener("click", deps.settings.resetDefaults);
+      }
+      if (elements.settingsExitToMenuButton) {
+        elements.settingsExitToMenuButton.addEventListener("click", () => {
+          deps.settings.closeSettings();
+          deps.menu.showStart();
+        });
       }
       if (elements.confirmSettingsChangeButton) {
         elements.confirmSettingsChangeButton.addEventListener("click", deps.settings.confirmPendingSettingChange);
@@ -419,22 +474,26 @@
         });
       });
       if (elements.hintOpacityRange) {
-        elements.hintOpacityRange.addEventListener("change", () => {
+        const applyHintOpacity = () => {
           const value = Number(elements.hintOpacityRange.value) || 0.42;
           deps.settings.requestSettingChange(() => {
             runtime.hintOpacity = value;
           });
-        });
+        };
+        elements.hintOpacityRange.addEventListener("input", applyHintOpacity);
+        elements.hintOpacityRange.addEventListener("change", applyHintOpacity);
       }
       if (elements.viewRange) {
-        elements.viewRange.addEventListener("change", () => {
+        const applyView = () => {
           const next = Number(elements.viewRange.value);
           const value = Number.isFinite(next) ? next : 50;
           deps.settings.requestSettingChange(() => {
             runtime.viewValue = value;
             if (deps.camera && deps.camera.setViewValue) deps.camera.setViewValue(runtime.viewValue);
           });
-        });
+        };
+        elements.viewRange.addEventListener("input", applyView);
+        elements.viewRange.addEventListener("change", applyView);
       }
       // if (elements.pixelArtStyleSelect) {
       //   elements.pixelArtStyleSelect.addEventListener("change", () => {

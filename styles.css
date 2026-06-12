@@ -1,4 +1,12 @@
-﻿:root {
+@font-face {
+  font-family: "PressStart2P";
+  src: url("docs/PressStart2P-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
   color-scheme: dark;
   --bg: #101214;
   --panel: #171b1e;
@@ -10,7 +18,7 @@
   --amber: #e3b456;
   --red: #e25f5f;
   --cyan: #72b7ce;
-  --ui-start-background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-background-001.png") */;
+  --ui-start-background: url("docs/start-menu-geometry-background.png");
   --ui-start-title: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-logo-001.png") */;
   --ui-start-title-small: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-logo-small-001.png") */;
   --ui-start-title-glow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-glow-001.png") */;
@@ -699,6 +707,11 @@ h2 {
   accent-color: var(--green);
 }
 
+/* Optional start-menu PNG setting area is disabled while geometry-only UI is active. */
+.start-menu-setting {
+  display: none !important;
+}
+
 body.pixel-style-geometry * {
   border-image-source: none !important;
   background-image: none !important;
@@ -756,11 +769,7 @@ body.pixel-style-geometry .equipment-icon:not(.equipment-icon-fallback) {
 }
 
 body.pixel-style-geometry .weapon-image-frame::after {
-  content: "GEOMETRY";
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0;
+  content: none;
 }
 
 .selected-loadout-label {
@@ -1138,14 +1147,9 @@ body.pixel-style-geometry .weapon-image-frame::after {
 }
 
 .actions button::before {
-  content: "";
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  margin-right: 6px;
-  vertical-align: middle;
-  background: none /* PNG disabled: url("docs/images/user-interface/pixel-art-action-icon-execute-001.png") */ center / contain no-repeat;
-  image-rendering: pixelated;
+  display: none;
+  content: none;
+  /* Inactive action icon spacer disabled for geometry-only UI. */
 }
 
 #restartButton::before {
@@ -1238,7 +1242,7 @@ body.pixel-style-geometry .weapon-image-frame::after {
 .settings-overlay {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 46;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -3106,4 +3110,1502 @@ body.game-expanded.expanded-paused .right-panel {
   .mission-report {
     grid-template-columns: 1fr;
   }
+}
+
+@media (min-width: 1051px) {
+  :root {
+    --desktop-ui-gap: 10px;
+    --desktop-ui-card-gap: 12px;
+    --desktop-ui-card-pad: 14px;
+    --desktop-ui-row: 42px;
+    --desktop-ui-button: 42px;
+    --desktop-ui-small-button: 34px;
+    --desktop-ui-label: 32px;
+    --desktop-ui-line: 1.28;
+  }
+
+  body.pixel-style-geometry .menu-panel,
+  body.pixel-style-geometry .pause-panel,
+  body.pixel-style-geometry .credits-card,
+  body.pixel-style-geometry .control-card,
+  body.pixel-style-geometry .settings-panel,
+  body.pixel-style-geometry .settings-change-card,
+  body.pixel-style-geometry .inventory-panel,
+  body.pixel-style-geometry .lock-panel,
+  body.pixel-style-geometry .banner,
+  body.pixel-style-geometry .mission-report {
+    border: 1px solid rgba(114, 183, 206, 0.24) !important;
+    border-radius: 6px !important;
+    background:
+      linear-gradient(180deg, rgba(21, 26, 29, 0.96), rgba(13, 17, 19, 0.98)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 18px 45px rgba(0, 0, 0, 0.32);
+  }
+
+  body.pixel-style-geometry .side-panel {
+    gap: var(--desktop-ui-card-gap);
+    padding: 0;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  body.pixel-style-geometry .control-card {
+    display: grid;
+    align-content: start;
+    gap: var(--desktop-ui-gap);
+    min-width: 0;
+    padding: var(--desktop-ui-card-pad) !important;
+  }
+
+  body.pixel-style-geometry .control-card::before,
+  body.pixel-style-geometry .control-card::after,
+  body.pixel-style-geometry .main-menu-panel .control-card::before,
+  body.pixel-style-geometry .main-menu-panel .control-card .panel-label::after,
+  body.pixel-style-geometry .start-panel::before,
+  body.pixel-style-geometry .onboarding-question .menu-actions::before {
+    display: none !important;
+  }
+
+  body.pixel-style-geometry .eyebrow,
+  body.pixel-style-geometry .panel-label,
+  body.pixel-style-geometry .control-card > .panel-label,
+  body.pixel-style-geometry .main-menu-panel .control-card .panel-label,
+  body.pixel-style-geometry .control-card .panel-heading-row {
+    display: flex;
+    align-items: center;
+    min-height: var(--desktop-ui-label);
+    margin: 0;
+    padding: 0;
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.15;
+    text-align: left;
+    text-shadow: none;
+  }
+
+  body.pixel-style-geometry .panel-heading-row {
+    justify-content: space-between;
+    gap: var(--desktop-ui-gap);
+  }
+
+  body.pixel-style-geometry button,
+  body.pixel-style-geometry select,
+  body.pixel-style-geometry input,
+  body.pixel-style-geometry textarea {
+    line-height: 1.2;
+  }
+
+  body.pixel-style-geometry button,
+  body.pixel-style-geometry select {
+    min-height: var(--desktop-ui-button);
+    border-radius: 4px !important;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 850;
+    text-align: center;
+    text-shadow: none !important;
+  }
+
+  body.pixel-style-geometry select {
+    text-align: left;
+  }
+
+  body.pixel-style-geometry .field-stack,
+  body.pixel-style-geometry .level-picker,
+  body.pixel-style-geometry .lock-entry {
+    gap: 6px;
+    margin-top: 0;
+    font-size: 11px;
+    line-height: var(--desktop-ui-line);
+  }
+
+  body.pixel-style-geometry .field-stack span,
+  body.pixel-style-geometry .level-picker span,
+  body.pixel-style-geometry .field-stack label,
+  body.pixel-style-geometry .level-picker label {
+    display: flex;
+    align-items: center;
+    min-height: 16px;
+  }
+
+  body.pixel-style-geometry .start-panel {
+    align-content: center;
+    gap: 16px;
+    width: min(720px, calc(100vw - 72px));
+    min-height: min(500px, calc(100vh - 96px));
+    padding: 36px !important;
+    text-align: center;
+  }
+
+  body.pixel-style-geometry .start-panel h2 {
+    width: auto;
+    aspect-ratio: auto;
+    margin: 0;
+    background: none !important;
+    color: var(--text);
+    font-size: clamp(42px, 5vw, 68px);
+    line-height: 0.96;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  body.pixel-style-geometry .start-panel .eyebrow {
+    justify-content: center;
+    width: auto;
+    min-height: 24px;
+    margin: 0;
+    color: var(--amber);
+    font-size: 12px;
+  }
+
+  body.pixel-style-geometry .start-panel #playMenuButton {
+    justify-self: center;
+    width: min(360px, 88%);
+    min-height: 66px;
+    margin-top: 4px;
+    font-size: 24px;
+  }
+
+  body.pixel-style-geometry .onboarding-question {
+    gap: 12px;
+    width: min(500px, 100%);
+    margin-top: 0;
+    padding: 14px !important;
+    border-radius: 6px !important;
+  }
+
+  body.pixel-style-geometry .onboarding-question p {
+    min-height: 50px;
+    padding: 0 8px;
+    line-height: 1.25;
+    text-shadow: none;
+  }
+
+  body.pixel-style-geometry .menu-actions,
+  body.pixel-style-geometry .pause-actions,
+  body.pixel-style-geometry .banner-actions,
+  body.pixel-style-geometry .settings-actions {
+    align-items: center;
+    gap: var(--desktop-ui-gap);
+    margin-top: 0;
+  }
+
+  body.pixel-style-geometry .onboarding-question .menu-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-top: 0;
+  }
+
+  body.pixel-style-geometry .credits-card {
+    gap: 4px;
+    padding: 12px !important;
+    line-height: 1.25;
+  }
+
+  body.pixel-style-geometry .credits-card .panel-label {
+    justify-content: flex-start;
+    min-height: 20px;
+    margin: 0;
+    color: var(--green);
+  }
+
+  body.pixel-style-geometry .main-menu-panel {
+    width: min(1120px, calc(100vw - 48px));
+    padding: 18px !important;
+  }
+
+  body.pixel-style-geometry .main-menu-grid {
+    grid-template-columns: minmax(230px, 0.9fr) minmax(220px, 0.8fr) minmax(250px, 1fr) minmax(250px, 1fr);
+    gap: var(--desktop-ui-card-gap);
+    align-items: stretch;
+  }
+
+  body.pixel-style-geometry .main-menu-panel .control-card {
+    min-height: 100%;
+    padding: var(--desktop-ui-card-pad) !important;
+  }
+
+  body.pixel-style-geometry .privilege-board,
+  body.pixel-style-geometry .reward-list,
+  body.pixel-style-geometry .number-block-grid {
+    gap: var(--desktop-ui-gap);
+    margin-top: 0;
+  }
+
+  body.pixel-style-geometry .privilege-board .summary-row,
+  body.pixel-style-geometry .reward-list span {
+    display: grid;
+    align-items: center;
+    min-height: var(--desktop-ui-row);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 8px 10px;
+    line-height: 1.24;
+  }
+
+  body.pixel-style-geometry .reward-list span {
+    padding-left: 10px;
+  }
+
+  body.pixel-style-geometry .reward-list span::before,
+  body.pixel-style-geometry .number-block-grid button.completed::after,
+  body.pixel-style-geometry .number-block-grid button.locked::after {
+    display: none;
+  }
+
+  body.pixel-style-geometry .number-block-grid {
+    grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  }
+
+  body.pixel-style-geometry .number-block-grid button {
+    display: grid;
+    place-items: center;
+    min-height: 58px;
+    border-radius: 4px !important;
+    font-size: 20px;
+  }
+
+  body.pixel-style-geometry .settings-panel {
+    width: min(900px, calc(100vw - 48px));
+    height: min(780px, calc(100vh - 48px));
+    padding: 16px !important;
+  }
+
+  body.pixel-style-geometry .settings-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    min-height: 54px;
+    margin-bottom: 12px;
+  }
+
+  body.pixel-style-geometry .settings-header h2,
+  body.pixel-style-geometry .settings-change-card h2,
+  body.pixel-style-geometry .pause-panel h2 {
+    margin: 0;
+    line-height: 1.05;
+  }
+
+  body.pixel-style-geometry .settings-actions button,
+  body.pixel-style-geometry #resetSettingsButton,
+  body.pixel-style-geometry #closeSettingsButton {
+    min-width: 112px;
+    min-height: 38px;
+  }
+
+  body.pixel-style-geometry .settings-grid {
+    gap: var(--desktop-ui-card-gap);
+    padding-right: 6px;
+  }
+
+  body.pixel-style-geometry .settings-grid > .control-card {
+    height: min(560px, calc(100vh - 226px));
+    overflow: auto;
+  }
+
+  body.pixel-style-geometry .settings-tabs {
+    gap: 8px;
+    padding: 0;
+    background: transparent;
+  }
+
+  body.pixel-style-geometry .settings-tabs button {
+    min-height: 38px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  body.pixel-style-geometry .keybinding-list {
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  body.pixel-style-geometry .keybinding-row,
+  body.pixel-style-geometry .enemy-loadout-row {
+    min-height: 48px;
+    border-radius: 4px;
+    padding: 7px 9px;
+    line-height: 1.2;
+  }
+
+  body.pixel-style-geometry .keybinding-row {
+    grid-template-columns: minmax(0, 1fr) 118px;
+  }
+
+  body.pixel-style-geometry .keybinding-row button {
+    min-height: 32px;
+  }
+
+  body.pixel-style-geometry .enemy-loadout-row {
+    grid-template-columns: 54px minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  body.pixel-style-geometry .icon-select-row {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  body.pixel-style-geometry .mission-status-grid {
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  body.pixel-style-geometry .mission-status-grid div,
+  body.pixel-style-geometry .inventory-grid div,
+  body.pixel-style-geometry .mission-report div {
+    display: grid;
+    align-content: center;
+    min-height: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 8px 9px;
+    line-height: var(--desktop-ui-line);
+  }
+
+  body.pixel-style-geometry .mission-status-grid span,
+  body.pixel-style-geometry .inventory-grid span,
+  body.pixel-style-geometry .mission-report span,
+  body.pixel-style-geometry .operator-card span {
+    line-height: 1.18;
+  }
+
+  body.pixel-style-geometry .mission-status-grid strong,
+  body.pixel-style-geometry .inventory-grid strong,
+  body.pixel-style-geometry .mission-report strong {
+    margin-top: 3px;
+    line-height: 1.18;
+  }
+
+  body.pixel-style-geometry .inventory-summary {
+    align-items: center;
+    gap: 8px;
+  }
+
+  body.pixel-style-geometry #inventoryButton,
+  body.pixel-style-geometry #showAllHealthButton,
+  body.pixel-style-geometry .actions button {
+    min-height: var(--desktop-ui-small-button);
+  }
+
+  body.pixel-style-geometry .actions {
+    gap: 8px;
+  }
+
+  body.pixel-style-geometry .operator-card {
+    display: grid;
+    gap: 6px;
+    min-height: 78px;
+    border-radius: 4px;
+    padding: 9px;
+    line-height: 1.2;
+  }
+
+  body.pixel-style-geometry .operator-card strong {
+    display: flex;
+    align-items: center;
+    min-height: 18px;
+  }
+
+  body.pixel-style-geometry .weapon-pixel-preview {
+    display: grid;
+    place-items: center;
+    min-height: 86px;
+    border-radius: 4px;
+  }
+
+  body.pixel-style-geometry .bullet-strip,
+  body.pixel-style-geometry .loadout-summary,
+  body.pixel-style-geometry .inventory-grid,
+  body.pixel-style-geometry .equipment-table-options {
+    gap: var(--desktop-ui-gap);
+  }
+
+  body.pixel-style-geometry .inventory-panel,
+  body.pixel-style-geometry .equipment-table-dialog,
+  body.pixel-style-geometry .laptop-dialog {
+    padding: 16px !important;
+  }
+
+  body.pixel-style-geometry .inventory-details {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+  }
+
+  body.pixel-style-geometry .inventory-slot-grid {
+    gap: 6px;
+  }
+
+  body.pixel-style-geometry .inventory-slot {
+    border-radius: 3px !important;
+  }
+
+  body.pixel-style-geometry .inventory-item-detail {
+    border-radius: 4px;
+    padding: 10px 12px;
+    line-height: 1.3;
+  }
+
+  body.pixel-style-geometry .lock-panel {
+    display: grid;
+    gap: 12px;
+    padding: 16px !important;
+  }
+
+  body.pixel-style-geometry .lock-display,
+  body.pixel-style-geometry .lock-keypad {
+    gap: 8px;
+  }
+
+  body.pixel-style-geometry .lock-keypad button {
+    min-height: 44px;
+  }
+
+  body.pixel-style-geometry .pause-panel {
+    display: grid;
+    gap: 14px;
+    width: min(500px, calc(100vw - 48px));
+    padding: 18px !important;
+  }
+
+  body.pixel-style-geometry .pause-panel h2 {
+    min-height: 36px;
+    padding: 0;
+  }
+
+  body.pixel-style-geometry .mission-report,
+  body.pixel-style-geometry .banner {
+    gap: var(--desktop-ui-gap);
+    padding: 16px !important;
+    line-height: 1.25;
+  }
+
+  body.pixel-style-geometry .banner strong {
+    min-height: 42px;
+    padding: 0;
+    font-size: 22px;
+  }
+}
+
+body.pixel-style-geometry .brandbar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+body.pixel-style-geometry .brandbar > div:first-child {
+  display: grid;
+  align-content: center;
+  min-width: min(420px, 42vw);
+}
+
+body.pixel-style-geometry .brandbar-status {
+  flex: 1 1 760px;
+  max-width: 980px;
+  padding: 10px 12px !important;
+}
+
+body.pixel-style-geometry .brandbar-status .panel-label {
+  min-height: 18px;
+  margin-bottom: 6px;
+}
+
+body.pixel-style-geometry .brandbar-status .mission-status-grid {
+  grid-template-columns: repeat(5, minmax(92px, 1fr));
+  gap: 7px;
+  margin-top: 0;
+}
+
+body.pixel-style-geometry .brandbar-status .mission-status-grid div,
+body.pixel-style-geometry .brandbar-status .mission-status-grid div:first-child,
+body.pixel-style-geometry .brandbar-status .mission-status-grid div:nth-child(2),
+body.pixel-style-geometry .brandbar-status .mission-status-grid div:nth-child(5) {
+  grid-column: auto;
+  min-height: 42px;
+}
+
+body.pixel-style-geometry .brandbar-status .mission-status-grid strong {
+  white-space: normal;
+}
+
+body.pixel-style-geometry .weapon-pixel-preview {
+  min-height: 92px;
+  border: 1px solid rgba(114, 183, 206, 0.24);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, rgba(114, 183, 206, 0.08), rgba(255, 255, 255, 0.02)),
+    #0f1417 !important;
+}
+
+body.pixel-style-geometry .weapon-image-frame {
+  min-height: 82px;
+}
+
+.weapon-pixel-art {
+  display: grid;
+  grid-template-columns: repeat(12, 8px);
+  grid-template-rows: repeat(5, 8px);
+  gap: 0;
+  image-rendering: pixelated;
+}
+
+.weapon-pixel-cell {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+
+.weapon-pixel-art-rifle .weapon-pixel-cell:is(
+  .weapon-pixel-cell-26,
+  .weapon-pixel-cell-27,
+  .weapon-pixel-cell-28,
+  .weapon-pixel-cell-29,
+  .weapon-pixel-cell-30,
+  .weapon-pixel-cell-31,
+  .weapon-pixel-cell-32,
+  .weapon-pixel-cell-33,
+  .weapon-pixel-cell-34,
+  .weapon-pixel-cell-35,
+  .weapon-pixel-cell-36,
+  .weapon-pixel-cell-37
+) {
+  background: #8fb9c4;
+}
+
+.weapon-pixel-art-rifle .weapon-pixel-cell:is(.weapon-pixel-cell-38, .weapon-pixel-cell-39, .weapon-pixel-cell-40) {
+  background: #d9d2b9;
+}
+
+.weapon-pixel-art-rifle .weapon-pixel-cell:is(.weapon-pixel-cell-14, .weapon-pixel-cell-15, .weapon-pixel-cell-16, .weapon-pixel-cell-41, .weapon-pixel-cell-42) {
+  background: #566269;
+}
+
+.weapon-pixel-art-rifle .weapon-pixel-cell:is(.weapon-pixel-cell-43, .weapon-pixel-cell-44, .weapon-pixel-cell-45, .weapon-pixel-cell-55) {
+  background: #3e4a50;
+}
+
+.weapon-pixel-art-smg .weapon-pixel-cell:is(
+  .weapon-pixel-cell-27,
+  .weapon-pixel-cell-28,
+  .weapon-pixel-cell-29,
+  .weapon-pixel-cell-30,
+  .weapon-pixel-cell-31,
+  .weapon-pixel-cell-32,
+  .weapon-pixel-cell-33
+) {
+  background: #77c996;
+}
+
+.weapon-pixel-art-smg .weapon-pixel-cell:is(.weapon-pixel-cell-34, .weapon-pixel-cell-35, .weapon-pixel-cell-36) {
+  background: #d9d2b9;
+}
+
+.weapon-pixel-art-smg .weapon-pixel-cell:is(.weapon-pixel-cell-16, .weapon-pixel-cell-17, .weapon-pixel-cell-40, .weapon-pixel-cell-41, .weapon-pixel-cell-42, .weapon-pixel-cell-53) {
+  background: #3f5348;
+}
+
+.weapon-pixel-art-pistol .weapon-pixel-cell:is(
+  .weapon-pixel-cell-28,
+  .weapon-pixel-cell-29,
+  .weapon-pixel-cell-30,
+  .weapon-pixel-cell-31,
+  .weapon-pixel-cell-32,
+  .weapon-pixel-cell-33
+) {
+  background: #e3b456;
+}
+
+.weapon-pixel-art-pistol .weapon-pixel-cell:is(.weapon-pixel-cell-34, .weapon-pixel-cell-35) {
+  background: #d9d2b9;
+}
+
+.weapon-pixel-art-pistol .weapon-pixel-cell:is(.weapon-pixel-cell-41, .weapon-pixel-cell-42, .weapon-pixel-cell-53, .weapon-pixel-cell-54) {
+  background: #5b4930;
+}
+
+.weapon-pixel-art-melee .weapon-pixel-cell:is(
+  .weapon-pixel-cell-26,
+  .weapon-pixel-cell-27,
+  .weapon-pixel-cell-28,
+  .weapon-pixel-cell-29,
+  .weapon-pixel-cell-30,
+  .weapon-pixel-cell-31,
+  .weapon-pixel-cell-32,
+  .weapon-pixel-cell-33
+) {
+  background: #e8eef0;
+}
+
+.weapon-pixel-art-melee .weapon-pixel-cell:is(.weapon-pixel-cell-24, .weapon-pixel-cell-25, .weapon-pixel-cell-36, .weapon-pixel-cell-37) {
+  background: #5c4435;
+}
+
+.weapon-pixel-art-melee .weapon-pixel-cell:is(.weapon-pixel-cell-38, .weapon-pixel-cell-39) {
+  background: #e3b456;
+}
+
+.weapon-pixel-art-none {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  min-height: 46px;
+  border: 1px dashed rgba(152, 162, 155, 0.36);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+/*
+Geometry weapon group disabled.
+.weapon-geometry {
+  position: relative;
+  width: 150px;
+  height: 54px;
+  image-rendering: pixelated;
+}
+
+.weapon-part {
+  position: absolute;
+  display: block;
+  border: 1px solid rgba(238, 243, 239, 0.22);
+  background: var(--cyan);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.24);
+}
+
+.weapon-geometry-rifle .weapon-stock {
+  left: 10px;
+  top: 24px;
+  width: 28px;
+  height: 14px;
+  background: #58646a;
+}
+
+.weapon-geometry-rifle .weapon-body {
+  left: 34px;
+  top: 18px;
+  width: 54px;
+  height: 18px;
+  background: #6bb5c9;
+}
+
+.weapon-geometry-rifle .weapon-barrel {
+  left: 86px;
+  top: 22px;
+  width: 50px;
+  height: 8px;
+  background: #d8d2bc;
+}
+
+.weapon-geometry-rifle .weapon-grip {
+  left: 54px;
+  top: 34px;
+  width: 11px;
+  height: 16px;
+  background: #3e4b51;
+}
+
+.weapon-geometry-rifle .weapon-magazine {
+  left: 70px;
+  top: 35px;
+  width: 12px;
+  height: 18px;
+  background: #46545a;
+}
+
+.weapon-geometry-smg {
+  width: 128px;
+}
+
+.weapon-geometry-smg .weapon-stock {
+  left: 18px;
+  top: 25px;
+  width: 22px;
+  height: 10px;
+  background: #4c565d;
+}
+
+.weapon-geometry-smg .weapon-body {
+  left: 38px;
+  top: 18px;
+  width: 44px;
+  height: 20px;
+  background: #67c690;
+}
+
+.weapon-geometry-smg .weapon-barrel {
+  left: 80px;
+  top: 23px;
+  width: 30px;
+  height: 7px;
+  background: #d8d2bc;
+}
+
+.weapon-geometry-smg .weapon-grip {
+  left: 52px;
+  top: 36px;
+  width: 10px;
+  height: 15px;
+  background: #3d4a3f;
+}
+
+.weapon-geometry-smg .weapon-magazine {
+  left: 67px;
+  top: 35px;
+  width: 10px;
+  height: 18px;
+  background: #415047;
+}
+
+.weapon-geometry-pistol {
+  width: 96px;
+}
+
+.weapon-geometry-pistol .weapon-body {
+  left: 24px;
+  top: 18px;
+  width: 38px;
+  height: 16px;
+  background: #e3b456;
+}
+
+.weapon-geometry-pistol .weapon-barrel {
+  left: 60px;
+  top: 21px;
+  width: 18px;
+  height: 7px;
+  background: #d8d2bc;
+}
+
+.weapon-geometry-pistol .weapon-grip {
+  left: 36px;
+  top: 32px;
+  width: 12px;
+  height: 20px;
+  background: #5c4b2b;
+  transform: skewX(-8deg);
+}
+
+.weapon-geometry-pistol .weapon-stock,
+.weapon-geometry-pistol .weapon-magazine {
+  display: none;
+}
+
+.weapon-geometry-melee {
+  width: 118px;
+}
+
+.weapon-geometry-melee .weapon-blade {
+  left: 46px;
+  top: 10px;
+  width: 56px;
+  height: 10px;
+  background: #e7edf0;
+}
+
+.weapon-geometry-melee .weapon-guard {
+  left: 39px;
+  top: 8px;
+  width: 8px;
+  height: 18px;
+  background: #e3b456;
+}
+
+.weapon-geometry-melee .weapon-grip {
+  left: 18px;
+  top: 12px;
+  width: 24px;
+  height: 10px;
+  background: #5b4637;
+}
+
+.weapon-geometry-melee .weapon-stock,
+.weapon-geometry-melee .weapon-body,
+.weapon-geometry-melee .weapon-barrel,
+.weapon-geometry-melee .weapon-magazine {
+  display: none;
+}
+
+.weapon-geometry-none {
+  display: grid;
+  place-items: center;
+  width: 130px;
+  height: 54px;
+  border: 1px dashed rgba(152, 162, 155, 0.36);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+*/
+
+body.pixel-style-geometry .equipment-icon,
+body.pixel-style-geometry .equipment-icon-fallback,
+body.pixel-style-geometry .equipment-icon-preview,
+body.pixel-style-geometry .equipment-icon-small,
+body.pixel-style-geometry .equipment-icon-tiny {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+}
+
+body.pixel-style-geometry .loadout-text-strip {
+  display: grid;
+  gap: 5px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.pixel-style-geometry .loadout-text-strip span,
+body.pixel-style-geometry .operator-equipment-label,
+body.pixel-style-geometry .inventory-grid strong,
+body.pixel-style-geometry .summary-row strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+body.pixel-style-geometry .plain-select-row {
+  display: grid;
+  min-width: 0;
+}
+
+body.pixel-style-geometry .actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+body.pixel-style-geometry .health-meter {
+  height: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  background: #0b0f11;
+}
+
+body.pixel-style-geometry .armor-fill {
+  background: #eef3ef;
+}
+
+body.pixel-style-geometry .health-fill {
+  background: var(--green);
+}
+
+body.pixel-style-geometry .operator-card.down .health-fill {
+  background: var(--red);
+}
+
+body.pixel-style-geometry .inventory-slot {
+  background: #101417 !important;
+}
+
+body.pixel-style-geometry .inventory-slot:not(.empty) {
+  background: #172025 !important;
+}
+
+body.pixel-style-geometry .inventory-slot:hover,
+body.pixel-style-geometry .inventory-slot.drop-target {
+  background: #223039 !important;
+}
+
+body.pixel-style-geometry .inventory-grid div,
+body.pixel-style-geometry .inventory-item-detail {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 4px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+body.pixel-style-geometry .expanded-pause-button {
+  min-width: 0;
+  min-height: 28px;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none;
+  color: rgba(238, 243, 239, 0.58);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
+}
+
+body.pixel-style-geometry .settings-change-overlay {
+  display: none !important;
+}
+
+@media (min-width: 1051px) {
+  body.pixel-style-geometry .settings-grid {
+    grid-template-columns: 160px minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  body.pixel-style-geometry .settings-tabs {
+    position: static;
+    grid-template-columns: 1fr;
+    grid-column: 1;
+    grid-row: 1;
+    align-content: start;
+  }
+
+  body.pixel-style-geometry .settings-tabs button {
+    justify-content: center;
+    min-height: 46px;
+    white-space: normal;
+  }
+
+  body.pixel-style-geometry .settings-grid > .control-card {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 1050px) {
+  body.pixel-style-geometry .brandbar {
+    display: grid;
+    align-items: stretch;
+  }
+
+  body.pixel-style-geometry .brandbar > div:first-child {
+    min-width: 0;
+  }
+
+  body.pixel-style-geometry .brandbar-status {
+    max-width: none;
+  }
+}
+
+@media (max-width: 760px) {
+  body.pixel-style-geometry .brandbar-status .mission-status-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.pixel-style-geometry .brandbar-status .mission-status-grid div:first-child,
+  body.pixel-style-geometry .brandbar-status .mission-status-grid div:nth-child(2),
+  body.pixel-style-geometry .brandbar-status .mission-status-grid div:nth-child(5) {
+    grid-column: span 2;
+  }
+}
+
+body.pixel-style-geometry .settings-panel {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+body.pixel-style-geometry .settings-grid {
+  display: grid;
+  grid-template-columns: minmax(150px, 180px) minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+body.pixel-style-geometry .settings-tabs {
+  position: static;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: 8px;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+}
+
+body.pixel-style-geometry .settings-tabs button {
+  display: grid;
+  place-items: center;
+  min-height: 46px;
+  white-space: normal;
+}
+
+body.pixel-style-geometry .settings-grid > .control-card {
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  overflow: auto;
+}
+
+body.pixel-style-geometry .settings-grid > .control-card.hidden {
+  display: none;
+}
+
+body.pixel-style-geometry [data-settings-panel] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+@media (max-width: 900px) {
+  body.pixel-style-geometry .settings-grid {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+
+  body.pixel-style-geometry .settings-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.pixel-style-geometry [data-settings-panel] {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+#startMenuOverlay {
+  place-items: start end;
+  padding: clamp(18px, 4vw, 48px);
+  background:
+    linear-gradient(90deg, rgba(5, 7, 8, 0.22), rgba(5, 7, 8, 0.74)),
+    radial-gradient(circle at 26% 70%, rgba(96, 198, 137, 0.12), transparent 34%),
+    rgba(5, 7, 8, 0.86);
+}
+
+html.start-menu-active,
+body.start-menu-active {
+  overflow: hidden;
+}
+
+#startMenuOverlay::before {
+  inset: 0;
+  background: var(--ui-start-background) center / cover no-repeat;
+  transform: none;
+  opacity: 0.82;
+  image-rendering: auto;
+}
+
+#startMenuOverlay::after {
+  background:
+    linear-gradient(90deg, rgba(5, 7, 8, 0.14), rgba(5, 7, 8, 0.82)),
+    linear-gradient(180deg, rgba(5, 7, 8, 0.16), rgba(5, 7, 8, 0.66));
+  opacity: 1;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-panel {
+  justify-self: end;
+  align-self: start;
+  align-content: start;
+  justify-items: stretch;
+  gap: 14px;
+  width: min(430px, calc(100vw - 36px));
+  min-height: auto;
+  max-height: calc(100vh - 56px);
+  padding: clamp(18px, 2.4vw, 26px) !important;
+  border: 1px solid rgba(114, 183, 206, 0.42) !important;
+  border-left: 6px solid rgba(96, 198, 137, 0.72) !important;
+  border-radius: 6px !important;
+  background:
+    linear-gradient(180deg, rgba(12, 17, 19, 0.68), rgba(12, 17, 19, 0.54)),
+    rgba(16, 20, 22, 0.5) !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52);
+  text-align: left;
+  backdrop-filter: blur(2px);
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-panel .eyebrow {
+  justify-content: flex-start;
+  color: var(--cyan);
+}
+
+/* Previous CSS pixel-letter/block title group disabled in favor of PressStart2P-Regular.ttf.
+.pixel-title {
+  display: grid;
+  gap: 8px;
+}
+
+.pixel-title-word {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pixel-title-word span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 0.86em;
+  min-height: 1.02em;
+  padding: 0 0.06em;
+  border: 2px solid rgba(238, 243, 239, 0.92);
+  background:
+    linear-gradient(180deg, rgba(238, 243, 239, 0.14), rgba(96, 198, 137, 0.08)),
+    rgba(10, 14, 16, 0.62);
+  color: #f5fbf7;
+  font-family: "Courier New", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-weight: 900;
+  line-height: 0.86;
+  text-align: center;
+  text-shadow: 2px 0 0 rgba(0, 0, 0, 0.72), 0 2px 0 rgba(0, 0, 0, 0.72);
+  box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.42), inset 3px 3px 0 rgba(255, 255, 255, 0.08);
+}
+
+body.pixel-style-geometry .start-panel h2.pixel-title {
+  width: 100%;
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(30px, 4.2vw, 52px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+*/
+
+.press-start-title {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  color: var(--text);
+  font-family: "PressStart2P", "Courier New", ui-monospace, monospace;
+  font-size: clamp(28px, 4.1vw, 50px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.58);
+}
+
+.press-start-title span {
+  display: block;
+}
+
+.start-menu-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+body.pixel-style-geometry .start-menu-options button,
+body.pixel-style-geometry .start-info-card button {
+  width: 100%;
+  min-height: 48px;
+  justify-content: center;
+  font-family: "PressStart2P", "Courier New", ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.start-menu-message {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(227, 180, 86, 0.5);
+  border-radius: 4px;
+  color: var(--amber);
+  background: rgba(16, 20, 22, 0.84);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* Inline start information card disabled; the separate overlay below is active instead.
+.start-info-panel {
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
+  padding: 12px;
+  border: 1px solid rgba(114, 183, 206, 0.34);
+  border-radius: 5px;
+  background: rgba(8, 12, 14, 0.8);
+  line-height: 1.35;
+}
+
+.start-info-panel blockquote {
+  margin: 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--green);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.start-info-panel strong,
+.start-info-panel span {
+  display: block;
+  font-size: 12px;
+}
+
+.start-info-panel span {
+  color: var(--muted);
+}
+*/
+
+.start-info-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 7, 8, 0.34);
+}
+
+.start-info-overlay.hidden {
+  display: none;
+}
+
+.start-onboarding-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 7, 8, 0.24);
+}
+
+.start-onboarding-overlay.hidden {
+  display: none;
+}
+
+.start-onboarding-overlay .start-onboarding-card {
+  width: min(560px, calc(100vw - 48px));
+  margin: 0;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(114, 183, 206, 0.42);
+  border-left: 6px solid rgba(96, 198, 137, 0.72);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(12, 17, 19, 0.72), rgba(12, 17, 19, 0.58)),
+    rgba(16, 20, 22, 0.5);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(2px);
+}
+
+.start-onboarding-overlay .start-onboarding-card p {
+  min-height: auto;
+  padding: 0;
+  background: none;
+  color: var(--text);
+  font-family: "PressStart2P", "Courier New", ui-monospace, monospace;
+  font-size: clamp(13px, 1.25vw, 18px);
+  line-height: 1.75;
+  text-align: center;
+}
+
+.start-onboarding-overlay .start-onboarding-card .menu-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 0;
+}
+
+.start-onboarding-overlay .start-onboarding-card .menu-actions::before {
+  display: none;
+}
+
+.start-onboarding-overlay .start-onboarding-card .menu-actions button {
+  min-height: 58px;
+}
+
+.start-onboarding-overlay .start-onboarding-card .subtle-menu-button {
+  justify-self: center;
+  width: min(220px, 100%);
+  min-height: 34px;
+  margin-top: 4px;
+  opacity: 0.78;
+  font-size: 10px !important;
+}
+
+.start-info-card {
+  display: grid;
+  gap: 14px;
+  width: min(560px, calc(100vw - 48px));
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(114, 183, 206, 0.42);
+  border-left: 6px solid rgba(227, 180, 86, 0.72);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(12, 17, 19, 0.76), rgba(12, 17, 19, 0.6)),
+    rgba(16, 20, 22, 0.56);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(2px);
+}
+
+.start-info-card blockquote {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--green);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.start-info-card strong,
+.start-info-card span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.start-info-card span {
+  color: var(--muted);
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button {
+  font-family: "PressStart2P", "Courier New", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+body.pixel-style-geometry .onboarding-question {
+  width: 100%;
+  border: 1px solid rgba(96, 198, 137, 0.34) !important;
+  background: rgba(8, 12, 14, 0.84) !important;
+}
+
+@media (max-width: 720px) {
+  #startMenuOverlay {
+    place-items: end center;
+    padding: 16px;
+  }
+
+  body.pixel-style-geometry #startMenuOverlay .start-panel {
+    width: min(100%, 440px);
+    max-height: calc(100vh - 32px);
+  }
+
+  body.pixel-style-geometry .start-panel h2.press-start-title {
+    font-size: clamp(27px, 9vw, 42px);
+  }
+}
+
+.range-value {
+  justify-self: end;
+  margin-left: auto;
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(114, 183, 206, 0.22);
+}
+
+.settings-footer-actions button {
+  min-width: 148px;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-panel {
+  border: 0 !important;
+  border-left: 0 !important;
+  background: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+  width: min(660px, calc(100vw - 56px));
+  min-height: min(780px, calc(100vh - 88px));
+  padding: clamp(22px, 4vh, 42px) !important;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+  overflow: visible;
+  gap: clamp(28px, 5.8vh, 58px);
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0;
+  width: min(440px, 100%);
+  gap: clamp(18px, 3.2vh, 36px);
+  justify-self: center;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button,
+body.pixel-style-geometry #startMenuOverlay #playMenuButton,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: auto;
+  padding: clamp(8px, 1.8vh, 16px) 0;
+  text-align: center;
+  text-indent: 0;
+  border: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: rgba(219, 255, 235, 0.94);
+  font-size: clamp(14px, 1.55vw, 20px) !important;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button:hover,
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button:focus-visible,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button:hover,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button:focus-visible {
+  border: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: var(--accent-cyan);
+  transform: translateX(8px);
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button:focus-visible::after,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button:focus-visible::after {
+  display: none !important;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-menu-options button:active,
+body.pixel-style-geometry #startMenuOverlay .onboarding-question button:active {
+  color: var(--accent-amber);
+  transform: translateX(8px) translateY(1px);
+}
+
+body.pixel-style-geometry #startMenuOverlay .eyebrow {
+  font-size: clamp(12px, 1.1vw, 16px);
+  line-height: 1.6;
+}
+
+body.pixel-style-geometry #startMenuOverlay .press-start-title {
+  max-width: min(100%, 640px);
+  overflow: visible;
+  font-size: clamp(36px, 5vw, 70px);
+  line-height: 1.32;
+  gap: clamp(10px, 1.7vh, 20px);
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.52);
+}
+
+body.pixel-style-geometry #startMenuOverlay .press-start-title span {
+  overflow: visible;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay {
+  display: grid;
+  place-items: center;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay.hidden {
+  display: none;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay .start-onboarding-card {
+  width: min(560px, calc(100vw - 48px)) !important;
+  margin: 0 !important;
+  padding: clamp(18px, 3vw, 28px) !important;
+  align-content: start;
+  justify-items: stretch;
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay .start-onboarding-card .menu-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay .start-onboarding-card .subtle-menu-button {
+  justify-self: center;
+  width: min(220px, 100%);
+  min-height: 34px;
+  font-size: 10px !important;
 }

@@ -49,6 +49,7 @@
       state.gameOver = true;
       state.running = false;
       state.result = result;
+      if (deps.clearResumePoint) deps.clearResumePoint();
       deps.audio.play(result === "success" ? "mission-success" : "mission-failed");
       const tutorialSuccess = runtime.activeMode === "tutorial" && result === "success";
       const storySuccess = runtime.activeMode === "level" && result === "success";
@@ -79,6 +80,7 @@
       renderMissionReport(result, progress);
       populateResultSelector();
       elements.banner.classList.remove("hidden");
+      if (deps.refreshStartMenu) deps.refreshStartMenu();
       deps.updateHud();
     }
 

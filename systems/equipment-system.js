@@ -122,15 +122,16 @@
 
     // Renders a compact static equipment image with a text fallback.
     function equipmentIconHtml(id, label, className = "") {
-      const src = equipmentImagePath(id);
-      const safeLabel = escapeAttr(label || id || "Equipment");
-      const classes = ["equipment-icon", className].filter(Boolean).join(" ");
+      // const src = equipmentImagePath(id);
+      // const safeLabel = escapeAttr(label || id || "Equipment");
+      // const classes = ["equipment-icon", className].filter(Boolean).join(" ");
       /*
       if (src) {
         return `<img class="${classes}" src="${src}" alt="${safeLabel}" loading="lazy" draggable="false" onerror="this.replaceWith(document.createTextNode('${fallbackInitial(label || id)}'))">`;
       }
-      */
       return `<span class="${classes} equipment-icon-fallback" aria-label="${safeLabel}">${fallbackInitial(label || id)}</span>`;
+      */
+      return "";
     }
 
     // Loads all weapon and armor JSON definitions from the equipment folder.
@@ -227,14 +228,12 @@
         return `
           <div class="enemy-loadout-row">
             <strong>${enemy.id}</strong>
-            <label class="icon-select-row">
-              ${equipmentIconHtml(selectedWeaponId, weapon ? weapon.name : selectedWeaponId, "equipment-icon-small")}
+            <label class="plain-select-row">
               <select data-enemy-weapon-id="${enemy.id}" aria-label="${enemy.id} weapon">
                 ${weaponOptionsHtml(selectedWeaponId)}
               </select>
             </label>
-            <label class="icon-select-row">
-              ${equipmentIconHtml(selectedArmorId, armor ? armor.name : selectedArmorId, "equipment-icon-small")}
+            <label class="plain-select-row">
               <select data-enemy-armor-id="${enemy.id}" aria-label="${enemy.id} armor">
                 ${armorOptionsHtml(selectedArmorId)}
               </select>
@@ -394,10 +393,10 @@
       renderWeaponTooltip(op, weapon, armor, backpack);
       renderAmmoBoard(op);
       elements.weaponStats.innerHTML = `
-        <div class="loadout-icon-strip" aria-label="Selected equipment">
-          ${equipmentIconHtml(weapon.id, weapon.name, "equipment-icon-small")}
-          ${equipmentIconHtml(armor.id, armor.name, "equipment-icon-small")}
-          ${equipmentIconHtml(backpack.id, backpack.name, "equipment-icon-small")}
+        <div class="loadout-text-strip" aria-label="Selected equipment">
+          <span>Weapon: <strong>${weapon.name}</strong></span>
+          <span>Armor: <strong>${armor.name}</strong></span>
+          <span>Backpack: <strong>${backpack.name}</strong></span>
         </div>
         <div>${weapon.role}</div>
         <div class="empty-note">Hover weapon art for equipment details.</div>
@@ -454,11 +453,11 @@
         return;
       }
       const weapon = weaponById(weaponId);
-      const image = equipmentIconHtml(weaponId, weapon ? weapon.name : weaponId, "equipment-icon-preview");
+      const art = weaponPixelBlockHtml(weaponId, weapon);
       elements.weaponPixelPreview.classList.remove("empty");
       elements.weaponPixelPreview.innerHTML = `
         <div class="weapon-image-frame" role="img" aria-label="${weapon ? weapon.name : weaponId} pixel preview">
-          ${image}
+          ${art}
         </div>
       `;
     }
@@ -497,14 +496,14 @@
               <span class="armor-fill" style="width: ${armorPercent}%"></span>
             </span>
             <span class="operator-row">
-              <span class="operator-equipment-label">${equipmentIconHtml(op.armorId, armorById(op.armorId).name, "equipment-icon-tiny")}${armorById(op.armorId).name}</span>
+              <span class="operator-equipment-label">${armorById(op.armorId).name}</span>
               <span>${op.armor.toFixed(0)} AR</span>
             </span>
             <span class="health-meter" aria-hidden="true">
               <span class="health-fill" style="width: ${health}%"></span>
             </span>
             <span class="operator-row">
-              <span class="operator-equipment-label">${equipmentIconHtml(op.weaponId, weapon ? weapon.name : "Rifle", "equipment-icon-tiny")}${weapon ? weapon.name : "Rifle"}</span>
+              <span class="operator-equipment-label">${weapon ? weapon.name : "Rifle"}</span>
               <span>${health.toFixed(0)} HP</span>
             </span>
           </button>
@@ -548,6 +547,61 @@
       renderWeaponTooltip,
       renderAmmoBoard
     };
+
+    // Builds CSS pixel-block weapon art without PNG assets.
+    function weaponPixelBlockHtml(id, weapon) {
+      const type = pixelWeaponType(id, weapon);
+      const label = escapeAttr(weapon ? weapon.name : id || "Weapon");
+      if (type === "none") {
+        return `<div class="weapon-pixel-art weapon-pixel-art-none" aria-label="${label}"><span>No weapon</span></div>`;
+      }
+      return `
+        <div class="weapon-pixel-art weapon-pixel-art-${type}" aria-label="${label}">
+          ${Array.from({ length: 60 }, (_, index) => `<span class="weapon-pixel-cell weapon-pixel-cell-${index}" aria-hidden="true"></span>`).join("")}
+        </div>
+      `;
+    }
+
+    // Maps equipment ids to CSS pixel-block weapon art classes.
+    function pixelWeaponType(id, weapon) {
+      if (!id || id === "no-weapon" || weapon?.canFire === false && weapon?.attackType !== "melee") return "none";
+      if (weapon?.attackType === "melee" || id === "melee") return "melee";
+      if (id.includes("smg") || id.includes("pdw")) return "smg";
+      if (id.includes("pistol")) return "pistol";
+      return "rifle";
+    }
+
+    /*
+    Geometry weapon group disabled.
+    // Builds a CSS-only tactical weapon silhouette for the selected loadout.
+    function weaponGeometryHtml(id, weapon) {
+      const type = weaponGeometryType(id, weapon);
+      const label = escapeAttr(weapon ? weapon.name : id || "Weapon");
+      if (type === "none") {
+        return `<div class="weapon-geometry weapon-geometry-none" aria-label="${label}"><span>No weapon</span></div>`;
+      }
+      return `
+        <div class="weapon-geometry weapon-geometry-${type}" aria-label="${label}">
+          <span class="weapon-part weapon-stock"></span>
+          <span class="weapon-part weapon-body"></span>
+          <span class="weapon-part weapon-barrel"></span>
+          <span class="weapon-part weapon-grip"></span>
+          <span class="weapon-part weapon-magazine"></span>
+          <span class="weapon-part weapon-blade"></span>
+          <span class="weapon-part weapon-guard"></span>
+        </div>
+      `;
+    }
+
+    // Maps equipment ids to reusable CSS geometry classes.
+    function weaponGeometryType(id, weapon) {
+      if (!id || id === "no-weapon" || weapon?.canFire === false && weapon?.attackType !== "melee") return "none";
+      if (weapon?.attackType === "melee" || id === "melee") return "melee";
+      if (id.includes("smg") || id.includes("pdw")) return "smg";
+      if (id.includes("pistol")) return "pistol";
+      return "rifle";
+    }
+    */
   }
 
   // Escapes text for safe use inside HTML attributes.

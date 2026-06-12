@@ -218,6 +218,7 @@
       elements.banner.classList.add("hidden");
       if (elements.exitTutorialButton) elements.exitTutorialButton.classList.add("hidden");
       elements.levelTitle.textContent = runtime.currentLevel.title || runtime.currentLevelMeta.title;
+      if (deps.saveResumePoint) deps.saveResumePoint(runtime.currentLevelMeta, runtime.activeMode);
       deps.updateHud();
     }
 

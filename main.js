@@ -4,7 +4,14 @@ const elements = {
   canvas: document.getElementById("game"),
   startMenuOverlay: document.getElementById("startMenuOverlay"),
   playMenuButton: document.getElementById("playMenuButton"),
+  startSettingButton: document.getElementById("startSettingButton"),
+  startInfoButton: document.getElementById("startInfoButton"),
+  startExitButton: document.getElementById("startExitButton"),
+  startExitMessage: document.getElementById("startExitMessage"),
+  startInfoPanel: document.getElementById("startInfoPanel"),
+  closeStartInfoButton: document.getElementById("closeStartInfoButton"),
   onboardingQuestion: document.getElementById("onboardingQuestion"),
+  closeOnboardingButton: document.getElementById("closeOnboardingButton"),
   playedYesButton: document.getElementById("playedYesButton"),
   playedNoButton: document.getElementById("playedNoButton"),
   // startPngRenderingCheckbox: document.getElementById("startPngRenderingCheckbox"),
@@ -48,13 +55,16 @@ const elements = {
   cancelSettingsChangeButton: document.getElementById("cancelSettingsChangeButton"),
   closeSettingsButton: document.getElementById("closeSettingsButton"),
   resetSettingsButton: document.getElementById("resetSettingsButton"),
+  settingsExitToMenuButton: document.getElementById("settingsExitToMenuButton"),
   settingsTabs: document.querySelectorAll("[data-settings-tab]"),
   settingsPanels: document.querySelectorAll("[data-settings-panel]"),
   difficultySelect: document.getElementById("difficultySelect"),
   shootingModeSelect: document.getElementById("shootingModeSelect"),
   enemyTraceSelect: document.getElementById("enemyTraceSelect"),
   hintOpacityRange: document.getElementById("hintOpacityRange"),
+  hintOpacityValue: document.getElementById("hintOpacityValue"),
   viewRange: document.getElementById("viewRange"),
+  viewValueLabel: document.getElementById("viewValueLabel"),
   // pixelArtStyleSelect: document.getElementById("pixelArtStyleSelect"),
   // pngRenderingCheckbox: document.getElementById("pngRenderingCheckbox"),
   keyBindingList: document.getElementById("keyBindingList"),
@@ -112,6 +122,7 @@ const elements = {
 
 const ctx = elements.canvas.getContext("2d");
 const DEFAULT_WORLD = { w: 960, h: 640 };
+const RESUME_STORAGE_KEY = "delta-geometry-resume";
 const WORLD = { ...DEFAULT_WORLD };
 const TWO_PI = Math.PI * 2;
 const UNIT_RADIUS = 12;
@@ -235,6 +246,8 @@ const runtime = {
   expandedGame: false,
   expandedPaused: false,
   mobileMode: false,
+  gameDataReady: false,
+  gameDataLoading: null,
   hintOpacity: 0.42,
   viewValue: 50,
   pixelArtStyle: "geometry",
@@ -335,6 +348,99 @@ function setDifficulty(value) {
   updateHud();
 }
 
+// Saves the last playable destination for the start-menu Resume action.
+function saveResumePoint(meta, mode) {
+  if (!meta || !meta.id) return;
+  const payload = {
+    id: meta.id,
+    mode: mode || runtime.activeMode || "level",
+    title: meta.title || meta.id,
+    status: "in-progress",
+    savedAt: Date.now()
+  };
+  try {
+    localStorage.setItem(RESUME_STORAGE_KEY, JSON.stringify(payload));
+  } catch (error) {
+    // Resume is helpful, but the game should still run when storage is blocked.
+  }
+}
+
+// Clears finished or invalid Resume data.
+function clearResumePoint() {
+  try {
+    localStorage.removeItem(RESUME_STORAGE_KEY);
+  } catch (error) {
+    // Storage may be blocked; the visible button still falls back to runtime state.
+  }
+}
+
+// Reads the unfinished destination saved for Resume.
+function readResumePoint() {
+  try {
+    const raw = localStorage.getItem(RESUME_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.id !== "string") return null;
+    if (parsed.status !== "in-progress") {
+      clearResumePoint();
+      return null;
+    }
+    const exists = [...LEVEL_OPTIONS, ...TUTORIAL_OPTIONS, ...TEMP_LEVEL_OPTIONS].some((option) => option.id === parsed.id);
+    if (!exists) {
+      clearResumePoint();
+      return null;
+    }
+    return parsed;
+  } catch (error) {
+    clearResumePoint();
+    return null;
+  }
+}
+
+// Reports whether the start menu can resume active or saved gameplay.
+function hasResumePoint() {
+  return Boolean((runtime.state && !runtime.state.gameOver) || readResumePoint());
+}
+
+// Updates the adaptive Start/Resume button and clears transient start-menu text.
+function refreshStartMenu() {
+  if (elements.playMenuButton) {
+    elements.playMenuButton.textContent = hasResumePoint() ? "Resume" : "Start";
+  }
+  if (elements.startExitMessage) {
+    elements.startExitMessage.classList.add("hidden");
+    elements.startExitMessage.textContent = "";
+  }
+}
+
+// Starts or resumes gameplay from the start menu.
+async function resumeFromStartMenu() {
+  if (runtime.state && !runtime.state.gameOver) {
+    if (menu) menu.enterGame();
+    return true;
+  }
+  const point = readResumePoint();
+  if (!point) return false;
+  await ensureGameDataReady();
+  await level.loadLevel(point.id);
+  if (menu) menu.enterGame();
+  return true;
+}
+
+// Attempts to close the current browser tab and shows a fallback when blocked.
+function exitFromStartMenu() {
+  if (elements.startExitMessage) {
+    elements.startExitMessage.textContent = "Trying to close the tab...";
+    elements.startExitMessage.classList.remove("hidden");
+  }
+  window.close();
+  window.setTimeout(() => {
+    if (!elements.startExitMessage) return;
+    elements.startExitMessage.textContent = "Your browser blocked tab closing. Close this tab manually to exit.";
+    elements.startExitMessage.classList.remove("hidden");
+  }, 180);
+}
+
 // Advances gameplay simulation for one frame.
 function update(dt) {
   const state = runtime.state;
@@ -385,6 +491,8 @@ function updateHud() {
       equipment.renderHealthBoard();
       equipment.renderEnemyLoadouts();
     }
+    if (elements.hintOpacityValue) elements.hintOpacityValue.textContent = `${Math.round(runtime.hintOpacity * 100)}%`;
+    if (elements.viewValueLabel) elements.viewValueLabel.textContent = String(Math.round(runtime.viewValue));
     return;
   }
   elements.modeLabel.textContent = runtime.digitalLockOpen ? "Digital Lock" : (runtime.settingsOpen ? "Settings" : (state.gameOver ? titleCase(state.result) : (hasManualInput() ? "Manual" : (state.running ? "Execute" : "Planning"))));
@@ -418,8 +526,14 @@ function updateHud() {
   if (elements.hintOpacityRange && Number(elements.hintOpacityRange.value) !== runtime.hintOpacity) {
     elements.hintOpacityRange.value = String(runtime.hintOpacity);
   }
+  if (elements.hintOpacityValue) {
+    elements.hintOpacityValue.textContent = `${Math.round(runtime.hintOpacity * 100)}%`;
+  }
   if (elements.viewRange && Number(elements.viewRange.value) !== runtime.viewValue) {
     elements.viewRange.value = String(runtime.viewValue);
+  }
+  if (elements.viewValueLabel) {
+    elements.viewValueLabel.textContent = String(Math.round(runtime.viewValue));
   }
   // if (elements.pixelArtStyleSelect && elements.pixelArtStyleSelect.value !== style) {
   //   elements.pixelArtStyleSelect.value = style;
@@ -647,6 +761,7 @@ function initializeSystems() {
     operatorBackpackLoadouts,
     progression,
     keysDown,
+    saveResumePoint,
     updateHud
   });
 
@@ -694,6 +809,8 @@ function initializeSystems() {
     currentTutorialIndex: () => level.currentTutorialIndex(),
     tutorial,
     progression,
+    clearResumePoint,
+    refreshStartMenu,
     menu: {
       showMain: () => menu && menu.showMain()
     },
@@ -764,6 +881,11 @@ function initializeSystems() {
     cycleOperator,
     toggleRun,
     setDifficulty,
+    hasResumePoint,
+    refreshStartMenu,
+    resumeFromStartMenu,
+    exitFromStartMenu,
+    ensureGameDataReady,
     updateHud,
     operatorLoadouts,
     inventoryIsOpen: () => runtime.inventoryOpen,
@@ -773,11 +895,14 @@ function initializeSystems() {
       openPause: () => menu && menu.openPause(),
       closePause: () => menu && menu.closePause(),
       togglePause: () => menu && menu.togglePause(),
+      showStart: () => menu && menu.showStart(),
       showMain: () => menu && menu.showMain(),
       showLevelMenu: () => menu && menu.showLevelMenu(),
       showTutorialMenu: () => menu && menu.showTutorialMenu(),
       openSettingsFromPause: () => menu && menu.openSettingsFromPause(),
       enterGame: () => menu && menu.enterGame(),
+      isMainOpen: () => menu && menu.isMainOpen(),
+      closeMainOverlay: () => menu && menu.closeMainOverlay(),
       toggleExpanded: (...args) => menu && menu.toggleExpanded(...args)
     }
   });
@@ -799,10 +924,11 @@ function initializeSystems() {
       if (camera) camera.resizeCanvas();
       if (objectScale) objectScale.update();
     },
+    hasResumePoint,
+    refreshStartMenu,
     setDifficulty,
     updateHud
   });
-  menu.render();
 
   mobileControls = window.MobileControlSystem.create({
     runtime,
@@ -831,22 +957,67 @@ window.__breachline = {
   getArmors: () => [...armors.values()],
   getObjectScale: () => objectScale ? objectScale.objectScale() : 1,
   restart: () => level.restart(),
-  loadLevel: (levelId) => level.loadLevel(levelId),
-  loadTutorial: (tutorialId) => level.loadLevel(tutorialId),
-  loadNextLevel: () => level.loadNextLevel(),
-  loadNextTutorial: () => level.loadNextTutorial(),
-  loadFirstLevel: () => level.loadFirstLevel(),
-  showMain: () => menu.showMain(),
+  loadLevel: async (levelId) => {
+    await ensureGameDataReady();
+    return level.loadLevel(levelId);
+  },
+  loadTutorial: async (tutorialId) => {
+    await ensureGameDataReady();
+    return level.loadLevel(tutorialId);
+  },
+  loadNextLevel: async () => {
+    await ensureGameDataReady();
+    return level.loadNextLevel();
+  },
+  loadNextTutorial: async () => {
+    await ensureGameDataReady();
+    return level.loadNextTutorial();
+  },
+  loadFirstLevel: async () => {
+    await ensureGameDataReady();
+    return level.loadFirstLevel();
+  },
+  showMain: async () => {
+    await ensureGameDataReady();
+    return menu.showMain();
+  },
   cycleOperator,
   toggleRun
 };
 
-// Loads startup data and opens the first level.
-async function boot() {
-  level.populateLevelSelect();
-  try {
+// Lazily loads equipment and selectors only after the player chooses a route.
+async function ensureGameDataReady() {
+  if (runtime.gameDataReady) return true;
+  if (runtime.gameDataLoading) return runtime.gameDataLoading;
+  runtime.gameDataLoading = (async () => {
+    level.populateLevelSelect();
     await equipment.loadEquipment();
-    await level.loadLevel(LEVEL_OPTIONS[0].id);
+    runtime.gameDataReady = true;
+    if (menu) menu.render();
+    updateHud();
+    return true;
+  })();
+  try {
+    return await runtime.gameDataLoading;
+  } catch (error) {
+    runtime.gameDataReady = false;
+    runtime.state = null;
+    elements.levelTitle.textContent = "Load Failed";
+    elements.bannerTitle.textContent = "Load Failed";
+    elements.bannerText.textContent = error.message;
+    elements.banner.classList.remove("hidden");
+    updateHud();
+    throw error;
+  } finally {
+    runtime.gameDataLoading = null;
+  }
+}
+
+// Shows only the start menu at boot; gameplay data is loaded after user choice.
+async function boot() {
+  try {
+    if (menu) menu.showStart();
+    updateHud();
   } catch (error) {
     runtime.state = null;
     elements.levelTitle.textContent = "Load Failed";

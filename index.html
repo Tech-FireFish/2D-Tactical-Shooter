@@ -3,28 +3,63 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Breachline 2D</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Delta Geometry</title>
+  <link rel="stylesheet" href="styles.css?v=27">
     <link rel="stylesheet" href="mobile/mobile.css">
   </head>
   <body>
     <section id="startMenuOverlay" class="menu-overlay" aria-label="Start menu" aria-modal="true" role="dialog">
-      <div class="credits-card">
-        <p class="panel-label">Credits</p>
-        <strong>Original tactical prototype</strong>
-        <span>Built with HTML, CSS, and JavaScript Canvas.</span>
-      </div>
       <div class="menu-panel start-panel">
-        <p class="eyebrow">Breachline Training</p>
-        <h2>2D tactical shooter</h2>
-        <button id="playMenuButton" type="button">Play</button>
-        <div id="onboardingQuestion" class="onboarding-question hidden">
+        <p class="eyebrow">Tactical Canvas Command</p>
+        <h2 class="press-start-title" aria-label="Delta Geometry">
+          <!-- Previous CSS pixel-letter title block disabled.
+          <span class="pixel-title-word" aria-hidden="true">
+            <span>D</span><span>E</span><span>L</span><span>T</span><span>A</span>
+          </span>
+          <span class="pixel-title-word" aria-hidden="true">
+            <span>G</span><span>E</span><span>O</span><span>M</span><span>E</span><span>T</span><span>R</span><span>Y</span>
+          </span>
+          -->
+          <span>Delta</span>
+          <span>Geometry</span>
+        </h2>
+        <nav class="start-menu-options" aria-label="Start menu options">
+          <button id="playMenuButton" type="button">Start</button>
+          <button id="startSettingButton" type="button">Setting</button>
+          <button id="startInfoButton" type="button">Information</button>
+          <button id="startExitButton" type="button">Exit</button>
+        </nav>
+        <p id="startExitMessage" class="start-menu-message hidden" role="status"></p>
+        <!-- Inline information card disabled. Information now opens in a separate transparent overlay.
+        <div id="startInfoPanel" class="start-info-panel hidden" aria-live="polite">
+          <p class="panel-label">Information</p>
+          <blockquote>Clear the unknown one angle, one door, and one decision at a time.</blockquote>
+          <strong>Credits</strong>
+          <span>Original tactical prototype.</span>
+          <span>Built with HTML, CSS, and JavaScript Canvas.</span>
+          <button id="closeStartInfoButton" type="button">Close</button>
+        </div>
+        -->
+      </div>
+      <div id="onboardingQuestion" class="start-onboarding-overlay hidden" aria-live="polite">
+        <section class="onboarding-question start-onboarding-card" aria-label="Start question">
           <p>Have you played this game before?</p>
           <div class="menu-actions">
             <button id="playedYesButton" type="button">Yes</button>
             <button id="playedNoButton" type="button">No</button>
           </div>
-        </div>
+          <button id="closeOnboardingButton" class="subtle-menu-button" type="button">Back</button>
+        </section>
+      </div>
+      <div id="startInfoPanel" class="start-info-overlay hidden" aria-live="polite">
+        <section class="start-info-card" aria-label="Game information">
+          <p class="panel-label">Information</p>
+          <blockquote>Clear the unknown one angle, one door, and one decision at a time.</blockquote>
+          <strong>Credits</strong>
+          <span>Original tactical prototype.</span>
+          <span>Built with HTML, CSS, and JavaScript Canvas.</span>
+          <button id="closeStartInfoButton" type="button">Exit</button>
+        </section>
       </div>
       <!--
       <label class="start-menu-setting checkbox-row" for="startPngRenderingCheckbox">
@@ -83,6 +118,31 @@
           <p class="eyebrow">Breachline 2D</p>
           <h1 id="levelTitle">Ridge House Entry</h1>
         </div>
+        <section class="control-card mission-status-card brandbar-status" aria-label="Mission status">
+          <p class="panel-label">Mission Status</p>
+          <div class="mission-status-grid">
+            <div>
+              <span>Mode</span>
+              <strong id="modeLabel">Planning</strong>
+            </div>
+            <div>
+              <span>Objective</span>
+              <strong id="objectiveLabel">Secure</strong>
+            </div>
+            <div>
+              <span>Operator</span>
+              <strong id="selectedStatusLabel">ALPHA</strong>
+            </div>
+            <div>
+              <span>Shooting</span>
+              <strong id="shootingStatusLabel">Automatic</strong>
+            </div>
+            <div>
+              <span>Zone</span>
+              <strong id="selectedZoneLabel">Floor 1</strong>
+            </div>
+          </div>
+        </section>
       </header>
 
       <section class="play-layout">
@@ -101,6 +161,7 @@
             <button id="inventoryButton" type="button">Open Inventory</button>
           </section>
 
+          <!--
           <section class="control-card mission-status-card" aria-label="Mission status">
             <p class="panel-label">Mission Status</p>
             <div class="mission-status-grid">
@@ -126,12 +187,13 @@
               </div>
             </div>
           </section>
+          -->
         </aside>
 
         <section class="game-panel">
           <canvas id="game" width="960" height="640" aria-label="Breachline 2D tactical map"></canvas>
           <button id="expandGameButton" class="expand-game-button" type="button">Expand</button>
-          <button id="expandedPauseButton" class="expanded-pause-button" type="button">PAUSE</button>
+          <button id="expandedPauseButton" class="expanded-pause-button" type="button">Press Esc to pause</button>
           <!--
           <div id="expandedNav" class="expanded-nav hidden" aria-label="Expanded gameplay navigation">
             <button type="button" data-expanded-action="inventory">Inventory</button>
@@ -274,11 +336,11 @@
                 </select>
               </label>
               <label class="level-picker" for="hintOpacityRange">
-                <span>Hint Transparency</span>
+                <span>Hint Transparency <strong id="hintOpacityValue" class="range-value">42%</strong></span>
                 <input id="hintOpacityRange" type="range" min="0.18" max="0.78" step="0.04" value="0.42">
               </label>
               <label class="level-picker" for="viewRange">
-                <span>View</span>
+                <span>View <strong id="viewValueLabel" class="range-value">50</strong></span>
                 <input id="viewRange" type="range" min="0" max="100" step="1" value="50">
               </label>
               <!--
@@ -322,9 +384,13 @@
               </div>
             </section>
           </div>
+          <div class="settings-footer-actions">
+            <button id="settingsExitToMenuButton" type="button">Exit to menu</button>
+          </div>
         </div>
       </section>
 
+      <!--
       <section id="settingsChangeOverlay" class="settings-change-overlay hidden" aria-label="Settings change warning" aria-modal="true" role="dialog">
         <div class="settings-change-card">
           <p class="eyebrow">Restart Required</p>
@@ -336,6 +402,7 @@
           </div>
         </div>
       </section>
+      -->
 
       <section id="digitalLockOverlay" class="settings-overlay hidden" aria-label="Digital lock" aria-modal="true" role="dialog">
         <div class="lock-panel">
@@ -447,19 +514,19 @@
     <script src="systems/camera-hack-system.js?v=1"></script>
     <script src="systems/tutorial-system.js?v=1"></script>
     <script src="systems/progression-system.js?v=1"></script>
-    <script src="systems/menu-system.js?v=1"></script>
+    <script src="systems/menu-system.js?v=3"></script>
     <script src="mobile/object-scale-system.js?v=1"></script>
     <script src="mobile/mobile-control-system.js?v=1"></script>
     <script src="systems/equipment-system.js?v=1"></script>
-    <script src="systems/level-system.js?v=1"></script>
+    <script src="systems/level-system.js?v=3"></script>
     <script src="systems/visibility-system.js?v=1"></script>
     <script src="systems/settings-system.js?v=1"></script>
     <script src="systems/digital-lock-system.js?v=1"></script>
     <script src="systems/enemy-behavior-system.js?v=1"></script>
-    <script src="systems/mission-system.js?v=1"></script>
+    <script src="systems/mission-system.js?v=2"></script>
     <script src="systems/render-system.js?v=1"></script>
-    <script src="systems/input-system.js?v=1"></script>
+    <script src="systems/input-system.js?v=4"></script>
     <script src="systems/action-system.js?v=3"></script>
-    <script src="main.js?v=21"></script>
+    <script src="main.js?v=25"></script>
   </body>
 </html>

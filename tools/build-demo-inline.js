@@ -9,11 +9,11 @@ const DEMO_DIR = path.join(ROOT, "demo");
 function main() {
   const indexFile = path.join(ROOT, "index.html");
   let html = fs.readFileSync(indexFile, "utf8");
-  html = html.replace(/<link rel="stylesheet" href="styles\.css">/, inlineStyle("styles.css"));
-  html = html.replace(/<link rel="stylesheet" href="mobile\/mobile\.css">/, inlineStyle("mobile/mobile.css"));
+  html = html.replace(/<link rel="stylesheet" href="styles\.css(?:\?v=\d+)?">/, inlineStyle("styles.css"));
+  html = html.replace(/<link rel="stylesheet" href="mobile\/mobile\.css(?:\?v=\d+)?">/, inlineStyle("mobile/mobile.css"));
 
   const scriptSources = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((match) => match[1].split("?")[0]);
-  const externalScriptPattern = /    <script src="systems\/audio-system\.js\?v=1"><\/script>[\s\S]*?    <script src="main\.js\?v=\d+"><\/script>/;
+  const externalScriptPattern = /    <script src="systems\/audio-system\.js(?:\?v=\d+)?"><\/script>[\s\S]*?    <script src="main\.js(?:\?v=\d+)?"><\/script>/;
   const inlineScripts = [
     demoDataScript(),
     ...scriptSources.map((source) => inlineScript(source))

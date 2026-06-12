@@ -1,16 +1,16 @@
-# Breachline 2D Gameplay Guide
+# Delta Geometry Gameplay Guide
 
-![Breachline 2D gameplay screenshot](docs/gameplay-screenshot.png)
+![Delta Geometry start menu screenshot](docs/start-menu-showcase.png)
 
 ## Gameplay
 
-Breachline 2D is a top-down tactical breach game. You choose one or two operators, assign each operator a weapon, plan routes through the level, open doors manually with `E` or by clicking nearby doors, and let operators automatically engage enemies when they have clear line-of-sight. You can pause and replan at any time with `Space`.
+Delta Geometry is a top-down tactical breach game. You choose one or two operators, assign each operator a weapon, plan routes through the level, open doors manually with `E` or by clicking nearby doors, and let operators automatically engage enemies when they have clear line-of-sight. You can pause and replan at any time with `Space`.
 
 The mission succeeds when the VIP/objective is secured or all hostiles are neutralized. The mission fails if all operators are down or the objective is compromised.
 
 ## Demo
 
-A self-contained demo copy is available in `demo/`. It runs by opening `demo/index.html` directly in a browser and does not require Node.js, npm, or a localhost server. The demo embeds the current level and equipment data in `demo/demo-data.js`, while keeping copied `level/` and `equipment/` folders as readable references.
+A self-contained demo copy is available in `demo/`. It runs by opening `demo/index.html` directly in a browser and does not require Node.js, npm, or a localhost server. The demo embeds the current level, tutorial, temporary level, and equipment data directly in the page, while keeping copied data folders as readable references.
 
 ## How To Run
 

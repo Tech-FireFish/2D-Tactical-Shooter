@@ -69,6 +69,12 @@
 
     // Applies a setup change immediately or asks for restart confirmation after units move.
     function requestSettingChange(applyChange, options = {}) {
+      applyChange();
+      if (options.restartWhenClean && deps.level && deps.level.restart) deps.level.restart();
+      deps.updateHud();
+      return true;
+      /*
+      Restart-warning flow disabled: settings now apply directly after the game has started.
       if (runtime.activeMode === "tutorial") {
         applyChange();
         deps.updateHud();
@@ -88,6 +94,7 @@
       if (elements.settingsChangeOverlay) elements.settingsChangeOverlay.classList.remove("hidden");
       deps.keysDown.clear();
       return false;
+      */
     }
 
     // Confirms the pending settings change and restarts the current mission when required.
