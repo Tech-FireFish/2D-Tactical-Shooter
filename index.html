@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Delta Geometry</title>
   <link rel="stylesheet" href="styles.css?v=27">
+    <link rel="stylesheet" href="css-pixel-art/css-pixel-art.css">
     <link rel="stylesheet" href="mobile/mobile.css">
   </head>
   <body>
@@ -69,6 +70,49 @@
       -->
     </section>
 
+    <section id="storeMenuOverlay" class="menu-overlay store-menu-overlay hidden" aria-label="Store page" aria-modal="true" role="dialog">
+      <div class="menu-panel store-panel">
+        <section class="store-layer store-profile-layer" aria-label="Operator profile">
+          <div id="storeProfileAvatar" class="store-profile-avatar" aria-label="Operator profile image"></div>
+          <div class="store-profile-copy">
+            <p class="eyebrow">Operator Profile</p>
+            <h2 id="storeProfileName">operator#1</h2>
+            <span>ID <strong id="storeProfileId">00000000</strong></span>
+          </div>
+          <div class="store-score-card">
+            <span>Score Earned</span>
+            <strong id="storeScoreValue">5000</strong>
+          </div>
+        </section>
+
+        <section class="store-layer store-equipment-layer" aria-label="Equipment store">
+          <div class="store-section-header">
+            <div>
+              <p class="eyebrow">Store</p>
+              <h3>Equipment Catalog</h3>
+            </div>
+            <span>Display only</span>
+          </div>
+          <p id="storeMessage" class="store-message hidden" role="status"></p>
+          <div id="storeEquipmentGrid" class="store-equipment-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="store-layer store-action-layer" aria-label="Store actions">
+          <button id="storeExitButton" type="button">Exit to menu</button>
+          <button id="storePlayButton" type="button">Play</button>
+        </section>
+        <!-- Store right-side detail panel disabled; Store returns to centered catalog layout. -->
+        <!-- <aside id="storeDetailPanel" class="store-layer store-detail-panel" aria-label="Selected equipment detail"></aside> -->
+        <div id="storeConfirmPopup" class="store-confirm-popup hidden" role="dialog" aria-label="Confirm store purchase">
+          <span id="storeConfirmText">Purchase item?</span>
+          <div>
+            <button id="storeCancelPurchaseButton" type="button">Cancel</button>
+            <button id="storeConfirmPurchaseButton" type="button">Purchase</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="mainMenuOverlay" class="menu-overlay hidden" aria-label="Main menu" aria-modal="true" role="dialog">
       <div class="menu-panel main-menu-panel">
         <header class="settings-header">
@@ -76,13 +120,18 @@
             <p class="eyebrow">Command Access</p>
             <h2>Main Page</h2>
           </div>
-          <button id="mainMenuCloseButton" type="button">Enter Game</button>
+          <div class="main-menu-header-actions">
+            <button id="mainMenuBackButton" class="main-menu-text-button" type="button">Go Back</button>
+            <button id="mainMenuCloseButton" class="main-menu-text-button" type="button">Enter Game</button>
+          </div>
         </header>
         <div class="main-menu-grid">
+          <!-- Privilege And Access card disabled while progression/access locks are disabled.
           <section class="control-card selected-loadout-card">
             <p class="panel-label">Privilege And Access</p>
             <div id="privilegeBoard" class="privilege-board"></div>
           </section>
+          -->
           <section class="control-card inventory-card">
             <p class="panel-label">Quick Setup</p>
             <label class="level-picker" for="menuDifficultySelect">
@@ -343,6 +392,13 @@
                 <span>View <strong id="viewValueLabel" class="range-value">50</strong></span>
                 <input id="viewRange" type="range" min="0" max="100" step="1" value="50">
               </label>
+              <label class="level-picker store-score-setting" for="storeScoreInput">
+                <span>Store Score</span>
+                <div class="inline-input-action">
+                  <input id="storeScoreInput" type="number" min="0" step="1" value="5000">
+                  <button id="confirmStoreScoreButton" type="button">Confirm Score</button>
+                </div>
+              </label>
               <!--
               <label class="level-picker" for="pixelArtStyleSelect">
                 <span>Pixel Art Style</span>
@@ -527,6 +583,7 @@
     <script src="systems/render-system.js?v=1"></script>
     <script src="systems/input-system.js?v=4"></script>
     <script src="systems/action-system.js?v=3"></script>
+    <script src="css-pixel-art/store-pixel-art.js?v=1"></script>
     <script src="main.js?v=25"></script>
   </body>
 </html>

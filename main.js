@@ -14,9 +14,24 @@ const elements = {
   closeOnboardingButton: document.getElementById("closeOnboardingButton"),
   playedYesButton: document.getElementById("playedYesButton"),
   playedNoButton: document.getElementById("playedNoButton"),
+  storeMenuOverlay: document.getElementById("storeMenuOverlay"),
+  storeProfileAvatar: document.getElementById("storeProfileAvatar"),
+  storeProfileName: document.getElementById("storeProfileName"),
+  storeProfileId: document.getElementById("storeProfileId"),
+  storeScoreValue: document.getElementById("storeScoreValue"),
+  storeMessage: document.getElementById("storeMessage"),
+  storeEquipmentGrid: document.getElementById("storeEquipmentGrid"),
+  // storeDetailPanel: document.getElementById("storeDetailPanel"),
+  storeConfirmPopup: document.getElementById("storeConfirmPopup"),
+  storeConfirmText: document.getElementById("storeConfirmText"),
+  storeCancelPurchaseButton: document.getElementById("storeCancelPurchaseButton"),
+  storeConfirmPurchaseButton: document.getElementById("storeConfirmPurchaseButton"),
+  storeExitButton: document.getElementById("storeExitButton"),
+  storePlayButton: document.getElementById("storePlayButton"),
   // startPngRenderingCheckbox: document.getElementById("startPngRenderingCheckbox"),
   mainMenuOverlay: document.getElementById("mainMenuOverlay"),
   mainMenuCloseButton: document.getElementById("mainMenuCloseButton"),
+  mainMenuBackButton: document.getElementById("mainMenuBackButton"),
   privilegeBoard: document.getElementById("privilegeBoard"),
   menuDifficultySelect: document.getElementById("menuDifficultySelect"),
   menuShootingModeSelect: document.getElementById("menuShootingModeSelect"),
@@ -65,6 +80,8 @@ const elements = {
   hintOpacityValue: document.getElementById("hintOpacityValue"),
   viewRange: document.getElementById("viewRange"),
   viewValueLabel: document.getElementById("viewValueLabel"),
+  storeScoreInput: document.getElementById("storeScoreInput"),
+  confirmStoreScoreButton: document.getElementById("confirmStoreScoreButton"),
   // pixelArtStyleSelect: document.getElementById("pixelArtStyleSelect"),
   // pngRenderingCheckbox: document.getElementById("pngRenderingCheckbox"),
   keyBindingList: document.getElementById("keyBindingList"),
@@ -123,6 +140,7 @@ const elements = {
 const ctx = elements.canvas.getContext("2d");
 const DEFAULT_WORLD = { w: 960, h: 640 };
 const RESUME_STORAGE_KEY = "delta-geometry-resume";
+const STORE_PROFILE_STORAGE_KEY = "delta-geometry-store-profile";
 const WORLD = { ...DEFAULT_WORLD };
 const TWO_PI = Math.PI * 2;
 const UNIT_RADIUS = 12;
@@ -195,9 +213,29 @@ const ARMOR_OPTIONS = [
 ];
 
 const BACKPACK_OPTIONS = [
+  { id: "no-backpack", file: "equipment/no-backpack.json" },
   { id: "small-backpack", file: "equipment/small-backpack.json" },
   { id: "medium-backpack", file: "equipment/medium-backpack.json" },
   { id: "large-backpack", file: "equipment/large-backpack.json" }
+];
+
+const STORE_CATALOG = [
+  { id: "no-weapon", type: "weapon", name: "No Weapon", icon: "no-weapon", stats: { disabled: true } },
+  { id: "rifle", type: "weapon", name: "Rifle", icon: "rifle", stats: { range: 245, damage: 18, magSize: 30, reserve: 120, fireInterval: 0.16 } },
+  { id: "smg", type: "weapon", name: "SMG", icon: "smg", stats: { range: 190, damage: 12, magSize: 32, reserve: 160, fireInterval: 0.09 } },
+  { id: "pistol", type: "weapon", name: "Pistol", icon: "pistol", stats: { range: 150, damage: 22, magSize: 12, reserve: 60, fireInterval: 0.36 } },
+  { id: "melee", type: "weapon", name: "Melee", icon: "melee", stats: { range: 26, damage: 200, melee: true } },
+  { id: "advanced-carbine", type: "weapon", name: "Advanced Carbine", icon: "advanced-carbine", stats: { range: 285, damage: 22, magSize: 34, reserve: 150, fireInterval: 0.13, reward: true } },
+  { id: "compact-pdw", type: "weapon", name: "Compact PDW", icon: "compact-pdw", stats: { range: 215, damage: 15, magSize: 40, reserve: 200, fireInterval: 0.075, reward: true } },
+  { id: "marksman-pistol", type: "weapon", name: "Marksman Pistol", icon: "marksman-pistol", stats: { range: 205, damage: 34, magSize: 10, reserve: 70, fireInterval: 0.32, reward: true } },
+  { id: "no-armor", type: "armor", name: "No Armor", icon: "no-armor", stats: { armor: 0, speedMultiplier: 1 } },
+  { id: "light-armor", type: "armor", name: "Light Armor", icon: "light-armor", stats: { armor: 25, speedMultiplier: 1 } },
+  { id: "medium-armor", type: "armor", name: "Medium Armor", icon: "medium-armor", stats: { armor: 50, speedMultiplier: 0.94 } },
+  { id: "heavy-armor", type: "armor", name: "Heavy Armor", icon: "heavy-armor", stats: { armor: 80, speedMultiplier: 0.88, reward: true } },
+  { id: "no-backpack", type: "backpack", name: "No Backpack", icon: "no-backpack", stats: { slots: 1, speedMultiplier: 1, ammoMultiplier: 1 } },
+  { id: "small-backpack", type: "backpack", name: "Small Backpack", icon: "small-backpack", stats: { slots: 2, speedMultiplier: 1.02 } },
+  { id: "medium-backpack", type: "backpack", name: "Medium Backpack", icon: "medium-backpack", stats: { slots: 4, speedMultiplier: 1 } },
+  { id: "large-backpack", type: "backpack", name: "Large Backpack", icon: "large-backpack", stats: { slots: 6, speedMultiplier: 0.96 } }
 ];
 
 const SOUND_OPTIONS = [
@@ -211,7 +249,10 @@ const SOUND_OPTIONS = [
   { id: "mission-failed", file: "sounds/mission-failed.wav" },
   { id: "window-break", file: "sounds/window-break.wav" },
   { id: "operator-walk", file: "sounds/armed-cement-walk.wav" },
-  { id: "enemy-walk", file: "sounds/enemy-walk.wav" }
+  { id: "enemy-walk", file: "sounds/enemy-walk.wav" },
+  { id: "button-guidance", file: "sounds/button-guidance.wav" },
+  { id: "store-select", file: "sounds/store-select.wav" },
+  { id: "store-purchase", file: "sounds/store-purchase.wav" }
 ];
 
 const MOBILE_OBJECT_SCALE_CONFIG = {
@@ -248,6 +289,9 @@ const runtime = {
   mobileMode: false,
   gameDataReady: false,
   gameDataLoading: null,
+  onboardingReturnToStore: false,
+  storeSelectedItemId: null,
+  storeConfirmItemId: null,
   hintOpacity: 0.42,
   viewValue: 50,
   pixelArtStyle: "geometry",
@@ -346,6 +390,312 @@ function setDifficulty(value) {
     runtime.state.message = runtime.currentDifficulty === "difficult" ? "Difficult mode: short sight, chase/search enemies, random enemy gear" : "Normal visibility enabled";
   }
   updateHud();
+}
+
+// Builds the default persistent store profile and equipment ownership.
+function defaultStoreProfile() {
+  return {
+    storeVersion: 2,
+    name: "operator#1",
+    id: String(Math.floor(10000000 + Math.random() * 90000000)),
+    score: 5000,
+    ownedItemIds: ["rifle", "light-armor", "no-backpack"],
+    equippedDefaults: {
+      weaponId: "rifle",
+      armorId: "light-armor",
+      backpackId: "no-backpack"
+    }
+  };
+}
+
+// Reads or creates the lightweight store profile shown before gameplay starts.
+function storeProfile() {
+  const fallback = defaultStoreProfile();
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_PROFILE_STORAGE_KEY) || "null");
+    if (!saved || typeof saved !== "object") {
+      writeStoreProfile(fallback);
+      return fallback;
+    }
+    const isCurrentVersion = saved.storeVersion === fallback.storeVersion;
+    const savedScore = Number(saved.score);
+    const merged = {
+      ...fallback,
+      ...(isCurrentVersion ? saved : {}),
+      storeVersion: fallback.storeVersion,
+      name: saved.name || fallback.name,
+      id: saved.id || fallback.id,
+      score: isCurrentVersion && Number.isFinite(savedScore) ? Math.max(0, Math.floor(savedScore)) : fallback.score,
+      ownedItemIds: uniqueIds([...(fallback.ownedItemIds || []), ...((saved.ownedItemIds || []))]),
+      equippedDefaults: {
+        ...fallback.equippedDefaults,
+        ...(isCurrentVersion ? (saved.equippedDefaults || {}) : {})
+      }
+    };
+    writeStoreProfile(merged);
+    return merged;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+// Persists the current Store profile when browser storage is available.
+function writeStoreProfile(profile) {
+  try {
+    localStorage.setItem(STORE_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  } catch (error) {
+    // Store remains playable when localStorage is blocked.
+  }
+}
+
+// Returns a duplicate-free list while preserving order.
+function uniqueIds(ids) {
+  return [...new Set((ids || []).filter(Boolean))];
+}
+
+// Finds Store metadata by ID.
+function storeItemById(id) {
+  return STORE_CATALOG.find((item) => item.id === id) || null;
+}
+
+// Generates equipment prices from lightweight store stats.
+function storePrice(item) {
+  if (!item || item.id === "no-weapon" || item.id === "no-armor" || item.id === "no-backpack") return 0;
+  const stats = item.stats || {};
+  let value = 0;
+  if (item.type === "weapon") {
+    if (stats.melee) value = stats.damage * 3 + stats.range * 2;
+    else value = (stats.range || 0) * 1.4
+      + (stats.damage || 0) * 16
+      + (stats.magSize || 0) * 5
+      + (stats.reserve || 0) * 0.6
+      + (stats.fireInterval ? 180 / stats.fireInterval : 0);
+  } else if (item.type === "armor") {
+    value = (stats.armor || 0) * 14 + Math.max(0, 1 - (stats.speedMultiplier || 1)) * 600;
+  } else if (item.type === "backpack") {
+    value = (stats.slots || 0) * 140 + Math.max(0, 1 - (stats.speedMultiplier || 1)) * 350;
+  }
+  if (stats.reward) value *= 1.25;
+  return Math.max(0, Math.round(value / 25) * 25);
+}
+
+// Builds compact Store detail text from static catalog metadata.
+function storeItemSummary(item) {
+  if (!item) return "Select equipment to inspect its silhouette, role, and current store state.";
+  const stats = item.stats || {};
+  if (item.type === "weapon") {
+    if (stats.disabled) return "Training-safe empty weapon slot. Operators will not fire until another weapon is equipped.";
+    if (stats.melee) return `Close-contact weapon. Damage ${stats.damage}, range ${stats.range}. No magazine or reserve ammo required.`;
+    return `Range ${stats.range}. Damage ${stats.damage}. Magazine ${stats.magSize}. Reserve ${stats.reserve}. Fire interval ${stats.fireInterval}s.`;
+  }
+  if (item.type === "armor") {
+    return `Armor ${stats.armor}. Mobility ${Math.round((stats.speedMultiplier || 1) * 100)}%.`;
+  }
+  if (item.type === "backpack") {
+    return `Inventory slots ${stats.slots}. Ammo carry ${Math.round((stats.ammoMultiplier || 1) * 100)}%. Mobility ${Math.round((stats.speedMultiplier || 1) * 100)}%.`;
+  }
+  return "Equipment item.";
+}
+
+// Applies Store defaults to saved operator loadout maps for future level clones.
+function syncStoreDefaultsToLoadouts() {
+  const profile = storeProfile();
+  const defaults = profile.equippedDefaults || {};
+  for (const id of ["ALPHA", "BRAVO"]) {
+    operatorLoadouts[id] = defaults.weaponId || "rifle";
+    operatorArmorLoadouts[id] = defaults.armorId || "light-armor";
+    operatorBackpackLoadouts[id] = defaults.backpackId || "no-backpack";
+  }
+}
+
+// Returns the Store-owned defaults for systems that clone operators dynamically.
+function storeLoadoutDefaults() {
+  return storeProfile().equippedDefaults || { weaponId: "rifle", armorId: "light-armor", backpackId: "no-backpack" };
+}
+
+// Equips an owned Store item as the default for all future operators.
+function equipStoreItem(profile, item) {
+  if (!item) return profile;
+  if (item.type === "weapon") profile.equippedDefaults.weaponId = item.id;
+  if (item.type === "armor") profile.equippedDefaults.armorId = item.id;
+  if (item.type === "backpack") profile.equippedDefaults.backpackId = item.id;
+  writeStoreProfile(profile);
+  syncStoreDefaultsToLoadouts();
+  if (runtime.gameDataReady && runtime.state) applyStoreDefaultsToActiveOperators();
+  return profile;
+}
+
+// Applies Store defaults to the currently loaded operators when equipment data exists.
+function applyStoreDefaultsToActiveOperators() {
+  if (!runtime.state || !equipment || !shooting) return;
+  const defaults = storeLoadoutDefaults();
+  const armor = equipment.armorById(defaults.armorId || "light-armor");
+  const backpack = equipment.backpackById(defaults.backpackId || "no-backpack");
+  for (const op of runtime.state.level.operators || []) {
+    op.weaponId = equipment.validWeaponId(defaults.weaponId || "rifle");
+    op.armorId = equipment.validArmorId(defaults.armorId || "light-armor");
+    op.backpackId = equipment.validBackpackId(defaults.backpackId || "no-backpack");
+    op.maxArmor = armor.armor;
+    op.armor = Math.min(op.maxArmor, Math.max(op.armor || 0, op.maxArmor));
+    op.inventory.slots = backpack.slots;
+    op.inventory.items = Array.from({ length: backpack.slots }, (_, index) => (op.inventory.items || [])[index] || null);
+    op.speed = (op.baseSpeed || 92) * armor.speedMultiplier * (backpack.speedMultiplier || 1);
+    shooting.resetAmmo(op);
+  }
+  updateHud();
+}
+
+// Shows a short Store status line.
+function setStoreMessage(message) {
+  if (!elements.storeMessage) return;
+  elements.storeMessage.textContent = message || "";
+  elements.storeMessage.classList.toggle("hidden", !message);
+}
+
+// Closes the Store purchase confirmation selector.
+function closeStoreConfirmation(options = {}) {
+  runtime.storeConfirmItemId = null;
+  if (options.clearSelection) runtime.storeSelectedItemId = null;
+  if (elements.storeConfirmPopup) elements.storeConfirmPopup.classList.add("hidden");
+  renderStorePage();
+}
+
+// Handles Store item selection and confirmation opening.
+function selectStoreItem(itemId) {
+  const item = storeItemById(itemId);
+  if (!item) return;
+  if (runtime.storeSelectedItemId === itemId) {
+    openStoreConfirmation(itemId);
+    return;
+  }
+  runtime.storeSelectedItemId = itemId;
+  runtime.storeConfirmItemId = null;
+  if (audio) {
+    audio.unlock();
+    audio.play("store-select");
+  }
+  setStoreMessage(`${item.name} selected`);
+  renderStorePage();
+}
+
+// Opens the confirmation selector for the selected Store item.
+function openStoreConfirmation(itemId) {
+  const item = storeItemById(itemId);
+  if (!item || !elements.storeConfirmPopup) return;
+  runtime.storeConfirmItemId = itemId;
+  if (elements.storeConfirmText) elements.storeConfirmText.textContent = `${item.name}`;
+  elements.storeConfirmPopup.classList.remove("hidden");
+}
+
+// Purchases or equips the currently confirmed Store item.
+function confirmStorePurchase() {
+  const item = storeItemById(runtime.storeConfirmItemId || runtime.storeSelectedItemId);
+  if (!item) return;
+  const profile = storeProfile();
+  const owned = profile.ownedItemIds.includes(item.id);
+  const price = storePrice(item);
+  if (!owned && profile.score < price) {
+    setStoreMessage("Not enough score");
+    if (audio) audio.play("store-select");
+    renderStorePage();
+    return;
+  }
+  if (!owned) {
+    profile.score -= price;
+    profile.ownedItemIds = uniqueIds([...(profile.ownedItemIds || []), item.id]);
+  }
+  equipStoreItem(profile, item);
+  runtime.storeSelectedItemId = null;
+  runtime.storeConfirmItemId = null;
+  if (audio) audio.play("store-purchase");
+  setStoreMessage(owned ? `${item.name} equipped` : `${item.name} owned`);
+  renderStorePage();
+}
+
+// Updates Store score from Settings.
+function setStoreScore(value) {
+  const next = Number(value);
+  if (!Number.isFinite(next) || next < 0) {
+    setStoreMessage("Invalid score");
+    return false;
+  }
+  const profile = storeProfile();
+  profile.score = Math.floor(next);
+  writeStoreProfile(profile);
+  setStoreMessage(`Store score set to ${profile.score}`);
+  renderStorePage();
+  updateHud();
+  return true;
+}
+
+// Renders the Store profile and catalog without loading equipment JSON.
+function renderStorePage() {
+  const profile = storeProfile();
+  if (elements.storeProfileName) elements.storeProfileName.textContent = profile.name;
+  if (elements.storeProfileId) elements.storeProfileId.textContent = profile.id;
+  if (elements.storeScoreValue) elements.storeScoreValue.textContent = String(profile.score);
+  if (elements.storeScoreInput) elements.storeScoreInput.value = String(profile.score);
+  if (elements.storeProfileAvatar && window.StorePixelArt) {
+    elements.storeProfileAvatar.innerHTML = window.StorePixelArt.render("operator-profile", { label: "Operator profile image" });
+  }
+  if (!elements.storeEquipmentGrid) return;
+  const ownedIds = new Set(profile.ownedItemIds || []);
+  const equipped = profile.equippedDefaults || {};
+  elements.storeEquipmentGrid.innerHTML = STORE_CATALOG.map((item) => `
+    <article class="store-item-card${runtime.storeSelectedItemId === item.id ? " selected" : ""}${ownedIds.has(item.id) ? " owned" : ""}${Object.values(equipped).includes(item.id) ? " equipped" : ""}" data-store-item-id="${item.id}">
+      ${window.StorePixelArt ? window.StorePixelArt.render(item.icon || item.id, { label: `${item.name} ${item.type}` }) : ""}
+      <div class="store-item-copy">
+        <span>${titleCase(item.type)}</span>
+        <strong>${item.name}</strong>
+      </div>
+      <div class="store-item-price">
+        <span>${Object.values(equipped).includes(item.id) ? "Equipped" : "Price"}</span>
+        <strong>${ownedIds.has(item.id) ? "Owned" : storePrice(item)}</strong>
+      </div>
+    </article>
+  `).join("");
+  if (elements.storeConfirmPopup) {
+    elements.storeConfirmPopup.classList.toggle("hidden", !runtime.storeConfirmItemId);
+  }
+  if (elements.storeConfirmText && runtime.storeConfirmItemId) {
+    const item = storeItemById(runtime.storeConfirmItemId);
+    elements.storeConfirmText.textContent = item ? item.name : "Purchase item?";
+  }
+  // Store right-side detail panel disabled; selection remains visible on catalog cards.
+  // renderStoreDetailPanel(profile);
+}
+
+// Renders the right-side selected equipment Store showcase.
+function renderStoreDetailPanel(profile = storeProfile()) {
+  if (!elements.storeDetailPanel) return;
+  const item = storeItemById(runtime.storeSelectedItemId);
+  if (!item) {
+    elements.storeDetailPanel.innerHTML = `
+      <div class="store-detail-empty">
+        <p class="eyebrow">Equipment Detail</p>
+        <h3>Select equipment</h3>
+        <p>Click an item in the catalog to inspect its larger silhouette and store status.</p>
+      </div>
+    `;
+    return;
+  }
+  const ownedIds = new Set(profile.ownedItemIds || []);
+  const equipped = profile.equippedDefaults || {};
+  const owned = ownedIds.has(item.id);
+  const equippedNow = Object.values(equipped).includes(item.id);
+  const stateLabel = equippedNow ? "Equipped" : owned ? "Owned" : `Price ${storePrice(item)}`;
+  elements.storeDetailPanel.innerHTML = `
+    <div class="store-detail-art">
+      ${window.StorePixelArt ? window.StorePixelArt.render(item.icon || item.id, { label: `${item.name} detail silhouette`, size: "detail" }) : ""}
+    </div>
+    <div class="store-detail-copy">
+      <p class="eyebrow">${titleCase(item.type)}</p>
+      <h3>${item.name}</h3>
+      <strong>${stateLabel}</strong>
+      <p>${storeItemSummary(item)}</p>
+      <span>Click selected item again to confirm purchase or equip.</span>
+    </div>
+  `;
 }
 
 // Saves the last playable destination for the start-menu Resume action.
@@ -493,6 +843,9 @@ function updateHud() {
     }
     if (elements.hintOpacityValue) elements.hintOpacityValue.textContent = `${Math.round(runtime.hintOpacity * 100)}%`;
     if (elements.viewValueLabel) elements.viewValueLabel.textContent = String(Math.round(runtime.viewValue));
+    if (elements.storeScoreInput && document.activeElement !== elements.storeScoreInput) {
+      elements.storeScoreInput.value = String(storeProfile().score);
+    }
     return;
   }
   elements.modeLabel.textContent = runtime.digitalLockOpen ? "Digital Lock" : (runtime.settingsOpen ? "Settings" : (state.gameOver ? titleCase(state.result) : (hasManualInput() ? "Manual" : (state.running ? "Execute" : "Planning"))));
@@ -534,6 +887,9 @@ function updateHud() {
   }
   if (elements.viewValueLabel) {
     elements.viewValueLabel.textContent = String(Math.round(runtime.viewValue));
+  }
+  if (elements.storeScoreInput && document.activeElement !== elements.storeScoreInput) {
+    elements.storeScoreInput.value = String(storeProfile().score);
   }
   // if (elements.pixelArtStyleSelect && elements.pixelArtStyleSelect.value !== style) {
   //   elements.pixelArtStyleSelect.value = style;
@@ -759,6 +1115,7 @@ function initializeSystems() {
     operatorLoadouts,
     operatorArmorLoadouts,
     operatorBackpackLoadouts,
+    storeLoadoutDefaults,
     progression,
     keysDown,
     saveResumePoint,
@@ -885,6 +1242,10 @@ function initializeSystems() {
     refreshStartMenu,
     resumeFromStartMenu,
     exitFromStartMenu,
+    selectStoreItem,
+    closeStoreConfirmation,
+    confirmStorePurchase,
+    setStoreScore,
     ensureGameDataReady,
     updateHud,
     operatorLoadouts,
@@ -896,6 +1257,11 @@ function initializeSystems() {
       closePause: () => menu && menu.closePause(),
       togglePause: () => menu && menu.togglePause(),
       showStart: () => menu && menu.showStart(),
+      showStore: () => menu && menu.showStore(),
+      closeStore: () => menu && menu.closeStore(),
+      isStoreOpen: () => menu && menu.isStoreOpen(),
+      openOnboarding: (...args) => menu && menu.openOnboarding(...args),
+      closeOnboarding: () => menu && menu.closeOnboarding(),
       showMain: () => menu && menu.showMain(),
       showLevelMenu: () => menu && menu.showLevelMenu(),
       showTutorialMenu: () => menu && menu.showTutorialMenu(),
@@ -926,6 +1292,7 @@ function initializeSystems() {
     },
     hasResumePoint,
     refreshStartMenu,
+    renderStorePage,
     setDifficulty,
     updateHud
   });
@@ -992,6 +1359,7 @@ async function ensureGameDataReady() {
   runtime.gameDataLoading = (async () => {
     level.populateLevelSelect();
     await equipment.loadEquipment();
+    syncStoreDefaultsToLoadouts();
     runtime.gameDataReady = true;
     if (menu) menu.render();
     updateHud();

@@ -10,6 +10,7 @@ function main() {
   const indexFile = path.join(ROOT, "index.html");
   let html = fs.readFileSync(indexFile, "utf8");
   html = html.replace(/<link rel="stylesheet" href="styles\.css(?:\?v=\d+)?">/, inlineStyle("styles.css"));
+  html = html.replace(/<link rel="stylesheet" href="css-pixel-art\/css-pixel-art\.css(?:\?v=\d+)?">/, inlineStyle("css-pixel-art/css-pixel-art.css"));
   html = html.replace(/<link rel="stylesheet" href="mobile\/mobile\.css(?:\?v=\d+)?">/, inlineStyle("mobile/mobile.css"));
 
   const scriptSources = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((match) => match[1].split("?")[0]);

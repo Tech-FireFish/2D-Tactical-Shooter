@@ -19,6 +19,15 @@
   --red: #e25f5f;
   --cyan: #72b7ce;
   --ui-start-background: url("docs/start-menu-geometry-background.png");
+  /* CSS-only menu background fallback disabled while the Start/Store background image exception is active.
+  --ui-start-background:
+    radial-gradient(circle at 18% 22%, rgba(96, 198, 137, 0.22), transparent 0 14%, transparent 22%),
+    radial-gradient(circle at 72% 28%, rgba(114, 183, 206, 0.2), transparent 0 13%, transparent 21%),
+    radial-gradient(circle at 54% 76%, rgba(224, 175, 86, 0.18), transparent 0 15%, transparent 24%),
+    repeating-linear-gradient(0deg, rgba(114, 183, 206, 0.08) 0 2px, transparent 2px 36px),
+    repeating-linear-gradient(90deg, rgba(96, 198, 137, 0.06) 0 2px, transparent 2px 42px),
+    linear-gradient(135deg, #050708 0%, #101719 45%, #070b0d 100%);
+  */
   --ui-start-title: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-logo-001.png") */;
   --ui-start-title-small: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-logo-small-001.png") */;
   --ui-start-title-glow: none /* PNG disabled: url("docs/images/user-interface/pixel-art-start-title-glow-001.png") */;
@@ -2249,7 +2258,7 @@ canvas {
 
 .menu-actions button,
 .pause-actions button,
-.main-menu-panel button {
+.main-menu-panel button:not(.main-menu-text-button) {
   min-height: 56px;
   padding-inline: 22px;
   font-size: 17px;
@@ -2258,7 +2267,7 @@ canvas {
 .start-panel #playMenuButton,
 .menu-actions button,
 .pause-actions button,
-.main-menu-panel button,
+.main-menu-panel button:not(.main-menu-text-button),
 .settings-tabs button,
 .banner-actions button,
 .expand-game-button,
@@ -2276,7 +2285,7 @@ canvas {
 .start-panel #playMenuButton:focus-visible,
 .menu-actions button:focus-visible,
 .pause-actions button:focus-visible,
-.main-menu-panel button:focus-visible,
+.main-menu-panel button:not(.main-menu-text-button):focus-visible,
 .settings-tabs button:focus-visible,
 .banner-actions button:focus-visible,
 .expand-game-button:focus-visible,
@@ -2287,7 +2296,7 @@ canvas {
 .start-panel #playMenuButton:focus-visible::after,
 .menu-actions button:focus-visible::after,
 .pause-actions button:focus-visible::after,
-.main-menu-panel button:focus-visible::after,
+.main-menu-panel button:not(.main-menu-text-button):focus-visible::after,
 .settings-tabs button:focus-visible::after,
 .banner-actions button:focus-visible::after,
 .expand-game-button:focus-visible::after,
@@ -2303,7 +2312,7 @@ canvas {
 .start-panel #playMenuButton:hover,
 .menu-actions button:hover,
 .pause-actions button:hover,
-.main-menu-panel button:hover,
+.main-menu-panel button:not(.main-menu-text-button):hover,
 .settings-tabs button:hover,
 .banner-actions button:hover,
 .expand-game-button:hover,
@@ -2315,7 +2324,7 @@ canvas {
 .start-panel #playMenuButton:active,
 .menu-actions button:active,
 .pause-actions button:active,
-.main-menu-panel button:active,
+.main-menu-panel button:not(.main-menu-text-button):active,
 .settings-tabs button:active,
 .banner-actions button:active,
 .expand-game-button:active,
@@ -2323,8 +2332,8 @@ canvas {
   background: var(--ui-secondary-pressed) center / 100% 100% no-repeat;
 }
 
-.main-menu-panel button.locked,
-.main-menu-panel button:disabled {
+.main-menu-panel button:not(.main-menu-text-button).locked,
+.main-menu-panel button:not(.main-menu-text-button):disabled {
   background: var(--ui-secondary-disabled) center / 100% 100% no-repeat;
 }
 
@@ -2402,6 +2411,417 @@ canvas {
   display: grid;
   grid-template-columns: minmax(220px, 0.9fr) minmax(220px, 0.8fr) minmax(260px, 1fr) minmax(260px, 1fr);
   gap: 12px;
+}
+
+.store-menu-overlay {
+  overflow: hidden;
+  place-items: center;
+  padding: clamp(20px, 4vw, 48px);
+  font-family: "PressStart2P", monospace;
+  background: #000;
+}
+
+.store-menu-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--ui-start-background) center / cover no-repeat;
+}
+
+.store-menu-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(0, 0, 0, 0.68), rgba(6, 10, 12, 0.72)),
+    radial-gradient(circle at 70% 28%, rgba(96, 198, 137, 0.12), transparent 34%);
+}
+
+.store-menu-overlay * {
+  font-family: "PressStart2P", monospace;
+}
+
+.store-panel {
+  width: min(1180px, 94vw);
+  max-height: min(860px, 92vh);
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(260px, 1fr) auto;
+  gap: 16px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  padding: clamp(18px, 2vw, 26px);
+  background: transparent;
+  box-shadow: none;
+  z-index: 1;
+}
+
+.store-layer {
+  border: 1px solid rgba(114, 183, 206, 0.18);
+  background: rgba(6, 10, 12, 0.58);
+  backdrop-filter: none;
+}
+
+.store-profile-layer {
+  grid-column: 1;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 16px;
+}
+
+.store-profile-avatar {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  align-self: center;
+  justify-self: center;
+  border: 1px solid rgba(114, 183, 206, 0.22);
+  background-color: rgba(8, 12, 14, 0.42);
+  overflow: hidden;
+}
+
+.store-profile-copy {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.store-profile-copy h2 {
+  margin: 0;
+  font-family: "PressStart2P", monospace;
+  font-size: clamp(18px, 2vw, 28px);
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.store-profile-copy span,
+.store-score-card span,
+.store-item-copy span,
+.store-item-price span,
+.store-section-header span {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.store-score-card {
+  min-width: 160px;
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+  padding: 12px 14px;
+  border: 1px solid rgba(96, 198, 137, 0.35);
+  background: rgba(96, 198, 137, 0.08);
+}
+
+.store-score-card strong {
+  font-family: "PressStart2P", monospace;
+  font-size: 20px;
+  color: var(--success);
+}
+
+.store-equipment-layer {
+  grid-column: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  padding: 16px;
+  gap: 14px;
+}
+
+.store-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 12px;
+}
+
+.store-section-header h3 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.store-message {
+  min-height: 26px;
+  display: grid;
+  align-items: center;
+  margin: 0;
+  color: var(--green);
+  font-size: 9px;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+.store-equipment-grid {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.store-item-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  grid-template-areas:
+    "icon copy"
+    "icon price";
+  align-items: center;
+  gap: 8px 12px;
+  min-height: 126px;
+  padding: 12px;
+  border: 2px solid rgba(114, 183, 206, 0.22);
+  background: linear-gradient(135deg, rgba(10, 15, 17, 0.7), rgba(224, 175, 86, 0.05));
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease, transform 120ms ease;
+}
+
+.store-item-card:hover {
+  border-color: rgba(224, 175, 86, 0.72);
+  background: linear-gradient(135deg, rgba(114, 183, 206, 0.12), rgba(224, 175, 86, 0.1));
+}
+
+.store-item-card.selected {
+  border-color: rgba(96, 198, 137, 0.95);
+  box-shadow: inset 0 0 0 2px rgba(96, 198, 137, 0.25);
+}
+
+.store-item-card.equipped::after {
+  content: "Equipped";
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  color: var(--green);
+  font-size: 7px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.store-item-card.owned .store-item-price strong {
+  color: var(--green);
+}
+
+.store-item-card .css-pixel-art {
+  grid-area: icon;
+  justify-self: center;
+  align-self: center;
+}
+
+.store-item-copy,
+.store-item-price {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.store-item-copy {
+  grid-area: copy;
+}
+
+.store-item-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.store-item-price {
+  grid-area: price;
+}
+
+.store-item-price strong {
+  font-family: "PressStart2P", monospace;
+  font-size: 11px;
+  color: var(--amber);
+}
+
+.store-action-layer {
+  grid-column: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 0;
+  background: transparent;
+}
+
+/* Store right-side detail panel disabled; kept here as a future restore point.
+.store-detail-panel {
+  grid-column: 2;
+  grid-row: 1 / 4;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(180px, 0.75fr) auto;
+  align-content: stretch;
+  gap: 18px;
+  padding: clamp(18px, 2vw, 26px);
+  border: 1px solid rgba(96, 198, 137, 0.22);
+  background: rgba(6, 10, 12, 0.42);
+  overflow: auto;
+}
+
+.store-detail-art {
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(114, 183, 206, 0.22);
+  background-color: rgba(8, 12, 14, 0.34);
+}
+
+.store-detail-copy,
+.store-detail-empty {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.store-detail-copy h3,
+.store-detail-empty h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(20px, 2vw, 30px);
+  line-height: 1.25;
+}
+
+.store-detail-copy strong {
+  width: fit-content;
+  padding: 8px 10px;
+  border: 1px solid rgba(224, 175, 86, 0.42);
+  color: var(--amber);
+  background-color: rgba(224, 175, 86, 0.08);
+  font-size: 10px;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.store-detail-copy p,
+.store-detail-copy span,
+.store-detail-empty p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.8;
+}
+*/
+
+.store-action-layer button {
+  min-width: 180px;
+  min-height: 56px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-transform: uppercase;
+  font-weight: 900;
+  box-shadow: none;
+}
+
+.store-action-layer button:hover {
+  color: var(--green);
+  background: transparent;
+}
+
+body.pixel-style-geometry .menu-panel.store-panel {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.pixel-style-geometry .store-action-layer {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body.pixel-style-geometry #storeExitButton,
+body.pixel-style-geometry #storePlayButton {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.pixel-style-geometry #storeExitButton:hover,
+body.pixel-style-geometry #storePlayButton:hover {
+  background: transparent !important;
+  color: var(--green);
+}
+
+.store-confirm-popup {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(88px, 10vh, 132px);
+  transform: translateX(-50%);
+  z-index: 5;
+  min-width: min(420px, 82vw);
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 2px solid rgba(96, 198, 137, 0.74);
+  background: rgba(6, 10, 12, 0.92);
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.54);
+  text-align: center;
+}
+
+.store-confirm-popup span {
+  color: var(--text);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.store-confirm-popup div {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.store-confirm-popup button {
+  min-width: 136px;
+  min-height: 44px;
+  border: 1px solid rgba(114, 183, 206, 0.4);
+  background: rgba(114, 183, 206, 0.08);
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+.store-confirm-popup button:hover {
+  border-color: rgba(224, 175, 86, 0.72);
+  color: var(--amber);
+}
+
+.inline-input-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.inline-input-action input {
+  min-width: 0;
+  height: 38px;
+  border: 1px solid rgba(114, 183, 206, 0.24);
+  border-radius: 0;
+  padding: 0 10px;
+  background: rgba(5, 8, 10, 0.62);
+  color: var(--text);
+}
+
+.inline-input-action button {
+  min-height: 38px;
+  padding: 0 12px;
+  white-space: nowrap;
 }
 
 .main-menu-panel .control-card {
@@ -4160,10 +4580,7 @@ body.pixel-style-geometry [data-settings-panel] {
 #startMenuOverlay {
   place-items: start end;
   padding: clamp(18px, 4vw, 48px);
-  background:
-    linear-gradient(90deg, rgba(5, 7, 8, 0.22), rgba(5, 7, 8, 0.74)),
-    radial-gradient(circle at 26% 70%, rgba(96, 198, 137, 0.12), transparent 34%),
-    rgba(5, 7, 8, 0.86);
+  background: #000;
 }
 
 html.start-menu-active,
@@ -4175,14 +4592,14 @@ body.start-menu-active {
   inset: 0;
   background: var(--ui-start-background) center / cover no-repeat;
   transform: none;
-  opacity: 0.82;
+  opacity: 0.9;
   image-rendering: auto;
 }
 
 #startMenuOverlay::after {
   background:
-    linear-gradient(90deg, rgba(5, 7, 8, 0.14), rgba(5, 7, 8, 0.82)),
-    linear-gradient(180deg, rgba(5, 7, 8, 0.16), rgba(5, 7, 8, 0.66));
+    linear-gradient(90deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.88)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.78));
   opacity: 1;
 }
 
@@ -4471,6 +4888,42 @@ body.pixel-style-geometry .onboarding-question {
   body.pixel-style-geometry .start-panel h2.press-start-title {
     font-size: clamp(27px, 9vw, 42px);
   }
+
+  .store-panel {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    grid-template-rows: auto minmax(220px, 1fr) auto;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .store-profile-layer,
+  .store-equipment-layer,
+  .store-action-layer {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .store-profile-layer {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .store-score-card {
+    grid-column: 1 / -1;
+    justify-items: start;
+  }
+
+  .store-equipment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .store-action-layer {
+    flex-direction: column;
+  }
+
+  .store-action-layer button {
+    width: 100%;
+  }
 }
 
 .range-value {
@@ -4608,4 +5061,202 @@ body.pixel-style-geometry #startMenuOverlay .start-onboarding-overlay .start-onb
   width: min(220px, 100%);
   min-height: 34px;
   font-size: 10px !important;
+}
+
+#mainMenuOverlay {
+  overflow: hidden;
+  place-items: center;
+  background: #000;
+  backdrop-filter: none;
+  font-family: "PressStart2P", monospace;
+}
+
+#mainMenuOverlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--ui-start-background) center / cover no-repeat;
+  opacity: 0.9;
+  image-rendering: auto;
+}
+
+#mainMenuOverlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(0, 0, 0, 0.62), rgba(6, 10, 12, 0.72)),
+    radial-gradient(circle at 30% 24%, rgba(114, 183, 206, 0.14), transparent 34%);
+}
+
+#mainMenuOverlay * {
+  font-family: "PressStart2P", monospace;
+}
+
+body.pixel-style-geometry #mainMenuOverlay .main-menu-panel,
+#mainMenuOverlay .main-menu-panel {
+  width: min(1040px, calc(100vw - 48px));
+  max-height: min(840px, calc(100vh - 48px));
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 18px;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none;
+  overflow: auto;
+}
+
+#mainMenuOverlay .settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.main-menu-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.pixel-style-geometry #mainMenuOverlay .main-menu-grid,
+#mainMenuOverlay .main-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+body.pixel-style-geometry #mainMenuOverlay .control-card,
+#mainMenuOverlay .control-card {
+  min-height: 300px;
+  border: 1px solid rgba(114, 183, 206, 0.18) !important;
+  border-radius: 0;
+  padding: 18px !important;
+  background: rgba(6, 10, 12, 0.48) !important;
+  box-shadow: none;
+}
+
+#mainMenuOverlay .control-card::before,
+#mainMenuOverlay .control-card .panel-label::after {
+  display: none !important;
+  content: none !important;
+}
+
+#mainMenuOverlay .panel-label {
+  min-height: 32px;
+  margin-bottom: 16px;
+  color: var(--text);
+  font-size: 11px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+#mainMenuOverlay .level-picker {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+#mainMenuOverlay .level-picker span {
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+#mainMenuOverlay select {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid rgba(114, 183, 206, 0.28);
+  background: rgba(8, 12, 14, 0.7);
+  color: var(--text);
+  font-size: 10px;
+}
+
+#mainMenuOverlay .number-block-grid {
+  grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+  gap: 10px;
+}
+
+#mainMenuOverlay .number-block-grid button {
+  border: 1px solid rgba(114, 183, 206, 0.24);
+  background: rgba(6, 10, 12, 0.34);
+  color: var(--text);
+  box-shadow: none;
+}
+
+#mainMenuOverlay .main-menu-text-button {
+  min-height: 56px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  background-image: none;
+  color: var(--text);
+  box-shadow: none;
+  font-family: "PressStart2P", monospace;
+  text-shadow: none;
+  image-rendering: auto;
+  position: relative;
+  min-width: 154px;
+  padding: 0 14px;
+  font-size: 10px;
+}
+
+#mainMenuOverlay .number-block-grid button {
+  min-height: 64px;
+  font-size: 14px;
+}
+
+#mainMenuOverlay .number-block-grid button:hover {
+  border-color: rgba(96, 198, 137, 0.72);
+  background: rgba(96, 198, 137, 0.08);
+  color: var(--green);
+}
+
+#mainMenuOverlay .main-menu-text-button:hover {
+  border-color: transparent;
+  background: transparent;
+  background-image: none;
+  color: var(--green);
+}
+
+#mainMenuOverlay .main-menu-text-button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+}
+
+#mainMenuOverlay .number-block-grid button.locked,
+#mainMenuOverlay .number-block-grid button:disabled {
+  opacity: 1;
+  color: var(--text);
+}
+
+@media (max-width: 980px) {
+  body.pixel-style-geometry #mainMenuOverlay .main-menu-grid,
+  #mainMenuOverlay .main-menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #mainMenuOverlay .settings-header,
+  .main-menu-header-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #mainMenuOverlay .main-menu-header-actions button {
+    width: 100%;
+  }
 }
