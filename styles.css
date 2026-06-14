@@ -2258,7 +2258,7 @@ canvas {
 
 .menu-actions button,
 .pause-actions button,
-.main-menu-panel button:not(.main-menu-text-button) {
+.main-menu-panel button:not(#mainMenuBackButton):not(#mainMenuCloseButton) {
   min-height: 56px;
   padding-inline: 22px;
   font-size: 17px;
@@ -2267,7 +2267,7 @@ canvas {
 .start-panel #playMenuButton,
 .menu-actions button,
 .pause-actions button,
-.main-menu-panel button:not(.main-menu-text-button),
+.main-menu-panel button:not(#mainMenuBackButton):not(#mainMenuCloseButton),
 .settings-tabs button,
 .banner-actions button,
 .expand-game-button,
@@ -2285,7 +2285,7 @@ canvas {
 .start-panel #playMenuButton:focus-visible,
 .menu-actions button:focus-visible,
 .pause-actions button:focus-visible,
-.main-menu-panel button:not(.main-menu-text-button):focus-visible,
+.main-menu-panel button:not(#mainMenuBackButton):not(#mainMenuCloseButton):focus-visible,
 .settings-tabs button:focus-visible,
 .banner-actions button:focus-visible,
 .expand-game-button:focus-visible,
@@ -2296,7 +2296,7 @@ canvas {
 .start-panel #playMenuButton:focus-visible::after,
 .menu-actions button:focus-visible::after,
 .pause-actions button:focus-visible::after,
-.main-menu-panel button:not(.main-menu-text-button):focus-visible::after,
+.main-menu-panel button:not(#mainMenuBackButton):not(#mainMenuCloseButton):focus-visible::after,
 .settings-tabs button:focus-visible::after,
 .banner-actions button:focus-visible::after,
 .expand-game-button:focus-visible::after,
@@ -2312,7 +2312,7 @@ canvas {
 .start-panel #playMenuButton:hover,
 .menu-actions button:hover,
 .pause-actions button:hover,
-.main-menu-panel button:not(.main-menu-text-button):hover,
+.main-menu-panel button:not(#mainMenuBackButton):not(#mainMenuCloseButton):hover,
 .settings-tabs button:hover,
 .banner-actions button:hover,
 .expand-game-button:hover,
@@ -2324,7 +2324,7 @@ canvas {
 .start-panel #playMenuButton:active,
 .menu-actions button:active,
 .pause-actions button:active,
-.main-menu-panel button:not(.main-menu-text-button):active,
+.main-menu-panel button:not(#mainMenuBackButton):not(#mainMenuCloseButton):active,
 .settings-tabs button:active,
 .banner-actions button:active,
 .expand-game-button:active,
@@ -2332,8 +2332,8 @@ canvas {
   background: var(--ui-secondary-pressed) center / 100% 100% no-repeat;
 }
 
-.main-menu-panel button:not(.main-menu-text-button).locked,
-.main-menu-panel button:not(.main-menu-text-button):disabled {
+.main-menu-panel button:not(#mainMenuBackButton):not(#mainMenuCloseButton).locked,
+.main-menu-panel button:not(#mainMenuBackButton):not(#mainMenuCloseButton):disabled {
   background: var(--ui-secondary-disabled) center / 100% 100% no-repeat;
 }
 
@@ -5198,17 +5198,20 @@ body.pixel-style-geometry #mainMenuOverlay .control-card,
   box-shadow: none;
 }
 
-#mainMenuOverlay .main-menu-text-button {
+#mainMenuOverlay #mainMenuBackButton,
+#mainMenuOverlay #mainMenuCloseButton {
   min-height: 56px;
-  border: 0;
+  border: 0 !important;
   border-radius: 0;
-  background: transparent;
-  background-image: none;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
   color: var(--text);
-  box-shadow: none;
+  box-shadow: none !important;
   font-family: "PressStart2P", monospace;
   text-shadow: none;
   image-rendering: auto;
+  appearance: none;
   position: relative;
   min-width: 154px;
   padding: 0 14px;
@@ -5226,16 +5229,35 @@ body.pixel-style-geometry #mainMenuOverlay .control-card,
   color: var(--green);
 }
 
-#mainMenuOverlay .main-menu-text-button:hover {
-  border-color: transparent;
-  background: transparent;
-  background-image: none;
+#mainMenuOverlay #mainMenuBackButton:hover,
+#mainMenuOverlay #mainMenuCloseButton:hover {
+  border: 0 !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
   color: var(--green);
 }
 
-#mainMenuOverlay .main-menu-text-button:focus-visible {
+#mainMenuOverlay #mainMenuBackButton:focus-visible,
+#mainMenuOverlay #mainMenuCloseButton:focus-visible {
+  border: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
   outline: 1px solid currentColor;
   outline-offset: 4px;
+}
+
+#mainMenuOverlay #mainMenuBackButton:active,
+#mainMenuOverlay #mainMenuCloseButton:active {
+  border: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
 }
 
 #mainMenuOverlay .number-block-grid button.locked,

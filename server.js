@@ -13,7 +13,7 @@ const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
-  // ".png": "image/png",
+  ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".svg": "image/svg+xml; charset=utf-8",
@@ -21,6 +21,16 @@ const MIME_TYPES = {
   ".pdf": "application/pdf",
   ".ico": "image/x-icon"
 };
+
+const CACHEABLE_EXTENSIONS = new Set([".css", ".js", ".wav", ".ttf", ".png"]);
+
+function cacheControlFor(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (path.basename(filePath).toLowerCase() === "index.html") return "no-store";
+  if (ext === ".json") return "no-store";
+  if (CACHEABLE_EXTENSIONS.has(ext)) return "public, max-age=3600";
+  return "no-store";
+}
 
 function send(res, statusCode, body, contentType = "text/plain; charset=utf-8") {
   res.writeHead(statusCode, {
@@ -67,7 +77,7 @@ const server = http.createServer((req, res) => {
 
     res.writeHead(200, {
       "Content-Type": contentType,
-      "Cache-Control": "no-store"
+      "Cache-Control": cacheControlFor(filePath)
     });
 
     if (req.method === "HEAD") {

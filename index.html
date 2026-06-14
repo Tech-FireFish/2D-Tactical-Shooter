@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Delta Geometry</title>
+    <link rel="preload" href="docs/PressStart2P-Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="docs/start-menu-geometry-background.png" as="image">
   <link rel="stylesheet" href="styles.css?v=27">
     <link rel="stylesheet" href="css-pixel-art/css-pixel-art.css">
     <link rel="stylesheet" href="mobile/mobile.css">
@@ -121,8 +123,8 @@
             <h2>Main Page</h2>
           </div>
           <div class="main-menu-header-actions">
-            <button id="mainMenuBackButton" class="main-menu-text-button" type="button">Go Back</button>
-            <button id="mainMenuCloseButton" class="main-menu-text-button" type="button">Enter Game</button>
+            <button id="mainMenuBackButton" type="button">Go Back</button>
+            <button id="mainMenuCloseButton" type="button">Enter Game</button>
           </div>
         </header>
         <div class="main-menu-grid">
@@ -265,6 +267,7 @@
               <button id="exitTutorialButton" class="hidden" type="button">Exit To First Level</button>
               <button id="bannerRestartButton" type="button">Restart</button>
               <button id="exitToMenuButton" type="button">Exit</button>
+              <button id="backToStoreButton" type="button">Back to Store</button>
             </div>
           </div>
         </section>
@@ -560,7 +563,7 @@
       </div>
       -->
     </div>
-    <script src="systems/audio-system.js?v=1"></script>
+    <script src="systems/audio-system.js?v=3"></script>
     <script src="systems/keybinding-system.js?v=1"></script>
     <script src="systems/camera-system.js?v=1"></script>
     <script src="systems/geometry-system.js?v=1"></script>
@@ -584,6 +587,6 @@
     <script src="systems/input-system.js?v=4"></script>
     <script src="systems/action-system.js?v=3"></script>
     <script src="css-pixel-art/store-pixel-art.js?v=1"></script>
-    <script src="main.js?v=25"></script>
+    <script src="main.js?v=28"></script>
   </body>
 </html>

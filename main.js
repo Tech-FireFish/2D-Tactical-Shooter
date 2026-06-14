@@ -134,6 +134,7 @@ const elements = {
   nextLevelButton: document.getElementById("nextLevelButton"),
   exitTutorialButton: document.getElementById("exitTutorialButton"),
   exitToMenuButton: document.getElementById("exitToMenuButton"),
+  backToStoreButton: document.getElementById("backToStoreButton"),
   bannerRestartButton: document.getElementById("bannerRestartButton")
 };
 
@@ -292,6 +293,8 @@ const runtime = {
   onboardingReturnToStore: false,
   storeSelectedItemId: null,
   storeConfirmItemId: null,
+  storeGridRenderKey: "",
+  storeAvatarRenderKey: "",
   hintOpacity: 0.42,
   viewValue: 50,
   pixelArtStyle: "geometry",
@@ -301,6 +304,18 @@ const runtime = {
   manualFireHeld: false,
   manualFirePoint: null,
   activeMode: "level",
+  hudDirty: true,
+  loadoutDirty: true,
+  inventoryDirty: true,
+  tutorialDirty: true,
+  lastHeavyHudTime: 0,
+  heavyHudInterval: 125,
+  lastPixelArtStyle: "",
+  performanceMetrics: {
+    updateMs: 0,
+    drawMs: 0,
+    hudMs: 0
+  },
   lastTime: performance.now()
 };
 
@@ -628,6 +643,23 @@ function setStoreScore(value) {
   return true;
 }
 
+// Adds mission-earned score into the persistent Store profile.
+function addStoreScore(amount) {
+  const value = Number(amount);
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  const earned = Math.floor(value);
+  const profile = storeProfile();
+  profile.score = Math.max(0, Math.floor(Number(profile.score) || 0) + earned);
+  writeStoreProfile(profile);
+  if (elements.storeScoreValue) elements.storeScoreValue.textContent = String(profile.score);
+  if (elements.storeScoreInput && document.activeElement !== elements.storeScoreInput) {
+    elements.storeScoreInput.value = String(profile.score);
+  }
+  renderStorePage();
+  updateHud();
+  return earned;
+}
+
 // Renders the Store profile and catalog without loading equipment JSON.
 function renderStorePage() {
   const profile = storeProfile();
@@ -635,25 +667,37 @@ function renderStorePage() {
   if (elements.storeProfileId) elements.storeProfileId.textContent = profile.id;
   if (elements.storeScoreValue) elements.storeScoreValue.textContent = String(profile.score);
   if (elements.storeScoreInput) elements.storeScoreInput.value = String(profile.score);
-  if (elements.storeProfileAvatar && window.StorePixelArt) {
+  const avatarKey = window.StorePixelArt ? "css-pixel-avatar" : "none";
+  if (elements.storeProfileAvatar && window.StorePixelArt && runtime.storeAvatarRenderKey !== avatarKey) {
     elements.storeProfileAvatar.innerHTML = window.StorePixelArt.render("operator-profile", { label: "Operator profile image" });
+    runtime.storeAvatarRenderKey = avatarKey;
   }
   if (!elements.storeEquipmentGrid) return;
   const ownedIds = new Set(profile.ownedItemIds || []);
   const equipped = profile.equippedDefaults || {};
-  elements.storeEquipmentGrid.innerHTML = STORE_CATALOG.map((item) => `
-    <article class="store-item-card${runtime.storeSelectedItemId === item.id ? " selected" : ""}${ownedIds.has(item.id) ? " owned" : ""}${Object.values(equipped).includes(item.id) ? " equipped" : ""}" data-store-item-id="${item.id}">
-      ${window.StorePixelArt ? window.StorePixelArt.render(item.icon || item.id, { label: `${item.name} ${item.type}` }) : ""}
-      <div class="store-item-copy">
-        <span>${titleCase(item.type)}</span>
-        <strong>${item.name}</strong>
-      </div>
-      <div class="store-item-price">
-        <span>${Object.values(equipped).includes(item.id) ? "Equipped" : "Price"}</span>
-        <strong>${ownedIds.has(item.id) ? "Owned" : storePrice(item)}</strong>
-      </div>
-    </article>
-  `).join("");
+  const equippedIds = Object.values(equipped);
+  const gridKey = [
+    runtime.storeSelectedItemId || "",
+    (profile.ownedItemIds || []).join(","),
+    equippedIds.join(","),
+    window.StorePixelArt ? "css-pixel" : "text"
+  ].join("|");
+  if (runtime.storeGridRenderKey !== gridKey) {
+    elements.storeEquipmentGrid.innerHTML = STORE_CATALOG.map((item) => `
+      <article class="store-item-card${runtime.storeSelectedItemId === item.id ? " selected" : ""}${ownedIds.has(item.id) ? " owned" : ""}${equippedIds.includes(item.id) ? " equipped" : ""}" data-store-item-id="${item.id}">
+        ${window.StorePixelArt ? window.StorePixelArt.render(item.icon || item.id, { label: `${item.name} ${item.type}` }) : ""}
+        <div class="store-item-copy">
+          <span>${titleCase(item.type)}</span>
+          <strong>${item.name}</strong>
+        </div>
+        <div class="store-item-price">
+          <span>${equippedIds.includes(item.id) ? "Equipped" : "Price"}</span>
+          <strong>${ownedIds.has(item.id) ? "Owned" : storePrice(item)}</strong>
+        </div>
+      </article>
+    `).join("");
+    runtime.storeGridRenderKey = gridKey;
+  }
   if (elements.storeConfirmPopup) {
     elements.storeConfirmPopup.classList.toggle("hidden", !runtime.storeConfirmItemId);
   }
@@ -771,7 +815,7 @@ async function resumeFromStartMenu() {
   }
   const point = readResumePoint();
   if (!point) return false;
-  await ensureGameDataReady();
+  await preloadGameData();
   await level.loadLevel(point.id);
   if (menu) menu.enterGame();
   return true;
@@ -818,78 +862,132 @@ function update(dt) {
     .map((shot) => ({ ...shot, ttl: shot.ttl - dt }))
     .filter((shot) => shot.ttl > 0);
   mission.checkMissionEnd();
-  updateHud();
+  updateHud({ allowThrottle: true });
+}
+
+// Smooths lightweight performance measurements for console diagnostics.
+function recordPerformanceMetric(key, value) {
+  const current = runtime.performanceMetrics[key] || 0;
+  runtime.performanceMetrics[key] = current ? current * 0.9 + value * 0.1 : value;
+}
+
+// Writes text only when the DOM value actually changes.
+function setText(element, value) {
+  if (!element) return;
+  const next = String(value);
+  if (element.textContent !== next) element.textContent = next;
+}
+
+// Writes form values only when the DOM value actually changes.
+function setValue(element, value) {
+  if (!element) return;
+  const next = String(value);
+  if (element.value !== next) element.value = next;
+}
+
+// Toggles a class only when the class state is different.
+function setClass(element, className, enabled) {
+  if (!element) return;
+  if (element.classList.contains(className) !== enabled) {
+    element.classList.toggle(className, enabled);
+  }
+}
+
+// Decides whether heavier HUD panels should be rebuilt on this call.
+function shouldRefreshHeavyHud(options, now) {
+  if (!options || options.allowThrottle !== true) return true;
+  if (runtime.hudDirty || runtime.loadoutDirty || runtime.inventoryDirty || runtime.tutorialDirty) return true;
+  return now - runtime.lastHeavyHudTime >= runtime.heavyHudInterval;
+}
+
+// Clears HUD dirty flags after expensive panel work has been refreshed.
+function clearHudDirtyFlags(now) {
+  runtime.hudDirty = false;
+  runtime.loadoutDirty = false;
+  runtime.inventoryDirty = false;
+  runtime.tutorialDirty = false;
+  runtime.lastHeavyHudTime = now;
 }
 
 // Refreshes labels, loadout controls, health cards, and mission status.
-function updateHud() {
+function updateHud(options = {}) {
+  const hudStart = performance.now();
+  const now = hudStart;
   const state = runtime.state;
   runtime.pixelArtStyle = "geometry";
   const style = "geometry";
-  document.body.classList.toggle("pixel-style-geometry", style === "geometry");
-  document.body.classList.toggle("pixel-style-v1", style === "v1");
-  document.body.classList.toggle("pixel-style-v2", style === "v2");
+  const refreshHeavy = shouldRefreshHeavyHud(options, now);
+  if (runtime.lastPixelArtStyle !== style) {
+    setClass(document.body, "pixel-style-geometry", style === "geometry");
+    setClass(document.body, "pixel-style-v1", style === "v1");
+    setClass(document.body, "pixel-style-v2", style === "v2");
+    runtime.lastPixelArtStyle = style;
+  }
   if (!state) {
-    elements.modeLabel.textContent = "Loading";
-    elements.objectiveLabel.textContent = "Loading";
-    elements.selectedStatusLabel.textContent = "None";
-    elements.shootingStatusLabel.textContent = "Automatic";
-    elements.selectedZoneLabel.textContent = "Loading";
-    elements.runButton.textContent = "Execute";
-    if (equipment) {
+    setText(elements.modeLabel, "Loading");
+    setText(elements.objectiveLabel, "Loading");
+    setText(elements.selectedStatusLabel, "None");
+    setText(elements.shootingStatusLabel, "Automatic");
+    setText(elements.selectedZoneLabel, "Loading");
+    setText(elements.runButton, "Execute");
+    if (equipment && refreshHeavy) {
       equipment.renderLoadoutPanel();
       equipment.renderHealthBoard();
       equipment.renderEnemyLoadouts();
     }
-    if (elements.hintOpacityValue) elements.hintOpacityValue.textContent = `${Math.round(runtime.hintOpacity * 100)}%`;
-    if (elements.viewValueLabel) elements.viewValueLabel.textContent = String(Math.round(runtime.viewValue));
+    if (elements.hintOpacityValue) setText(elements.hintOpacityValue, `${Math.round(runtime.hintOpacity * 100)}%`);
+    if (elements.viewValueLabel) setText(elements.viewValueLabel, Math.round(runtime.viewValue));
     if (elements.storeScoreInput && document.activeElement !== elements.storeScoreInput) {
-      elements.storeScoreInput.value = String(storeProfile().score);
+      setValue(elements.storeScoreInput, storeProfile().score);
     }
+    if (refreshHeavy) clearHudDirtyFlags(now);
+    recordPerformanceMetric("hudMs", performance.now() - hudStart);
     return;
   }
-  elements.modeLabel.textContent = runtime.digitalLockOpen ? "Digital Lock" : (runtime.settingsOpen ? "Settings" : (state.gameOver ? titleCase(state.result) : (hasManualInput() ? "Manual" : (state.running ? "Execute" : "Planning"))));
+  setText(elements.modeLabel, runtime.digitalLockOpen ? "Digital Lock" : (runtime.settingsOpen ? "Settings" : (state.gameOver ? titleCase(state.result) : (hasManualInput() ? "Manual" : (state.running ? "Execute" : "Planning")))));
   if (state.level.objective.secured) {
-    elements.objectiveLabel.textContent = "Secured";
+    setText(elements.objectiveLabel, "Secured");
   } else if (state.level.objective.harmed) {
-    elements.objectiveLabel.textContent = "Compromised";
+    setText(elements.objectiveLabel, "Compromised");
   } else {
     const activeEnemies = state.level.enemies.filter((enemy) => !enemy.down).length;
-    elements.objectiveLabel.textContent = `${activeEnemies} hostiles`;
+    setText(elements.objectiveLabel, `${activeEnemies} hostiles`);
   }
-  elements.runButton.textContent = state.running ? "Pause" : "Execute";
-  elements.difficultySelect.value = runtime.currentDifficulty;
-  elements.shootingModeSelect.value = state.shootingMode;
-  elements.enemyTraceSelect.value = runtime.enemyTraceMode;
+  setText(elements.runButton, state.running ? "Pause" : "Execute");
+  setValue(elements.difficultySelect, runtime.currentDifficulty);
+  setValue(elements.shootingModeSelect, state.shootingMode);
+  setValue(elements.enemyTraceSelect, runtime.enemyTraceMode);
   const selected = selectedOperator();
-  elements.selectedStatusLabel.textContent = selected ? selected.id : "None";
-  elements.shootingStatusLabel.textContent = titleCase(state.shootingMode || "automatic");
-  elements.selectedZoneLabel.textContent = selected ? (selected.zone || selected.floor || "Map") : "Map";
-  equipment.renderLoadoutPanel();
-  equipment.renderHealthBoard();
-  equipment.renderEnemyLoadouts();
-  inventory.renderSummary();
+  setText(elements.selectedStatusLabel, selected ? selected.id : "None");
+  setText(elements.shootingStatusLabel, titleCase(state.shootingMode || "automatic"));
+  setText(elements.selectedZoneLabel, selected ? (selected.zone || selected.floor || "Map") : "Map");
+  if (refreshHeavy) {
+    equipment.renderLoadoutPanel();
+    equipment.renderHealthBoard();
+    equipment.renderEnemyLoadouts();
+    inventory.renderSummary();
+  }
   if (elements.hintText) {
     const hint = selected && interaction ? interaction.nearestHint(selected) : "";
-    elements.hintText.textContent = hint || "Move near doors, windows, stairs, papers, laptops, or tables.";
+    setText(elements.hintText, hint || "Move near doors, windows, stairs, papers, laptops, or tables.");
   }
   if (elements.hintCard) {
     elements.hintCard.style.setProperty("--hint-card-alpha", String(runtime.hintOpacity));
   }
   if (elements.hintOpacityRange && Number(elements.hintOpacityRange.value) !== runtime.hintOpacity) {
-    elements.hintOpacityRange.value = String(runtime.hintOpacity);
+    setValue(elements.hintOpacityRange, runtime.hintOpacity);
   }
   if (elements.hintOpacityValue) {
-    elements.hintOpacityValue.textContent = `${Math.round(runtime.hintOpacity * 100)}%`;
+    setText(elements.hintOpacityValue, `${Math.round(runtime.hintOpacity * 100)}%`);
   }
   if (elements.viewRange && Number(elements.viewRange.value) !== runtime.viewValue) {
-    elements.viewRange.value = String(runtime.viewValue);
+    setValue(elements.viewRange, runtime.viewValue);
   }
   if (elements.viewValueLabel) {
-    elements.viewValueLabel.textContent = String(Math.round(runtime.viewValue));
+    setText(elements.viewValueLabel, Math.round(runtime.viewValue));
   }
   if (elements.storeScoreInput && document.activeElement !== elements.storeScoreInput) {
-    elements.storeScoreInput.value = String(storeProfile().score);
+    setValue(elements.storeScoreInput, storeProfile().score);
   }
   // if (elements.pixelArtStyleSelect && elements.pixelArtStyleSelect.value !== style) {
   //   elements.pixelArtStyleSelect.value = style;
@@ -900,9 +998,13 @@ function updateHud() {
   // if (elements.startPngRenderingCheckbox && elements.startPngRenderingCheckbox.checked !== (runtime.usePngRendering !== false)) {
   //   elements.startPngRenderingCheckbox.checked = runtime.usePngRendering !== false;
   // }
-  if (runtime.inventoryOpen) inventory.renderInventory();
-  if (runtime.laptopOpen && cameraHack) cameraHack.render();
-  if (tutorial) tutorial.update();
+  if (refreshHeavy) {
+    if (runtime.inventoryOpen) inventory.renderInventory();
+    if (runtime.laptopOpen && cameraHack) cameraHack.render();
+    if (tutorial) tutorial.update();
+    clearHudDirtyFlags(now);
+  }
+  recordPerformanceMetric("hudMs", performance.now() - hudStart);
 }
 
 // Converts result labels into display-friendly title case.
@@ -919,8 +1021,12 @@ function draw() {
 function loop(now) {
   const dt = Math.min(0.05, (now - runtime.lastTime) / 1000);
   runtime.lastTime = now;
+  const updateStart = performance.now();
   update(dt);
+  const drawStart = performance.now();
+  recordPerformanceMetric("updateMs", drawStart - updateStart);
   draw();
+  recordPerformanceMetric("drawMs", performance.now() - drawStart);
   requestAnimationFrame(loop);
 }
 
@@ -1166,6 +1272,7 @@ function initializeSystems() {
     currentTutorialIndex: () => level.currentTutorialIndex(),
     tutorial,
     progression,
+    addStoreScore,
     clearResumePoint,
     refreshStartMenu,
     menu: {
@@ -1323,36 +1430,51 @@ window.__breachline = {
   getWeapons: () => [...weapons.values()],
   getArmors: () => [...armors.values()],
   getObjectScale: () => objectScale ? objectScale.objectScale() : 1,
+  audioPreloadAll: () => audio ? audio.preloadAll() : null,
+  isAudioPreloaded: (id) => audio ? audio.isPreloaded(id) : false,
+  isAudioUnlocked: () => audio ? audio.isUnlocked() : false,
+  performanceSnapshot: () => ({
+    updateMs: Number(runtime.performanceMetrics.updateMs.toFixed(2)),
+    drawMs: Number(runtime.performanceMetrics.drawMs.toFixed(2)),
+    hudMs: Number(runtime.performanceMetrics.hudMs.toFixed(2)),
+    heavyHudInterval: runtime.heavyHudInterval,
+    audioPreloaded: audio ? audio.isPreloaded() : false,
+    audioUnlocked: audio ? audio.isUnlocked() : false,
+    gameDataReady: runtime.gameDataReady
+  }),
   restart: () => level.restart(),
   loadLevel: async (levelId) => {
-    await ensureGameDataReady();
+    await preloadGameData();
     return level.loadLevel(levelId);
   },
   loadTutorial: async (tutorialId) => {
-    await ensureGameDataReady();
+    await preloadGameData();
     return level.loadLevel(tutorialId);
   },
   loadNextLevel: async () => {
-    await ensureGameDataReady();
+    await preloadGameData();
     return level.loadNextLevel();
   },
   loadNextTutorial: async () => {
-    await ensureGameDataReady();
+    await preloadGameData();
     return level.loadNextTutorial();
   },
   loadFirstLevel: async () => {
-    await ensureGameDataReady();
+    await preloadGameData();
     return level.loadFirstLevel();
   },
   showMain: async () => {
-    await ensureGameDataReady();
+    await preloadGameData();
     return menu.showMain();
   },
   cycleOperator,
   toggleRun
 };
 
-// Lazily loads equipment and selectors only after the player chooses a route.
+/*
+Lazy route-triggered loading disabled.
+The old design waited for Start/Resume/onboarding/menu choices before loading
+equipment and selector data:
 async function ensureGameDataReady() {
   if (runtime.gameDataReady) return true;
   if (runtime.gameDataLoading) return runtime.gameDataLoading;
@@ -1380,12 +1502,52 @@ async function ensureGameDataReady() {
     runtime.gameDataLoading = null;
   }
 }
+*/
 
-// Shows only the start menu at boot; gameplay data is loaded after user choice.
+// Preloads equipment and selector/menu data in the background after Start appears.
+async function preloadGameData() {
+  if (runtime.gameDataReady) return true;
+  if (runtime.gameDataLoading) return runtime.gameDataLoading;
+  runtime.gameDataLoading = (async () => {
+    level.populateLevelSelect();
+    await equipment.loadEquipment();
+    syncStoreDefaultsToLoadouts();
+    runtime.gameDataReady = true;
+    runtime.hudDirty = true;
+    runtime.loadoutDirty = true;
+    if (menu) menu.render();
+    updateHud();
+    return true;
+  })();
+  try {
+    return await runtime.gameDataLoading;
+  } catch (error) {
+    runtime.gameDataReady = false;
+    runtime.state = null;
+    elements.levelTitle.textContent = "Load Failed";
+    elements.bannerTitle.textContent = "Load Failed";
+    elements.bannerText.textContent = error.message;
+    elements.banner.classList.remove("hidden");
+    updateHud();
+    throw error;
+  } finally {
+    runtime.gameDataLoading = null;
+  }
+}
+
+// Compatibility wrapper for existing callers; eager preload normally finishes first.
+async function ensureGameDataReady() {
+  return preloadGameData();
+}
+
+// Shows the start menu first, then preloads game data after the first paint.
 async function boot() {
   try {
     if (menu) menu.showStart();
     updateHud();
+    requestAnimationFrame(() => {
+      preloadGameData().catch(() => {});
+    });
   } catch (error) {
     runtime.state = null;
     elements.levelTitle.textContent = "Load Failed";
